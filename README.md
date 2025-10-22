@@ -16,8 +16,6 @@ MDK-Predator is designed to work on the Mayhem-MDK module, an addon board for th
 - **Cryptographic Protocol Research**: Analyze automotive encryption protocols
 
 ### ✅ Wireless Security
-- **WiFi Analysis**: Network scanning, security assessment, handshake capture
-- **Bluetooth Analysis**: Classic and BLE device discovery, service enumeration
 - **SubGHz RF**: Signal capture, protocol decoding, spectrum analysis (300-928 MHz)
 
 ### ❌ Excluded Features
