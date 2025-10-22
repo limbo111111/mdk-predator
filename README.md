@@ -13,12 +13,29 @@ MDK-Predator is designed to work on the Mayhem-MDK module, an addon board for th
 ## Features
 
 ### ✅ Automotive Security
-- **Key Fob Analysis**: Capture and analyze automotive key fob signals (315/433.92/868/915 MHz)
+- **Key Fob Analysis**: Interactive capture and analysis of automotive key fob signals (315/433.92/868/915 MHz)
+  - Start/Stop capture controls
+  - Real-time signal counting
+  - Detailed capture information
 - **Rolling Code Testing**: KeeLoq, HCS301, and other rolling code implementations
+  - Pattern detection and analysis
+  - Code sequence display
+  - Replay protection verification
 - **Cryptographic Protocol Research**: Analyze automotive encryption protocols
 
 ### ✅ Wireless Security
+- **WiFi Analysis**: Network scanning and security assessment
+  - Interactive scan controls
+  - Network list with details (SSID, channel, signal, security)
+  - Security protocol analysis
+- **Bluetooth Analysis**: Device discovery and service enumeration
+  - Classic and BLE device scanning
+  - Device details display
+  - GATT service enumeration
 - **SubGHz RF**: Signal capture, protocol decoding, spectrum analysis (300-928 MHz)
+  - Interactive spectrum scanning
+  - Real-time signal capture
+  - Protocol decoder for ASK/OOK
 
 ### ❌ Excluded Features
 Per project requirements, RFID/NFC access control features are **not included**.

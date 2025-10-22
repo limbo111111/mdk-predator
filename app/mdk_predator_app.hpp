@@ -90,6 +90,8 @@ public:
 
 private:
     NavigationView& nav_;
+    bool is_capturing = false;
+    uint32_t signal_count = 0;
     
     Labels labels {
         { { 2 * 8, 1 * 16 }, "Automotive Security", Color::light_grey() }
@@ -116,11 +118,22 @@ private:
     };
     
     Console console {
-        { 0, 24 * 8, 240, 8 * 8 }
+        { 0, 18 * 8, 240, 14 * 8 }
+    };
+    
+    Text text_frequency {
+        { 2 * 8, 12 * 16, 26 * 8, 16 },
+        ""
+    };
+    
+    Text text_signal_count {
+        { 2 * 8, 13 * 16, 26 * 8, 16 },
+        "Signals captured: 0"
     };
     
     void start_key_fob_analyzer();
     void start_rolling_code_tester();
+    void update_signal_display();
 };
 
 // WiFi module view
@@ -132,6 +145,8 @@ public:
 
 private:
     NavigationView& nav_;
+    bool is_scanning = false;
+    uint32_t networks_found = 0;
     
     Labels labels {
         { { 2 * 8, 1 * 16 }, "WiFi Analysis", Color::light_grey() }
@@ -139,7 +154,7 @@ private:
     
     Button button_scan {
         { 2 * 8, 3 * 16, 26 * 8, 2 * 16 },
-        "Network Scanner"
+        "Start Scan"
     };
     
     Button button_analyze {
@@ -158,10 +173,21 @@ private:
     };
     
     Console console {
-        { 0, 24 * 8, 240, 8 * 8 }
+        { 0, 18 * 8, 240, 14 * 8 }
+    };
+    
+    Text text_scan_status {
+        { 2 * 8, 12 * 16, 26 * 8, 16 },
+        "Status: Ready"
+    };
+    
+    Text text_networks_found {
+        { 2 * 8, 13 * 16, 26 * 8, 16 },
+        "Networks found: 0"
     };
     
     void start_network_scan();
+    void update_scan_display();
 };
 
 // Bluetooth module view
@@ -173,6 +199,8 @@ public:
 
 private:
     NavigationView& nav_;
+    bool is_scanning = false;
+    uint32_t devices_found = 0;
     
     Labels labels {
         { { 2 * 8, 1 * 16 }, "Bluetooth Analysis", Color::light_grey() }
@@ -180,7 +208,7 @@ private:
     
     Button button_scan {
         { 2 * 8, 3 * 16, 26 * 8, 2 * 16 },
-        "Device Scanner"
+        "Start Scan"
     };
     
     Button button_enumerate {
@@ -199,10 +227,21 @@ private:
     };
     
     Console console {
-        { 0, 24 * 8, 240, 8 * 8 }
+        { 0, 18 * 8, 240, 14 * 8 }
+    };
+    
+    Text text_scan_status {
+        { 2 * 8, 12 * 16, 26 * 8, 16 },
+        "Status: Ready"
+    };
+    
+    Text text_devices_found {
+        { 2 * 8, 13 * 16, 26 * 8, 16 },
+        "Devices found: 0"
     };
     
     void start_device_scan();
+    void update_scan_display();
 };
 
 // SubGHz module view
@@ -214,6 +253,9 @@ public:
 
 private:
     NavigationView& nav_;
+    bool is_scanning = false;
+    bool is_capturing = false;
+    uint32_t signals_captured = 0;
     
     Labels labels {
         { { 2 * 8, 1 * 16 }, "SubGHz RF Analysis", Color::light_grey() }
@@ -245,11 +287,22 @@ private:
     };
     
     Console console {
-        { 0, 24 * 8, 240, 8 * 8 }
+        { 0, 18 * 8, 240, 14 * 8 }
+    };
+    
+    Text text_frequency_range {
+        { 2 * 8, 13 * 16, 26 * 8, 16 },
+        "Range: 300-928 MHz"
+    };
+    
+    Text text_activity {
+        { 2 * 8, 14 * 16, 26 * 8, 16 },
+        "Signals: 0"
     };
     
     void start_spectrum_scan();
     void start_signal_capture();
+    void update_activity_display();
 };
 
 // Crypto module view
@@ -261,6 +314,7 @@ public:
 
 private:
     NavigationView& nav_;
+    bool has_data = false;
     
     Labels labels {
         { { 2 * 8, 1 * 16 }, "Crypto Analysis", Color::light_grey() }
@@ -287,9 +341,20 @@ private:
     };
     
     Console console {
-        { 0, 24 * 8, 240, 8 * 8 }
+        { 0, 18 * 8, 240, 14 * 8 }
     };
     
+    Text text_algorithm {
+        { 2 * 8, 12 * 16, 26 * 8, 16 },
+        "Algorithm: Unknown"
+    };
+    
+    Text text_entropy_value {
+        { 2 * 8, 13 * 16, 26 * 8, 16 },
+        "Entropy: N/A"
+    };
+    
+    void start_algorithm_identify();
     void start_entropy_analysis();
 };
 
