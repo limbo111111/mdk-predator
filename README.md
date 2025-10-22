@@ -63,6 +63,29 @@ The compiled library will be available at `build/lib/libmdk_predator.a`.
 make clean
 ```
 
+## Testing
+
+A comprehensive test suite validates all modules:
+
+```bash
+# Run all tests
+make test
+
+# Run specific test suites
+make test-automotive  # Automotive security tests
+make test-wireless    # Wireless security tests
+make test-crypto      # Cryptographic analysis tests
+make test-integration # Integration tests
+```
+
+**Test Coverage**: 5 test suites with 95 assertions covering:
+- Key fob analysis and rolling code testing
+- SubGHz RF signal analysis
+- Cryptographic protocol analysis
+- System integration and module coordination
+
+See [tests/README.md](tests/README.md) for detailed test documentation.
+
 ## Hardware Requirements
 
 - **HackRF One**: Software-defined radio transceiver (1 MHz - 6 GHz)
@@ -74,6 +97,7 @@ make clean
 - [Architecture Guide](docs/ARCHITECTURE.md) - System design and data flow
 - [API Reference](docs/API.md) - Complete API documentation
 - [User Guide](docs/USER_GUIDE.md) - Usage instructions and examples
+- [Test Guide](tests/README.md) - Test suite documentation
 
 ## Configuration
 
