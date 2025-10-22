@@ -1,0 +1,34 @@
+{
+  "name": "MDK-Predator",
+  "version": "1.0.0",
+  "description": "Security research suite for Mayhem-MDK module",
+  "author": "MDK-Predator Team",
+  "icon": "predator.png",
+  "category": "Security",
+  "requires_hardware": ["hackrf", "mayhem-mdk"],
+  "features": [
+    "Automotive Security Analysis",
+    "Key Fob Signal Capture",
+    "Rolling Code Testing",
+    "WiFi Network Analysis",
+    "Bluetooth Device Scanning",
+    "SubGHz RF Spectrum Analysis",
+    "Cryptographic Protocol Analysis"
+  ],
+  "permissions": [
+    "radio_receive",
+    "radio_transmit_restricted",
+    "storage_read",
+    "storage_write"
+  ],
+  "warnings": [
+    "For authorized security research only",
+    "Transmission disabled by default",
+    "Comply with local RF regulations"
+  ],
+  "entry_point": "mdk_predator_app",
+  "binary": "mdk_predator.ppma",
+  "min_firmware_version": "1.7.0",
+  "homepage": "https://github.com/limbo111111/mdk-predator",
+  "license": "MIT"
+}

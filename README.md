@@ -2,6 +2,8 @@
 
 A comprehensive security research suite for the Mayhem-MDK platform, ported from the Flipper Zero Predator Security Suite.
 
+📖 **New to MDK-Predator?** Start here: [GETTING_STARTED.md](GETTING_STARTED.md)
+
 ## Overview
 
 MDK-Predator is designed to work on the Mayhem-MDK module, an addon board for the HackRF Portapack H4M with Mayhem firmware. This project focuses on automotive and wireless security research capabilities.
@@ -42,20 +44,33 @@ MDK-Predator
 └── tests/              # Test suite
 ```
 
+## Quick Start
+
+### Getting the App on Your PortaPack
+
+**Quick Answer**: Copy `mdk_predator.ppma` to SD card `/APPS/` folder, insert SD card, launch from Apps menu!
+
+**Full Instructions**: See [HOW_TO_DEPLOY.md](HOW_TO_DEPLOY.md) for complete deployment guide.
+
+**5-Minute Setup**: See [QUICKSTART.md](QUICKSTART.md) for rapid setup guide!
+
 ## Building
 
-### Prerequisites
-- ARM toolchain (`arm-none-eabi-gcc`)
-- HackRF One with Mayhem-MDK module
-- Mayhem firmware
-
-### Compile
+### Library (for development)
 
 ```bash
 make
 ```
 
 The compiled library will be available at `build/lib/libmdk_predator.a`.
+
+### PortaPack Application
+
+See [DEPLOYMENT.md](docs/DEPLOYMENT.md) for complete instructions on:
+- Building the PortaPack application (.ppma)
+- Installing to SD card
+- Integrating with Mayhem firmware
+- Deploying to Mayhem-MDK module
 
 ### Clean Build
 
@@ -94,6 +109,8 @@ See [tests/README.md](tests/README.md) for detailed test documentation.
 
 ## Documentation
 
+- **[Quick Start Guide](QUICKSTART.md)** - Get running in 5 minutes!
+- **[Deployment Guide](docs/DEPLOYMENT.md)** - Install to PortaPack H4M
 - [Architecture Guide](docs/ARCHITECTURE.md) - System design and data flow
 - [API Reference](docs/API.md) - Complete API documentation
 - [User Guide](docs/USER_GUIDE.md) - Usage instructions and examples

@@ -1,0 +1,202 @@
+MDK-Predator Deployment Overview
+=================================
+
+OPTION 1: Download Pre-built (EASIEST)
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│  1. Download from GitHub Releases                          │
+│     https://github.com/limbo111111/mdk-predator/releases   │
+│                                                             │
+│     ↓                                                       │
+│                                                             │
+│  2. Get: mdk_predator.ppma                                 │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+
+OPTION 2: Build from Source
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│  1. Clone repositories:                                     │
+│     git clone https://github.com/limbo111111/mdk-predator  │
+│     git clone https://github.com/portapack-mayhem/...      │
+│                                                             │
+│     ↓                                                       │
+│                                                             │
+│  2. Run build script:                                       │
+│     ./scripts/build_portapack_app.sh -m /path/to/mayhem    │
+│                                                             │
+│     ↓                                                       │
+│                                                             │
+│  3. Get: build/portapack/mdk_predator.ppma                 │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+
+DEPLOYMENT: SD Card Method (RECOMMENDED)
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│  Computer Side:                                             │
+│  ┌──────────────────────┐                                  │
+│  │ Format SD Card       │                                  │
+│  │ as FAT32             │                                  │
+│  └──────────┬───────────┘                                  │
+│             │                                               │
+│             ↓                                               │
+│  ┌──────────────────────┐                                  │
+│  │ Create Folders:      │                                  │
+│  │   /APPS/             │                                  │
+│  │   /MDK-PREDATOR/     │                                  │
+│  └──────────┬───────────┘                                  │
+│             │                                               │
+│             ↓                                               │
+│  ┌──────────────────────┐                                  │
+│  │ Copy Files:          │                                  │
+│  │   mdk_predator.ppma  │  →  /APPS/                      │
+│  │   mdk_predator.conf  │  →  /MDK-PREDATOR/config/       │
+│  └──────────┬───────────┘                                  │
+│             │                                               │
+│             ↓                                               │
+│  ┌──────────────────────┐                                  │
+│  │ Safely Eject         │                                  │
+│  └──────────────────────┘                                  │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+
+INSTALLATION: On PortaPack
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│  Hardware:                                                  │
+│  ┌──────────────────┐                                      │
+│  │  HackRF One      │  ← SDR Radio                         │
+│  └────────┬─────────┘                                      │
+│           │ connected                                       │
+│  ┌────────▼─────────┐                                      │
+│  │  PortaPack H4M   │  ← Display & Controls                │
+│  └────────┬─────────┘                                      │
+│           │ attached                                        │
+│  ┌────────▼─────────┐                                      │
+│  │  Mayhem-MDK      │  ← Enhanced Module                   │
+│  │  Module          │                                      │
+│  └──────────────────┘                                      │
+│                                                             │
+│  ──────────────────────────────────────────────────        │
+│                                                             │
+│  Steps:                                                     │
+│  1. Power OFF PortaPack                                    │
+│  2. Insert SD Card                                          │
+│  3. Power ON PortaPack                                     │
+│  4. Wait for boot (10-15 seconds)                          │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+
+LAUNCHING THE APP
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│  On PortaPack Screen:                                       │
+│                                                             │
+│  Main Menu                                                  │
+│    ↓                                                        │
+│  Apps                                                       │
+│    ↓                                                        │
+│  MDK-Predator  ← Select this                               │
+│    ↓                                                        │
+│  Application Launches!                                      │
+│                                                             │
+│  ┌───────────────────────────────────┐                     │
+│  │  MDK-Predator Security Suite      │                     │
+│  │  Mayhem-MDK Module                │                     │
+│  │                                   │                     │
+│  │  [ Automotive Security ]          │                     │
+│  │  [ WiFi Analysis ]                │                     │
+│  │  [ Bluetooth Analysis ]           │                     │
+│  │  [ SubGHz RF ]                    │                     │
+│  │  [ Crypto Analysis ]              │                     │
+│  │  [ Exit ]                         │                     │
+│  │                                   │                     │
+│  │  Status: Initialized ✓            │                     │
+│  └───────────────────────────────────┘                     │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+
+FIRST TEST: WiFi Scanner
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│  1. From main menu, select "WiFi Analysis"                 │
+│  2. Select "Network Scanner"                                │
+│  3. Wait 10-15 seconds                                      │
+│  4. See nearby WiFi networks appear                         │
+│  5. Success! Your app is working! ✓                        │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+
+DIRECTORY STRUCTURE
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│  SD Card Layout:                                            │
+│                                                             │
+│  SD_CARD/                                                   │
+│  ├── APPS/                                                  │
+│  │   └── mdk_predator.ppma        ← Application here       │
+│  │                                                          │
+│  └── MDK-PREDATOR/                                          │
+│      ├── config/                                            │
+│      │   └── mdk_predator.conf    ← Configuration          │
+│      ├── logs/                     ← Log files (auto)       │
+│      └── captures/                 ← Captured data (auto)   │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+
+DOCUMENTATION PATHS
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│  Quick Start:                                               │
+│    → QUICKSTART.md (5 minutes)                             │
+│                                                             │
+│  Complete Guide:                                            │
+│    → GETTING_STARTED.md (comprehensive)                    │
+│                                                             │
+│  Deployment Instructions:                                   │
+│    → HOW_TO_DEPLOY.md (step-by-step)                       │
+│                                                             │
+│  Technical Details:                                         │
+│    → docs/DEPLOYMENT.md (advanced)                         │
+│                                                             │
+│  Verification:                                              │
+│    → docs/INSTALLATION_CHECKLIST.md (checklist)            │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+
+TROUBLESHOOTING
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│  App not in menu?                                           │
+│    → Check file is in /APPS/ directory                     │
+│    → Verify SD card is FAT32                               │
+│    → Try different SD card                                  │
+│                                                             │
+│  "Init Failed" error?                                       │
+│    → Check HackRF connection                               │
+│    → Verify Mayhem-MDK module seated                       │
+│    → Check power supply (5V, 2A min)                       │
+│                                                             │
+│  No signals detected?                                       │
+│    → Verify correct antenna connected                      │
+│    → Check frequency settings                              │
+│    → Increase gain in config                               │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+
+SAFETY REMINDERS
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│  🔒 Transmit: DISABLED by default                          │
+│  🔒 Mode: RECEIVE ONLY                                      │
+│  🔒 Testing: Authorized systems only                        │
+│  🔒 Regulations: Follow local RF laws                       │
+│                                                             │
+│  ⚠️  Only for authorized security research!                │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+
+For more information:
+  GitHub: https://github.com/limbo111111/mdk-predator
+  Docs: See repository /docs directory
