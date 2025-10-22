@@ -80,24 +80,45 @@ After launching, you'll see:
 
 1. Connect 433 MHz antenna
 2. Select **Automotive Security**
-3. Select **Key Fob Analyzer**
-4. Press a car key fob near antenna
-5. Signal should be detected and analyzed
+3. Select **Key Fob Analyzer** (button changes to "Stop Capture")
+4. Watch the console for signal detection
+5. View signal count and frequency display
+6. Press button again to stop capture
+
+**What you'll see:**
+- Signal count updates in real-time
+- Frequency: 433.92 MHz displayed
+- Console shows capture details
 
 #### Test 2: Scan WiFi Networks
 
 1. Connect 2.4 GHz antenna
 2. Select **WiFi Analysis**
-3. Select **Network Scanner**
-4. Wait 10-15 seconds
-5. Nearby networks will be displayed
+3. Select **Start Scan** (button changes to "Stop Scan")
+4. Watch discovered networks appear in console
+5. View network count and status
+6. Press "Security Analysis" to analyze findings
+
+**What you'll see:**
+- Networks found counter updates
+- Network list with SSID, channel, signal strength
+- Security protocol for each network
+- Scan status indicator
 
 #### Test 3: SubGHz Spectrum Scan
 
 1. Connect appropriate antenna (315-928 MHz)
 2. Select **SubGHz RF**
 3. Select **Spectrum Scanner**
-4. Spectrum will display RF activity
+4. View frequency range and activity
+5. Try **Signal Capture** to record signals
+6. Use **Protocol Decoder** on captured signals
+
+**What you'll see:**
+- Frequency range: 300-928 MHz
+- Activity at various frequencies
+- Signal strength measurements
+- Captured signal details
 
 ## Module Overview
 

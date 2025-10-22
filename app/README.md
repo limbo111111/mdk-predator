@@ -48,7 +48,7 @@ The build process will generate:
 
 ## Features
 
-The application provides a complete UI for all MDK-Predator modules:
+The application provides a complete UI for all MDK-Predator modules with interactive functionality:
 
 ### Main Menu
 - Automotive Security
@@ -56,27 +56,64 @@ The application provides a complete UI for all MDK-Predator modules:
 - Bluetooth Analysis  
 - SubGHz RF
 - Crypto Analysis
+- Real-time status display
+- Interactive console output
 
 ### Automotive Module
-- Key Fob Analyzer (315/433.92/868/915 MHz)
-- Rolling Code Tester (KeeLoq, HCS301)
+- **Key Fob Analyzer** (315/433.92/868/915 MHz)
+  - Start/Stop capture toggle
+  - Real-time signal count display
+  - Frequency and bandwidth information
+  - Detailed signal capture log
+- **Rolling Code Tester** (KeeLoq, HCS301)
+  - Pattern analysis with detailed output
+  - Code sequence display
+  - Replay protection detection
 
 ### WiFi Module
-- Network Scanner
-- Security Analysis
+- **Network Scanner**
+  - Start/Stop scan toggle
+  - Networks found counter
+  - SSID, channel, signal strength display
+  - Security protocol identification
+- **Security Analysis**
+  - Protocol strength assessment
+  - Vulnerability detection
 
 ### Bluetooth Module
-- Device Scanner (Classic + BLE)
-- Service Enumeration
+- **Device Scanner** (Classic + BLE)
+  - Start/Stop scan toggle
+  - Devices found counter
+  - Device name, type, and signal strength
+  - MAC address display
+- **Service Enumeration**
+  - GATT service discovery
+  - Characteristic listing
 
 ### SubGHz Module
-- Spectrum Scanner (300-928 MHz)
-- Signal Capture
-- Protocol Decoder
+- **Spectrum Scanner** (300-928 MHz)
+  - Start/Stop scan toggle
+  - Frequency range display
+  - Signal activity visualization
+  - Power level measurements
+- **Signal Capture**
+  - Real-time capture with details
+  - Pulse count and duration
+  - Signal counter tracking
+- **Protocol Decoder**
+  - ASK/OOK protocol support
+  - Pulse width analysis
 
 ### Crypto Module
-- Algorithm Identifier
-- Entropy Analysis
+- **Algorithm Identifier**
+  - Block cipher detection
+  - Key schedule analysis
+  - Algorithm type display
+- **Entropy Analysis**
+  - Randomness quality testing
+  - Chi-square statistical tests
+  - Bits per byte measurement
+  - Quality rating
 
 ## Usage
 

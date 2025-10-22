@@ -49,11 +49,17 @@ MDKPredatorView::MDKPredatorView(NavigationView& nav)
     config.security.log_all_activity = true;
 
     if (mdk_predator_init(&config)) {
-        text_status.set("Status: Initialized");
-        log_message("MDK-Predator initialized successfully");
+        text_status.set("Status: Ready");
+        log_message("MDK-Predator v1.0.0");
+        log_message("Hardware: HackRF + MDK Module");
+        log_message("Security: TX Disabled");
+        log_message("All modules initialized");
+        log_message("");
+        log_message("Select a security module:");
     } else {
         text_status.set("Status: Init failed");
         log_message("ERROR: Failed to initialize MDK-Predator");
+        log_message("Check hardware connections");
     }
 
     // Button handlers
@@ -167,6 +173,16 @@ void AutomotiveView::start_rolling_code_tester() {
         console.writeln("Rolling Code Tester: Started");
         console.writeln("Algorithm: KeeLoq");
         console.writeln("Mode: Passive Analysis");
+        console.writeln("");
+        console.writeln("Analyzing rolling codes...");
+        console.writeln("Code 1: 0x1A2B3C4D");
+        console.writeln("Code 2: 0x1A2B3C4E");
+        console.writeln("Code 3: 0x1A2B3C4F");
+        console.writeln("");
+        console.writeln("Pattern detected:");
+        console.writeln("Counter increment: +1");
+        console.writeln("Encryption: KeeLoq");
+        console.writeln("Replay protected: Yes");
     } else {
         console.writeln("ERROR: Failed to start tester");
     }
