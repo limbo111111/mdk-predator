@@ -16,15 +16,42 @@ typedef enum {
     MODULE_WIFI,
     MODULE_BLUETOOTH,
     MODULE_SUBGHZ,
-    MODULE_CRYPTO
+    MODULE_CRYPTO,
+    /* Aliases for app compatibility */
+    MDK_MODULE_AUTOMOTIVE = MODULE_AUTOMOTIVE,
+    MDK_MODULE_WIFI = MODULE_WIFI,
+    MDK_MODULE_BLUETOOTH = MODULE_BLUETOOTH,
+    MDK_MODULE_SUBGHZ = MODULE_SUBGHZ,
+    MDK_MODULE_CRYPTO = MODULE_CRYPTO
 } security_module_t;
+
+/* Hardware configuration */
+typedef struct {
+    uint32_t hackrf_sample_rate;
+    uint32_t hackrf_bandwidth;
+    uint32_t hackrf_lna_gain;
+    uint32_t hackrf_vga_gain;
+    uint32_t hackrf_txvga_gain;
+} mdk_hardware_config_t;
+
+/* Security configuration */
+typedef struct {
+    bool allow_transmit;
+    bool require_confirmation;
+    bool log_all_activity;
+} mdk_security_config_t;
 
 /* Main configuration */
 typedef struct {
     security_module_t default_module;
     bool enable_logging;
     uint32_t buffer_size;
+    mdk_hardware_config_t hardware;
+    mdk_security_config_t security;
 } mdk_predator_config_t;
+
+/* Short alias for app compatibility */
+typedef mdk_predator_config_t mdk_config_t;
 
 /* System status */
 typedef struct {
