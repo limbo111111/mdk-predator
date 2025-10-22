@@ -1,0 +1,55 @@
+# Build artifacts
+build/
+*.o
+*.a
+*.so
+*.elf
+*.bin
+*.hex
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Compiled binaries
+*.exe
+*.out
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Configuration overrides (keep template)
+mdk_predator.conf.local
+
+# Test artifacts
+test_signals/
+test_results/
+
+# Documentation builds
+docs/_build/
+docs/.buildinfo
+
+# Python cache (if used for scripts)
+__pycache__/
+*.pyc
+*.pyo
+
+# Backup files
+*.bak
+*.orig
