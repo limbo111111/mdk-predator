@@ -52,15 +52,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Comprehensive test suite with 95 assertions across 5 test files
+  - Automotive module tests: test_key_fob_analyzer.c, test_rolling_code_tester.c
+  - Wireless module tests: test_subghz_analyzer.c
+  - Crypto module tests: test_crypto_analyzer.c
+  - Integration tests: test_mdk_integration.c
+- Enhanced Makefile with test build system
+  - `make test` - Build and run all tests
+  - `make test-automotive` - Run automotive tests only
+  - `make test-wireless` - Run wireless tests only
+  - `make test-crypto` - Run crypto tests only
+  - `make test-integration` - Run integration tests only
+  - `make test-clean` - Clean test artifacts
+- Updated tests/README.md with comprehensive test documentation
 - Test directory structure with subdirectories for automotive, wireless, crypto, and integration tests
-- Test suite README with guidelines and safety considerations
-- `make test` target for running hardware tests
-- Updated .PHONY targets in Makefile
+- `make test` target for running all tests with summary reporting
+
+### Changed
+- Tests now run without hardware requirements (unit tests with mock data)
+- Test build uses native gcc instead of ARM cross-compiler
+- All tests passing with 100% success rate
 
 ### Planned
 - Extended protocol support
 - Performance optimizations
-- Additional test coverage
+- Hardware-specific test cases
 - UI integration examples
 - Signal database management
 
