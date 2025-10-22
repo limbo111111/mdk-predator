@@ -42,20 +42,27 @@ MDK-Predator
 └── tests/              # Test suite
 ```
 
+## Quick Start
+
+See [QUICKSTART.md](QUICKSTART.md) for a 5-minute setup guide!
+
 ## Building
 
-### Prerequisites
-- ARM toolchain (`arm-none-eabi-gcc`)
-- HackRF One with Mayhem-MDK module
-- Mayhem firmware
-
-### Compile
+### Library (for development)
 
 ```bash
 make
 ```
 
 The compiled library will be available at `build/lib/libmdk_predator.a`.
+
+### PortaPack Application
+
+See [DEPLOYMENT.md](docs/DEPLOYMENT.md) for complete instructions on:
+- Building the PortaPack application (.ppma)
+- Installing to SD card
+- Integrating with Mayhem firmware
+- Deploying to Mayhem-MDK module
 
 ### Clean Build
 
@@ -94,6 +101,8 @@ See [tests/README.md](tests/README.md) for detailed test documentation.
 
 ## Documentation
 
+- **[Quick Start Guide](QUICKSTART.md)** - Get running in 5 minutes!
+- **[Deployment Guide](docs/DEPLOYMENT.md)** - Install to PortaPack H4M
 - [Architecture Guide](docs/ARCHITECTURE.md) - System design and data flow
 - [API Reference](docs/API.md) - Complete API documentation
 - [User Guide](docs/USER_GUIDE.md) - Usage instructions and examples
