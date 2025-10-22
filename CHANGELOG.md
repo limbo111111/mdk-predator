@@ -51,6 +51,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Test directory structure with subdirectories for automotive, wireless, crypto, and integration tests
+- Test suite README with guidelines and safety considerations
+- `make test` target for running hardware tests
+- Updated .PHONY targets in Makefile
+
 ### Planned
 - Extended protocol support
 - Performance optimizations

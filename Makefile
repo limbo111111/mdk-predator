@@ -35,7 +35,7 @@ LIB_NAME = libmdk_predator.a
 LIB_PATH = $(LIB_DIR)/$(LIB_NAME)
 
 # Targets
-.PHONY: all clean directories
+.PHONY: all clean directories test info automotive wireless crypto
 
 all: directories $(LIB_PATH)
 
@@ -76,3 +76,16 @@ info:
 	@echo "Source files: $(words $(ALL_SRC))"
 	@echo "Object files: $(words $(ALL_OBJ))"
 	@echo "Library: $(LIB_PATH)"
+
+# Test target
+test:
+	@echo "MDK-Predator Test Suite"
+	@echo "======================="
+	@echo "Note: Tests require HackRF One with Mayhem-MDK hardware"
+	@echo ""
+	@if [ -d tests ]; then \
+		echo "Test structure ready. Implement hardware tests as needed."; \
+	else \
+		echo "Error: tests/ directory not found"; \
+		exit 1; \
+	fi
