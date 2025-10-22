@@ -1,0 +1,5 @@
+# Placeholder for cryptographic analysis tests
+# Tests will be added here for:
+# - Algorithm identification
+# - Key exchange analysis
+# - Rolling code cryptography
