@@ -22,7 +22,7 @@ bool rolling_code_tester_init(rolling_code_config_t *config) {
     }
     
     config->algorithm = ROLLING_CODE_KEELOQ;
-    config->test_mode = TEST_MODE_PASSIVE;
+    config->mode = TEST_MODE_PASSIVE;
     memset(config->manufacturer_key, 0, sizeof(config->manufacturer_key));
     
     return true;

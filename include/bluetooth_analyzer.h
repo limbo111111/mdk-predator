@@ -19,6 +19,13 @@ typedef enum {
     BT_MODE_CONNECT
 } bt_mode_t;
 
+/* Bluetooth scan types */
+typedef enum {
+    BT_SCAN_CLASSIC,
+    BT_SCAN_BLE,
+    BT_SCAN_BOTH
+} bt_scan_type_t;
+
 /* Pairing methods */
 typedef enum {
     BT_PAIRING_LEGACY,
@@ -30,6 +37,7 @@ typedef enum {
 /* Bluetooth configuration */
 typedef struct {
     bt_mode_t mode;
+    bt_scan_type_t scan_type;  // App compatibility
     bool scan_classic;
     bool scan_ble;
     uint32_t scan_duration;

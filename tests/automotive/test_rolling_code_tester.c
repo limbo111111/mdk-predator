@@ -39,7 +39,7 @@ void test_rolling_code_init_valid() {
     
     TEST_ASSERT(result == true, "Init should succeed with valid config");
     TEST_ASSERT(config.algorithm == ROLLING_CODE_KEELOQ, "Default algorithm should be KeeLoq");
-    TEST_ASSERT(config.test_mode == TEST_MODE_PASSIVE, "Default mode should be PASSIVE");
+    TEST_ASSERT(config.mode == TEST_MODE_PASSIVE, "Default mode should be PASSIVE");
 }
 
 /**

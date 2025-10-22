@@ -37,6 +37,14 @@ void test_mdk_init_valid() {
     config.default_module = MODULE_AUTOMOTIVE;
     config.enable_logging = true;
     config.buffer_size = 1024;
+    config.hardware.hackrf_sample_rate = 2000000;
+    config.hardware.hackrf_bandwidth = 1750000;
+    config.hardware.hackrf_lna_gain = 8;
+    config.hardware.hackrf_vga_gain = 20;
+    config.hardware.hackrf_txvga_gain = 0;
+    config.security.allow_transmit = false;
+    config.security.require_confirmation = true;
+    config.security.log_all_activity = true;
     
     bool result = mdk_predator_init(&config);
     
@@ -65,6 +73,14 @@ void test_mdk_get_status_after_init() {
     config.default_module = MODULE_SUBGHZ;
     config.enable_logging = false;
     config.buffer_size = 2048;
+    config.hardware.hackrf_sample_rate = 2000000;
+    config.hardware.hackrf_bandwidth = 1750000;
+    config.hardware.hackrf_lna_gain = 8;
+    config.hardware.hackrf_vga_gain = 20;
+    config.hardware.hackrf_txvga_gain = 0;
+    config.security.allow_transmit = false;
+    config.security.require_confirmation = true;
+    config.security.log_all_activity = true;
     
     mdk_predator_init(&config);
     bool result = mdk_get_status(&status);
@@ -98,6 +114,14 @@ void test_mdk_get_status_null() {
     config.default_module = MODULE_AUTOMOTIVE;
     config.enable_logging = false;
     config.buffer_size = 1024;
+    config.hardware.hackrf_sample_rate = 2000000;
+    config.hardware.hackrf_bandwidth = 1750000;
+    config.hardware.hackrf_lna_gain = 8;
+    config.hardware.hackrf_vga_gain = 20;
+    config.hardware.hackrf_txvga_gain = 0;
+    config.security.allow_transmit = false;
+    config.security.require_confirmation = true;
+    config.security.log_all_activity = true;
     
     mdk_predator_init(&config);
     bool result = mdk_get_status(NULL);
@@ -115,6 +139,14 @@ void test_mdk_set_active_module_valid() {
     config.default_module = MODULE_AUTOMOTIVE;
     config.enable_logging = false;
     config.buffer_size = 1024;
+    config.hardware.hackrf_sample_rate = 2000000;
+    config.hardware.hackrf_bandwidth = 1750000;
+    config.hardware.hackrf_lna_gain = 8;
+    config.hardware.hackrf_vga_gain = 20;
+    config.hardware.hackrf_txvga_gain = 0;
+    config.security.allow_transmit = false;
+    config.security.require_confirmation = true;
+    config.security.log_all_activity = true;
     
     mdk_predator_init(&config);
     
@@ -151,6 +183,14 @@ void test_mdk_run_diagnostic_valid() {
     config.default_module = MODULE_AUTOMOTIVE;
     config.enable_logging = false;
     config.buffer_size = 1024;
+    config.hardware.hackrf_sample_rate = 2000000;
+    config.hardware.hackrf_bandwidth = 1750000;
+    config.hardware.hackrf_lna_gain = 8;
+    config.hardware.hackrf_vga_gain = 20;
+    config.hardware.hackrf_txvga_gain = 0;
+    config.security.allow_transmit = false;
+    config.security.require_confirmation = true;
+    config.security.log_all_activity = true;
     
     mdk_predator_init(&config);
     
@@ -188,6 +228,14 @@ void test_mdk_run_diagnostic_null() {
     config.default_module = MODULE_AUTOMOTIVE;
     config.enable_logging = false;
     config.buffer_size = 1024;
+    config.hardware.hackrf_sample_rate = 2000000;
+    config.hardware.hackrf_bandwidth = 1750000;
+    config.hardware.hackrf_lna_gain = 8;
+    config.hardware.hackrf_vga_gain = 20;
+    config.hardware.hackrf_txvga_gain = 0;
+    config.security.allow_transmit = false;
+    config.security.require_confirmation = true;
+    config.security.log_all_activity = true;
     
     mdk_predator_init(&config);
     
@@ -216,6 +264,14 @@ void test_mdk_cleanup_multiple() {
     config.default_module = MODULE_AUTOMOTIVE;
     config.enable_logging = false;
     config.buffer_size = 1024;
+    config.hardware.hackrf_sample_rate = 2000000;
+    config.hardware.hackrf_bandwidth = 1750000;
+    config.hardware.hackrf_lna_gain = 8;
+    config.hardware.hackrf_vga_gain = 20;
+    config.hardware.hackrf_txvga_gain = 0;
+    config.security.allow_transmit = false;
+    config.security.require_confirmation = true;
+    config.security.log_all_activity = true;
     
     mdk_predator_init(&config);
     

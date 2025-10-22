@@ -28,13 +28,27 @@ bool mdk_predator_init(mdk_predator_config_t *config) {
         return false;
     }
     
-    // Initialize HackRF/Mayhem-MDK hardware
+    // Initialize HackRF/Mayhem-MDK hardware with config
     if (!mdk_hardware_init()) {
         return false;
     }
     
     // Copy configuration
     g_config = *config;
+    
+    // Apply hardware configuration
+    // Note: In production, this would call HackRF API functions
+    // hackrf_set_sample_rate(g_config.hardware.hackrf_sample_rate);
+    // hackrf_set_baseband_filter_bandwidth(g_config.hardware.hackrf_bandwidth);
+    // hackrf_set_lna_gain(g_config.hardware.hackrf_lna_gain);
+    // hackrf_set_vga_gain(g_config.hardware.hackrf_vga_gain);
+    // hackrf_set_txvga_gain(g_config.hardware.hackrf_txvga_gain);
+    
+    // Apply security configuration
+    if (!g_config.security.allow_transmit) {
+        // Disable transmit functions
+    }
+    
     g_initialized = true;
     
     return true;

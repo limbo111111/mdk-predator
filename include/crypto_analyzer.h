@@ -17,7 +17,12 @@ typedef enum {
     CRYPTO_ALG_RSA,
     CRYPTO_ALG_KEELOQ,
     CRYPTO_ALG_HITAG2,
-    CRYPTO_ALG_UNKNOWN
+    CRYPTO_ALG_UNKNOWN,
+    /* Aliases for app compatibility */
+    CRYPTO_ALGORITHM_AES = CRYPTO_ALG_AES,
+    CRYPTO_ALGORITHM_DES = CRYPTO_ALG_DES,
+    CRYPTO_ALGORITHM_3DES = CRYPTO_ALG_3DES,
+    CRYPTO_ALGORITHM_RSA = CRYPTO_ALG_RSA
 } crypto_algorithm_t;
 
 /* Crypto operation modes */
