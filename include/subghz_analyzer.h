@@ -36,6 +36,10 @@ typedef struct {
     uint32_t bandwidth;
     uint32_t sample_rate;
     subghz_modulation_t modulation;
+    /* App compatibility fields for spectrum scanning */
+    uint32_t frequency_min;
+    uint32_t frequency_max;
+    uint32_t step_size;
 } subghz_config_t;
 
 /* Spectrum data */

@@ -20,13 +20,16 @@ typedef enum {
 /* Test modes */
 typedef enum {
     TEST_MODE_PASSIVE,    // Only analyze
-    TEST_MODE_ACTIVE      // Can transmit (research only)
+    TEST_MODE_ACTIVE,     // Can transmit (research only)
+    /* Aliases for app compatibility */
+    ROLLING_CODE_MODE_PASSIVE = TEST_MODE_PASSIVE,
+    ROLLING_CODE_MODE_ACTIVE = TEST_MODE_ACTIVE
 } test_mode_t;
 
-/* Rolling code configuration */
+/* Rolling code configuration - also define with 'mode' field for app compatibility */
 typedef struct {
     rolling_code_algorithm_t algorithm;
-    test_mode_t test_mode;
+    test_mode_t mode;  // Changed from test_mode to mode for app compatibility
     uint8_t manufacturer_key[8];
 } rolling_code_config_t;
 
