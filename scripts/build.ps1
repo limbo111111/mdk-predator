@@ -92,7 +92,7 @@ function Test-Dependency {
     
     if ($Version) {
         try {
-            $versionOutput = & $Command $Version 2>&1
+            $versionOutput = & $Command $Version 2>&1 | Select-Object -First 1
             Write-Info "Version: $versionOutput"
         } catch {
             # Version check failed, but tool exists
