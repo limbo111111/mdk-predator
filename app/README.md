@@ -53,7 +53,7 @@ The application provides a complete UI for all MDK-Predator modules with interac
 ### Main Menu
 - Automotive Security
 - WiFi Analysis
-- Bluetooth Analysis  
+- Bluetooth Analysis
 - SubGHz RF
 - Crypto Analysis
 - Real-time status display
@@ -125,7 +125,7 @@ The application provides a complete UI for all MDK-Predator modules with interac
 
 ## Safety
 
-⚠️ **Important**: 
+⚠️ **Important**:
 - Transmission is disabled by default
 - Only for authorized security research
 - Comply with local RF regulations

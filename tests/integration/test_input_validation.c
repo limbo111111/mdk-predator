@@ -1,6 +1,6 @@
 /**
  * Unit tests for Input Validation Utilities
- * 
+ *
  * These tests validate the input validation functions
  */
 
@@ -35,7 +35,7 @@ static int tests_failed = 0;
  */
 void test_validate_not_null() {
     int value = 42;
-    
+
     TEST_ASSERT(validate_not_null(&value) == true, "Should return true for valid pointer");
     TEST_ASSERT(validate_not_null(NULL) == false, "Should return false for NULL pointer");
 }
@@ -98,7 +98,7 @@ void test_validate_string_length() {
     char long_str[100];
     memset(long_str, 'A', sizeof(long_str) - 1);
     long_str[sizeof(long_str) - 1] = '\0';
-    
+
     TEST_ASSERT(validate_string_length(short_str, 100) == VALIDATION_OK, "Should accept short string");
     TEST_ASSERT(validate_string_length(NULL, 100) == VALIDATION_NULL_POINTER, "Should reject NULL string");
     TEST_ASSERT(validate_string_length(long_str, 50) == VALIDATION_BUFFER_TOO_LARGE, "Should reject too long string");
@@ -119,7 +119,7 @@ void test_validate_array_index() {
  */
 void test_validate_mac_address() {
     uint8_t mac[6] = {0x00, 0x11, 0x22, 0x33, 0x44, 0x55};
-    
+
     TEST_ASSERT(validate_mac_address(mac) == true, "Should accept valid MAC pointer");
     TEST_ASSERT(validate_mac_address(NULL) == false, "Should reject NULL MAC pointer");
 }
@@ -152,7 +152,7 @@ void test_validate_wifi_5_channel() {
 void test_safe_memcpy() {
     uint8_t src[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
     uint8_t dest[10];
-    
+
     TEST_ASSERT(safe_memcpy(dest, sizeof(dest), src, 5) == true, "Should succeed with valid copy");
     TEST_ASSERT(dest[0] == 1 && dest[4] == 5, "Should copy data correctly");
     TEST_ASSERT(safe_memcpy(NULL, 10, src, 5) == false, "Should fail with NULL dest");
@@ -166,12 +166,12 @@ void test_safe_memcpy() {
 void test_safe_strncpy() {
     char src[] = "Hello, World!";
     char dest[20];
-    
+
     TEST_ASSERT(safe_strncpy(dest, sizeof(dest), src, strlen(src)) == true, "Should succeed with valid copy");
     TEST_ASSERT(strcmp(dest, "Hello, World!") == 0, "Should copy string correctly");
     TEST_ASSERT(safe_strncpy(NULL, 20, src, 5) == false, "Should fail with NULL dest");
     TEST_ASSERT(safe_strncpy(dest, sizeof(dest), NULL, 5) == false, "Should fail with NULL src");
-    
+
     char small_dest[5];
     TEST_ASSERT(safe_strncpy(small_dest, sizeof(small_dest), src, strlen(src)) == true, "Should truncate if needed");
     TEST_ASSERT(strlen(small_dest) < sizeof(small_dest), "Should null-terminate truncated string");
@@ -191,13 +191,13 @@ void test_validate_count() {
  */
 void test_get_validation_error_message() {
     const char *msg;
-    
+
     msg = get_validation_error_message(VALIDATION_OK);
     TEST_ASSERT(msg != NULL && strlen(msg) > 0, "Should return message for VALIDATION_OK");
-    
+
     msg = get_validation_error_message(VALIDATION_NULL_POINTER);
     TEST_ASSERT(msg != NULL && strlen(msg) > 0, "Should return message for VALIDATION_NULL_POINTER");
-    
+
     msg = get_validation_error_message(VALIDATION_BUFFER_TOO_LARGE);
     TEST_ASSERT(msg != NULL && strlen(msg) > 0, "Should return message for VALIDATION_BUFFER_TOO_LARGE");
 }
@@ -209,7 +209,7 @@ int main(void) {
     printf("========================================\n");
     printf("Input Validation Utilities Unit Tests\n");
     printf("========================================\n");
-    
+
     RUN_TEST(test_validate_not_null);
     RUN_TEST(test_validate_buffer_length);
     RUN_TEST(test_validate_frequency);
@@ -225,12 +225,12 @@ int main(void) {
     RUN_TEST(test_safe_strncpy);
     RUN_TEST(test_validate_count);
     RUN_TEST(test_get_validation_error_message);
-    
+
     printf("\n========================================\n");
     printf("Test Results:\n");
     printf("  Passed: %d\n", tests_passed);
     printf("  Failed: %d\n", tests_failed);
     printf("========================================\n");
-    
+
     return tests_failed > 0 ? 1 : 0;
 }
