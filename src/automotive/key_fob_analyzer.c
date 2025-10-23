@@ -1,6 +1,6 @@
 /**
  * Key Fob Analyzer Module
- * 
+ *
  * This module provides automotive key fob signal analysis capabilities
  * for the Mayhem-MDK platform.
  */
@@ -23,12 +23,12 @@ bool keyfob_analyzer_init(keyfob_config_t *config) {
     if (!config) {
         return false;
     }
-    
+
     config->frequency = KEYFOB_FREQUENCIES[0];
     config->bandwidth = 200000;  // 200 kHz
     config->sample_rate = 2000000;  // 2 MS/s
     config->mode = KEYFOB_MODE_RECEIVE;
-    
+
     return true;
 }
 
@@ -39,10 +39,10 @@ bool keyfob_capture_signal(keyfob_config_t *config, signal_data_t *signal) {
     if (!config || !signal) {
         return false;
     }
-    
+
     // Configure HackRF for signal capture
     // Implementation depends on Mayhem-MDK API
-    
+
     return true;
 }
 
@@ -53,12 +53,12 @@ bool keyfob_analyze_signal(signal_data_t *signal, keyfob_analysis_t *result) {
     if (!signal || !result) {
         return false;
     }
-    
+
     // Perform signal analysis
     // - Demodulation
     // - Protocol identification
     // - Data extraction
-    
+
     return true;
 }
 
@@ -69,10 +69,10 @@ bool keyfob_detect_rolling_code(signal_data_t *signal, rolling_code_info_t *info
     if (!signal || !info) {
         return false;
     }
-    
+
     // Analyze for rolling code patterns
     // Common algorithms: KeeLoq, HCS301, etc.
-    
+
     return true;
 }
 

@@ -5,8 +5,8 @@
 ### Bugs Fixed
 
 #### 1. UI Layout Overlap Bug ("Whitetrails")
-**Severity:** High  
-**Impact:** Visual artifacts, poor user experience  
+**Severity:** High
+**Impact:** Visual artifacts, poor user experience
 **Root Cause:** Text elements were positioned to overlap with console widget, causing "whitetrails" visual artifacts on screen.
 
 **Details:**
@@ -31,8 +31,8 @@
 - `app/mdk_predator_app.hpp`
 
 #### 2. Resource Leak Bug
-**Severity:** Medium  
-**Impact:** Potential resource leaks, improper hardware state cleanup  
+**Severity:** Medium
+**Impact:** Potential resource leaks, improper hardware state cleanup
 **Root Cause:** Missing cleanup function calls when users stop operations (capture/scan).
 
 **Details:**

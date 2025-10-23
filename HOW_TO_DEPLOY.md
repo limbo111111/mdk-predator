@@ -194,7 +194,7 @@ SD_CARD/
    ```
    MDK-Predator Security Suite
    Mayhem-MDK Module
-   
+
    Status: Initialized ✓
    ```
 
