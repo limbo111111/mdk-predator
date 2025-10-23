@@ -172,7 +172,7 @@ Initialize crypto analyzer.
 
 #### `crypto_identify_algorithm()`
 ```c
-bool crypto_identify_algorithm(uint8_t *ciphertext, uint32_t length, 
+bool crypto_identify_algorithm(uint8_t *ciphertext, uint32_t length,
                                 crypto_identification_t *result);
 ```
 Identify encryption algorithm.
@@ -186,7 +186,7 @@ Analyze rolling code cryptography.
 
 #### `crypto_entropy_analysis()`
 ```c
-bool crypto_entropy_analysis(uint8_t *data, uint32_t length, 
+bool crypto_entropy_analysis(uint8_t *data, uint32_t length,
                               entropy_result_t *result);
 ```
 Perform entropy analysis on data.
@@ -250,21 +250,21 @@ int main(void) {
         .enable_logging = true,
         .buffer_size = 1024 * 1024
     };
-    
+
     if (!mdk_predator_init(&config)) {
         return -1;
     }
-    
+
     keyfob_config_t keyfob_config;
     keyfob_analyzer_init(&keyfob_config);
-    
+
     signal_data_t signal;
     if (keyfob_capture_signal(&keyfob_config, &signal)) {
         keyfob_analysis_t result;
         keyfob_analyze_signal(&signal, &result);
         // Process result
     }
-    
+
     mdk_predator_cleanup();
     return 0;
 }
@@ -283,8 +283,8 @@ uint32_t count;
 
 if (wifi_scan_networks(&wifi_config, networks, &count)) {
     for (uint32_t i = 0; i < count; i++) {
-        printf("SSID: %s, Security: %d\n", 
-               networks[i].ssid, 
+        printf("SSID: %s, Security: %d\n",
+               networks[i].ssid,
                networks[i].security_type);
     }
 }
@@ -299,10 +299,10 @@ uint8_t data[256];
 entropy_result_t entropy;
 
 if (crypto_entropy_analysis(data, sizeof(data), &entropy)) {
-    printf("Entropy: %.2f / %.2f\n", 
-           entropy.entropy, 
+    printf("Entropy: %.2f / %.2f\n",
+           entropy.entropy,
            entropy.max_entropy);
-    printf("Quality: %.2f%%\n", 
+    printf("Quality: %.2f%%\n",
            entropy.randomness_quality * 100);
 }
 ```

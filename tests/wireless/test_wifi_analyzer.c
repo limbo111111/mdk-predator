@@ -1,6 +1,6 @@
 /**
  * Unit tests for WiFi Security Analysis Module
- * 
+ *
  * These tests validate the WiFi analyzer functionality without
  * requiring actual hardware.
  */
@@ -36,7 +36,7 @@ static int tests_failed = 0;
 void test_wifi_init_valid() {
     wifi_config_t config;
     bool result = wifi_analyzer_init(&config);
-    
+
     TEST_ASSERT(result == true, "Init should succeed with valid config");
     TEST_ASSERT(config.channel == 6, "Default channel should be 6");
     TEST_ASSERT(config.mode == WIFI_MODE_MONITOR, "Default mode should be MONITOR");
@@ -49,7 +49,7 @@ void test_wifi_init_valid() {
  */
 void test_wifi_init_null() {
     bool result = wifi_analyzer_init(NULL);
-    
+
     TEST_ASSERT(result == false, "Init should fail with NULL config");
 }
 
@@ -60,10 +60,10 @@ void test_wifi_scan_networks_valid() {
     wifi_config_t config;
     wifi_network_t networks[MAX_NETWORKS];
     uint32_t count;
-    
+
     wifi_analyzer_init(&config);
     bool result = wifi_scan_networks(&config, networks, &count);
-    
+
     TEST_ASSERT(result == true, "Network scan should succeed with valid parameters");
     TEST_ASSERT(count == 0, "Count should be initialized to 0");
 }
@@ -75,7 +75,7 @@ void test_wifi_scan_networks_null_config() {
     wifi_network_t networks[MAX_NETWORKS];
     uint32_t count;
     bool result = wifi_scan_networks(NULL, networks, &count);
-    
+
     TEST_ASSERT(result == false, "Network scan should fail with NULL config");
 }
 
@@ -85,10 +85,10 @@ void test_wifi_scan_networks_null_config() {
 void test_wifi_scan_networks_null_buffer() {
     wifi_config_t config;
     uint32_t count;
-    
+
     wifi_analyzer_init(&config);
     bool result = wifi_scan_networks(&config, NULL, &count);
-    
+
     TEST_ASSERT(result == false, "Network scan should fail with NULL networks buffer");
 }
 
@@ -98,10 +98,10 @@ void test_wifi_scan_networks_null_buffer() {
 void test_wifi_scan_networks_null_count() {
     wifi_config_t config;
     wifi_network_t networks[MAX_NETWORKS];
-    
+
     wifi_analyzer_init(&config);
     bool result = wifi_scan_networks(&config, networks, NULL);
-    
+
     TEST_ASSERT(result == false, "Network scan should fail with NULL count");
 }
 
@@ -111,12 +111,12 @@ void test_wifi_scan_networks_null_count() {
 void test_wifi_analyze_security_valid() {
     wifi_network_t network;
     wifi_security_analysis_t analysis;
-    
+
     network.security_type = WIFI_SECURITY_WPA2;
     network.rssi = -50;
-    
+
     bool result = wifi_analyze_security(&network, &analysis);
-    
+
     TEST_ASSERT(result == true, "Security analysis should succeed with valid parameters");
     TEST_ASSERT(analysis.encryption_type == WIFI_SECURITY_WPA2, "Encryption type should match network");
     TEST_ASSERT(analysis.signal_strength == -50, "Signal strength should match network RSSI");
@@ -128,7 +128,7 @@ void test_wifi_analyze_security_valid() {
 void test_wifi_analyze_security_null_network() {
     wifi_security_analysis_t analysis;
     bool result = wifi_analyze_security(NULL, &analysis);
-    
+
     TEST_ASSERT(result == false, "Security analysis should fail with NULL network");
 }
 
@@ -138,9 +138,9 @@ void test_wifi_analyze_security_null_network() {
 void test_wifi_analyze_security_null_buffer() {
     wifi_network_t network;
     network.security_type = WIFI_SECURITY_WPA2;
-    
+
     bool result = wifi_analyze_security(&network, NULL);
-    
+
     TEST_ASSERT(result == false, "Security analysis should fail with NULL analysis buffer");
 }
 
@@ -151,10 +151,10 @@ void test_wifi_capture_handshake_valid() {
     wifi_config_t config;
     uint8_t bssid[6] = {0x00, 0x11, 0x22, 0x33, 0x44, 0x55};
     handshake_data_t handshake;
-    
+
     wifi_analyzer_init(&config);
     bool result = wifi_capture_handshake(&config, bssid, &handshake);
-    
+
     TEST_ASSERT(result == true, "Handshake capture should succeed with valid parameters");
     TEST_ASSERT(handshake.is_complete == false, "Handshake should be incomplete initially");
     TEST_ASSERT(handshake.frame_count == 0, "Frame count should be 0 initially");
@@ -166,9 +166,9 @@ void test_wifi_capture_handshake_valid() {
 void test_wifi_capture_handshake_null_config() {
     uint8_t bssid[6] = {0x00, 0x11, 0x22, 0x33, 0x44, 0x55};
     handshake_data_t handshake;
-    
+
     bool result = wifi_capture_handshake(NULL, bssid, &handshake);
-    
+
     TEST_ASSERT(result == false, "Handshake capture should fail with NULL config");
 }
 
@@ -178,10 +178,10 @@ void test_wifi_capture_handshake_null_config() {
 void test_wifi_capture_handshake_null_bssid() {
     wifi_config_t config;
     handshake_data_t handshake;
-    
+
     wifi_analyzer_init(&config);
     bool result = wifi_capture_handshake(&config, NULL, &handshake);
-    
+
     TEST_ASSERT(result == false, "Handshake capture should fail with NULL BSSID");
 }
 
@@ -191,10 +191,10 @@ void test_wifi_capture_handshake_null_bssid() {
 void test_wifi_capture_handshake_null_buffer() {
     wifi_config_t config;
     uint8_t bssid[6] = {0x00, 0x11, 0x22, 0x33, 0x44, 0x55};
-    
+
     wifi_analyzer_init(&config);
     bool result = wifi_capture_handshake(&config, bssid, NULL);
-    
+
     TEST_ASSERT(result == false, "Handshake capture should fail with NULL handshake buffer");
 }
 
@@ -204,10 +204,10 @@ void test_wifi_capture_handshake_null_buffer() {
 void test_wifi_detect_deauth_valid() {
     wifi_config_t config;
     deauth_detection_t detection;
-    
+
     wifi_analyzer_init(&config);
     bool result = wifi_detect_deauth(&config, &detection);
-    
+
     TEST_ASSERT(result == true, "Deauth detection should succeed with valid parameters");
     TEST_ASSERT(detection.deauth_count == 0, "Deauth count should be 0 initially");
     TEST_ASSERT(detection.attack_detected == false, "Attack should not be detected initially");
@@ -219,7 +219,7 @@ void test_wifi_detect_deauth_valid() {
 void test_wifi_detect_deauth_null_config() {
     deauth_detection_t detection;
     bool result = wifi_detect_deauth(NULL, &detection);
-    
+
     TEST_ASSERT(result == false, "Deauth detection should fail with NULL config");
 }
 
@@ -228,10 +228,10 @@ void test_wifi_detect_deauth_null_config() {
  */
 void test_wifi_detect_deauth_null_buffer() {
     wifi_config_t config;
-    
+
     wifi_analyzer_init(&config);
     bool result = wifi_detect_deauth(&config, NULL);
-    
+
     TEST_ASSERT(result == false, "Deauth detection should fail with NULL detection buffer");
 }
 
@@ -241,10 +241,10 @@ void test_wifi_detect_deauth_null_buffer() {
 void test_wifi_cleanup_valid() {
     wifi_config_t config;
     wifi_analyzer_init(&config);
-    
+
     // Should not crash
     wifi_analyzer_cleanup(&config);
-    
+
     TEST_ASSERT(true, "Cleanup should succeed with valid config");
 }
 
@@ -254,7 +254,7 @@ void test_wifi_cleanup_valid() {
 void test_wifi_cleanup_null() {
     // Should not crash
     wifi_analyzer_cleanup(NULL);
-    
+
     TEST_ASSERT(true, "Cleanup should handle NULL config gracefully");
 }
 
@@ -265,7 +265,7 @@ int main(void) {
     printf("========================================\n");
     printf("WiFi Security Analyzer Unit Tests\n");
     printf("========================================\n");
-    
+
     RUN_TEST(test_wifi_init_valid);
     RUN_TEST(test_wifi_init_null);
     RUN_TEST(test_wifi_scan_networks_valid);
@@ -284,12 +284,12 @@ int main(void) {
     RUN_TEST(test_wifi_detect_deauth_null_buffer);
     RUN_TEST(test_wifi_cleanup_valid);
     RUN_TEST(test_wifi_cleanup_null);
-    
+
     printf("\n========================================\n");
     printf("Test Results:\n");
     printf("  Passed: %d\n", tests_passed);
     printf("  Failed: %d\n", tests_failed);
     printf("========================================\n");
-    
+
     return tests_failed > 0 ? 1 : 0;
 }

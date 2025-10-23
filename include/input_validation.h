@@ -1,6 +1,6 @@
 /**
  * Input Validation and Sanitization Utilities
- * 
+ *
  * Provides common input validation functions for security modules
  */
 
@@ -147,7 +147,7 @@ static inline validation_result_t validate_wifi_5_channel(uint16_t channel) {
 /**
  * Safe memory copy with bounds checking
  */
-static inline bool safe_memcpy(void *dest, size_t dest_size, 
+static inline bool safe_memcpy(void *dest, size_t dest_size,
                                const void *src, size_t copy_size) {
     if (!dest || !src) {
         return false;
@@ -164,7 +164,7 @@ static inline bool safe_memcpy(void *dest, size_t dest_size,
 /**
  * Safe string copy with null termination
  */
-static inline bool safe_strncpy(char *dest, size_t dest_size, 
+static inline bool safe_strncpy(char *dest, size_t dest_size,
                                 const char *src, size_t src_length) {
     if (!dest || !src || dest_size == 0) {
         return false;

@@ -1,6 +1,6 @@
 /**
  * Unit tests for SubGHz RF Analyzer Module
- * 
+ *
  * These tests validate the SubGHz analyzer functionality without
  * requiring actual hardware.
  */
@@ -36,7 +36,7 @@ static int tests_failed = 0;
 void test_subghz_init_valid() {
     subghz_config_t config;
     bool result = subghz_analyzer_init(&config);
-    
+
     TEST_ASSERT(result == true, "Init should succeed with valid config");
     TEST_ASSERT(config.frequency == 433920000, "Default frequency should be 433.92 MHz");
     TEST_ASSERT(config.bandwidth == 200000, "Default bandwidth should be 200 kHz");
@@ -49,7 +49,7 @@ void test_subghz_init_valid() {
  */
 void test_subghz_init_null() {
     bool result = subghz_analyzer_init(NULL);
-    
+
     TEST_ASSERT(result == false, "Init should fail with NULL config");
 }
 
@@ -59,10 +59,10 @@ void test_subghz_init_null() {
 void test_subghz_scan_spectrum_valid() {
     subghz_config_t config;
     spectrum_data_t spectrum;
-    
+
     subghz_analyzer_init(&config);
     bool result = subghz_scan_spectrum(&config, &spectrum);
-    
+
     TEST_ASSERT(result == true, "Spectrum scan should succeed with valid parameters");
 }
 
@@ -72,7 +72,7 @@ void test_subghz_scan_spectrum_valid() {
 void test_subghz_scan_spectrum_null_config() {
     spectrum_data_t spectrum;
     bool result = subghz_scan_spectrum(NULL, &spectrum);
-    
+
     TEST_ASSERT(result == false, "Spectrum scan should fail with NULL config");
 }
 
@@ -82,9 +82,9 @@ void test_subghz_scan_spectrum_null_config() {
 void test_subghz_scan_spectrum_null_buffer() {
     subghz_config_t config;
     subghz_analyzer_init(&config);
-    
+
     bool result = subghz_scan_spectrum(&config, NULL);
-    
+
     TEST_ASSERT(result == false, "Spectrum scan should fail with NULL spectrum buffer");
 }
 
@@ -94,10 +94,10 @@ void test_subghz_scan_spectrum_null_buffer() {
 void test_subghz_capture_signal_valid() {
     subghz_config_t config;
     rf_signal_t signal;
-    
+
     subghz_analyzer_init(&config);
     bool result = subghz_capture_signal(&config, &signal);
-    
+
     TEST_ASSERT(result == true, "Signal capture should succeed with valid parameters");
 }
 
@@ -107,7 +107,7 @@ void test_subghz_capture_signal_valid() {
 void test_subghz_capture_signal_null_config() {
     rf_signal_t signal;
     bool result = subghz_capture_signal(NULL, &signal);
-    
+
     TEST_ASSERT(result == false, "Signal capture should fail with NULL config");
 }
 
@@ -117,9 +117,9 @@ void test_subghz_capture_signal_null_config() {
 void test_subghz_capture_signal_null_buffer() {
     subghz_config_t config;
     subghz_analyzer_init(&config);
-    
+
     bool result = subghz_capture_signal(&config, NULL);
-    
+
     TEST_ASSERT(result == false, "Signal capture should fail with NULL signal buffer");
 }
 
@@ -129,13 +129,13 @@ void test_subghz_capture_signal_null_buffer() {
 void test_subghz_analyze_signal_valid() {
     rf_signal_t signal;
     signal_analysis_t analysis;
-    
+
     signal.i_samples = NULL;
     signal.q_samples = NULL;
     signal.sample_count = 0;
-    
+
     bool result = subghz_analyze_signal(&signal, &analysis);
-    
+
     TEST_ASSERT(result == true, "Signal analysis should succeed with valid parameters");
 }
 
@@ -145,7 +145,7 @@ void test_subghz_analyze_signal_valid() {
 void test_subghz_analyze_signal_null_signal() {
     signal_analysis_t analysis;
     bool result = subghz_analyze_signal(NULL, &analysis);
-    
+
     TEST_ASSERT(result == false, "Signal analysis should fail with NULL signal");
 }
 
@@ -156,9 +156,9 @@ void test_subghz_analyze_signal_null_buffer() {
     rf_signal_t signal;
     signal.i_samples = NULL;
     signal.q_samples = NULL;
-    
+
     bool result = subghz_analyze_signal(&signal, NULL);
-    
+
     TEST_ASSERT(result == false, "Signal analysis should fail with NULL analysis buffer");
 }
 
@@ -168,13 +168,13 @@ void test_subghz_analyze_signal_null_buffer() {
 void test_subghz_decode_protocol_valid() {
     rf_signal_t signal;
     protocol_data_t protocol;
-    
+
     signal.i_samples = NULL;
     signal.q_samples = NULL;
     signal.sample_count = 0;
-    
+
     bool result = subghz_decode_protocol(&signal, &protocol);
-    
+
     TEST_ASSERT(result == true, "Protocol decode should succeed with valid parameters");
 }
 
@@ -184,7 +184,7 @@ void test_subghz_decode_protocol_valid() {
 void test_subghz_decode_protocol_null_signal() {
     protocol_data_t protocol;
     bool result = subghz_decode_protocol(NULL, &protocol);
-    
+
     TEST_ASSERT(result == false, "Protocol decode should fail with NULL signal");
 }
 
@@ -195,9 +195,9 @@ void test_subghz_decode_protocol_null_buffer() {
     rf_signal_t signal;
     signal.i_samples = NULL;
     signal.q_samples = NULL;
-    
+
     bool result = subghz_decode_protocol(&signal, NULL);
-    
+
     TEST_ASSERT(result == false, "Protocol decode should fail with NULL protocol buffer");
 }
 
@@ -207,10 +207,10 @@ void test_subghz_decode_protocol_null_buffer() {
 void test_subghz_cleanup_valid() {
     subghz_config_t config;
     subghz_analyzer_init(&config);
-    
+
     // Should not crash
     subghz_analyzer_cleanup(&config);
-    
+
     TEST_ASSERT(true, "Cleanup should succeed with valid config");
 }
 
@@ -220,7 +220,7 @@ void test_subghz_cleanup_valid() {
 void test_subghz_cleanup_null() {
     // Should not crash
     subghz_analyzer_cleanup(NULL);
-    
+
     TEST_ASSERT(true, "Cleanup should handle NULL config gracefully");
 }
 
@@ -231,7 +231,7 @@ int main(void) {
     printf("========================================\n");
     printf("SubGHz RF Analyzer Unit Tests\n");
     printf("========================================\n");
-    
+
     RUN_TEST(test_subghz_init_valid);
     RUN_TEST(test_subghz_init_null);
     RUN_TEST(test_subghz_scan_spectrum_valid);
@@ -248,12 +248,12 @@ int main(void) {
     RUN_TEST(test_subghz_decode_protocol_null_buffer);
     RUN_TEST(test_subghz_cleanup_valid);
     RUN_TEST(test_subghz_cleanup_null);
-    
+
     printf("\n========================================\n");
     printf("Test Results:\n");
     printf("  Passed: %d\n", tests_passed);
     printf("  Failed: %d\n", tests_failed);
     printf("========================================\n");
-    
+
     return tests_failed > 0 ? 1 : 0;
 }

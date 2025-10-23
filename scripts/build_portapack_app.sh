@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # MDK-Predator PortaPack Application Build Script
-# 
+#
 # This script helps integrate MDK-Predator with PortaPack Mayhem firmware
 # and builds the application for deployment.
 #
@@ -68,25 +68,25 @@ EOF
 
 check_requirements() {
     print_info "Checking build requirements..."
-    
+
     # Check for arm-none-eabi-gcc
     if ! command -v arm-none-eabi-gcc &> /dev/null; then
         print_error "ARM toolchain not found. Please install arm-none-eabi-gcc"
         exit 1
     fi
-    
+
     # Check for cmake
     if ! command -v cmake &> /dev/null; then
         print_error "CMake not found. Please install CMake 3.16+"
         exit 1
     fi
-    
+
     # Check for python3
     if ! command -v python3 &> /dev/null; then
         print_error "Python 3 not found. Please install Python 3.7+"
         exit 1
     fi
-    
+
     print_info "All requirements satisfied"
 }
 
@@ -96,89 +96,89 @@ verify_mayhem_path() {
         print_usage
         exit 1
     fi
-    
+
     if [ ! -d "$MAYHEM_PATH" ]; then
         print_error "Mayhem firmware directory not found: $MAYHEM_PATH"
         exit 1
     fi
-    
+
     if [ ! -f "$MAYHEM_PATH/CMakeLists.txt" ]; then
         print_error "Invalid Mayhem firmware directory (CMakeLists.txt not found)"
         exit 1
     fi
-    
+
     print_info "Mayhem firmware found at: $MAYHEM_PATH"
 }
 
 integrate_with_mayhem() {
     print_info "Integrating MDK-Predator with Mayhem firmware..."
-    
+
     local external_dir="$MAYHEM_PATH/firmware/application/external/mdk_predator"
-    
+
     # Create external app directory
     mkdir -p "$external_dir"
-    
+
     # Copy application files
     print_info "Copying application files..."
     cp -r "$MDK_ROOT/app"/* "$external_dir/"
-    
+
     # Copy source files
     print_info "Copying source files..."
     cp -r "$MDK_ROOT/src" "$external_dir/"
     cp -r "$MDK_ROOT/include" "$external_dir/"
-    
+
     # Copy configuration
     print_info "Copying configuration..."
     cp "$MDK_ROOT/mdk_predator.conf" "$external_dir/"
-    
+
     print_info "Integration complete"
 }
 
 build_application() {
     print_info "Building PortaPack firmware with MDK-Predator..."
-    
+
     local build_dir="$MAYHEM_PATH/build"
-    
+
     # Create build directory
     mkdir -p "$build_dir"
     cd "$build_dir"
-    
+
     # Configure with CMake
     print_info "Running CMake configuration..."
     if ! cmake ..; then
         print_error "CMake configuration failed"
         exit 1
     fi
-    
+
     # Build external apps
     print_info "Building external applications..."
     if ! make external_apps; then
         print_error "Build failed"
         exit 1
     fi
-    
+
     print_info "Build complete"
 }
 
 copy_output() {
     print_info "Copying built application..."
-    
+
     local app_file="$MAYHEM_PATH/firmware/application/external/mdk_predator.ppma"
-    
+
     if [ ! -f "$app_file" ]; then
         print_error "Built application not found: $app_file"
         exit 1
     fi
-    
+
     # Create output directory
     mkdir -p "$OUTPUT_DIR"
-    
+
     # Copy application
     cp "$app_file" "$OUTPUT_DIR/"
-    
+
     # Copy configuration
     cp "$MDK_ROOT/mdk_predator.conf" "$OUTPUT_DIR/"
-    
+
     # Create README
     cat > "$OUTPUT_DIR/README.txt" << EOF
 MDK-Predator PortaPack Application
@@ -199,7 +199,7 @@ Installation:
 
 See DEPLOYMENT.md for detailed instructions.
 EOF
-    
+
     print_info "Application copied to: $OUTPUT_DIR"
     print_info "  - mdk_predator.ppma"
     print_info "  - mdk_predator.conf"
@@ -208,21 +208,21 @@ EOF
 
 clean_build() {
     print_info "Cleaning build artifacts..."
-    
+
     if [ -d "$MAYHEM_PATH/build" ]; then
         rm -rf "$MAYHEM_PATH/build"
     fi
-    
+
     if [ -d "$MAYHEM_PATH/firmware/application/external/mdk_predator" ]; then
         rm -rf "$MAYHEM_PATH/firmware/application/external/mdk_predator"
     fi
-    
+
     print_info "Clean complete"
 }
 
 main() {
     local do_clean=0
-    
+
     # Parse arguments
     while [[ $# -gt 0 ]]; do
         case $1 in
@@ -249,23 +249,23 @@ main() {
                 ;;
         esac
     done
-    
+
     # Verify paths
     verify_mayhem_path
-    
+
     # Check requirements
     check_requirements
-    
+
     # Clean if requested
     if [ $do_clean -eq 1 ]; then
         clean_build
     fi
-    
+
     # Build process
     integrate_with_mayhem
     build_application
     copy_output
-    
+
     # Success message
     echo ""
     echo -e "${GREEN}========================================${NC}"
