@@ -113,22 +113,22 @@ private:
     };
     
     Text text_status {
-        { 2 * 8, 22 * 16, 26 * 8, 16 },
+        { 2 * 8, 9 * 16, 26 * 8, 16 },
         ""
     };
     
-    Console console {
-        { 0, 18 * 8, 240, 14 * 8 }
-    };
-    
     Text text_frequency {
-        { 2 * 8, 12 * 16, 26 * 8, 16 },
+        { 2 * 8, 10 * 16, 26 * 8, 16 },
         ""
     };
     
     Text text_signal_count {
-        { 2 * 8, 13 * 16, 26 * 8, 16 },
+        { 2 * 8, 11 * 16, 26 * 8, 16 },
         "Signals captured: 0"
+    };
+    
+    Console console {
+        { 0, 12 * 16, 240, 8 * 16 }
     };
     
     void start_key_fob_analyzer();
@@ -168,22 +168,22 @@ private:
     };
     
     Text text_status {
-        { 2 * 8, 22 * 16, 26 * 8, 16 },
+        { 2 * 8, 9 * 16, 26 * 8, 16 },
         ""
     };
     
-    Console console {
-        { 0, 18 * 8, 240, 14 * 8 }
-    };
-    
     Text text_scan_status {
-        { 2 * 8, 12 * 16, 26 * 8, 16 },
+        { 2 * 8, 10 * 16, 26 * 8, 16 },
         "Status: Ready"
     };
     
     Text text_networks_found {
-        { 2 * 8, 13 * 16, 26 * 8, 16 },
+        { 2 * 8, 11 * 16, 26 * 8, 16 },
         "Networks found: 0"
+    };
+    
+    Console console {
+        { 0, 12 * 16, 240, 8 * 16 }
     };
     
     void start_network_scan();
@@ -222,22 +222,22 @@ private:
     };
     
     Text text_status {
-        { 2 * 8, 22 * 16, 26 * 8, 16 },
+        { 2 * 8, 9 * 16, 26 * 8, 16 },
         ""
     };
     
-    Console console {
-        { 0, 18 * 8, 240, 14 * 8 }
-    };
-    
     Text text_scan_status {
-        { 2 * 8, 12 * 16, 26 * 8, 16 },
+        { 2 * 8, 10 * 16, 26 * 8, 16 },
         "Status: Ready"
     };
     
     Text text_devices_found {
-        { 2 * 8, 13 * 16, 26 * 8, 16 },
+        { 2 * 8, 11 * 16, 26 * 8, 16 },
         "Devices found: 0"
+    };
+    
+    Console console {
+        { 0, 12 * 16, 240, 8 * 16 }
     };
     
     void start_device_scan();
@@ -282,12 +282,8 @@ private:
     };
     
     Text text_status {
-        { 2 * 8, 22 * 16, 26 * 8, 16 },
+        { 2 * 8, 12 * 16, 26 * 8, 16 },
         ""
-    };
-    
-    Console console {
-        { 0, 18 * 8, 240, 14 * 8 }
     };
     
     Text text_frequency_range {
@@ -298,6 +294,10 @@ private:
     Text text_activity {
         { 2 * 8, 14 * 16, 26 * 8, 16 },
         "Signals: 0"
+    };
+    
+    Console console {
+        { 0, 15 * 16, 240, 5 * 16 }
     };
     
     void start_spectrum_scan();
@@ -336,22 +336,22 @@ private:
     };
     
     Text text_status {
-        { 2 * 8, 22 * 16, 26 * 8, 16 },
+        { 2 * 8, 9 * 16, 26 * 8, 16 },
         ""
     };
     
-    Console console {
-        { 0, 18 * 8, 240, 14 * 8 }
-    };
-    
     Text text_algorithm {
-        { 2 * 8, 12 * 16, 26 * 8, 16 },
+        { 2 * 8, 10 * 16, 26 * 8, 16 },
         "Algorithm: Unknown"
     };
     
     Text text_entropy_value {
-        { 2 * 8, 13 * 16, 26 * 8, 16 },
+        { 2 * 8, 11 * 16, 26 * 8, 16 },
         "Entropy: N/A"
+    };
+    
+    Console console {
+        { 0, 12 * 16, 240, 8 * 16 }
     };
     
     void start_algorithm_identify();

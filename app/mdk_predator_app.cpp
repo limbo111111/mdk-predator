@@ -132,6 +132,7 @@ AutomotiveView::AutomotiveView(NavigationView& nav)
 void AutomotiveView::start_key_fob_analyzer() {
     if (is_capturing) {
         console.writeln("Stopping capture...");
+        keyfob_analyzer_cleanup(nullptr);
         is_capturing = false;
         button_key_fob.set_text("Start Capture");
         return;
@@ -230,6 +231,7 @@ WiFiView::WiFiView(NavigationView& nav)
 void WiFiView::start_network_scan() {
     if (is_scanning) {
         console.writeln("Stopping scan...");
+        wifi_analyzer_cleanup(nullptr);
         is_scanning = false;
         button_scan.set_text("Start Scan");
         text_scan_status.set("Status: Stopped");
@@ -325,6 +327,7 @@ BluetoothView::BluetoothView(NavigationView& nav)
 void BluetoothView::start_device_scan() {
     if (is_scanning) {
         console.writeln("Stopping scan...");
+        bluetooth_analyzer_cleanup(nullptr);
         is_scanning = false;
         button_scan.set_text("Start Scan");
         text_scan_status.set("Status: Stopped");
@@ -424,6 +427,7 @@ SubGHzView::SubGHzView(NavigationView& nav)
 void SubGHzView::start_spectrum_scan() {
     if (is_scanning) {
         console.writeln("Stopping spectrum scan...");
+        subghz_analyzer_cleanup(nullptr);
         is_scanning = false;
         button_spectrum.set_text("Spectrum Scanner");
         return;
@@ -457,6 +461,7 @@ void SubGHzView::start_spectrum_scan() {
 void SubGHzView::start_signal_capture() {
     if (is_capturing) {
         console.writeln("Stopping capture...");
+        subghz_analyzer_cleanup(nullptr);
         is_capturing = false;
         button_capture.set_text("Signal Capture");
         return;
