@@ -94,15 +94,15 @@ typedef struct {
 
 /* Function prototypes */
 bool crypto_analyzer_init(crypto_config_t *config);
-bool crypto_identify_algorithm(uint8_t *ciphertext, uint32_t length,
+bool crypto_identify_algorithm(uint8_t *ciphertext, uint32_t length, 
                                 crypto_identification_t *result);
-bool crypto_analyze_key_exchange(key_exchange_data_t *data,
+bool crypto_analyze_key_exchange(key_exchange_data_t *data, 
                                   key_exchange_analysis_t *analysis);
-bool crypto_test_weak_keys(crypto_config_t *config, uint8_t *key,
+bool crypto_test_weak_keys(crypto_config_t *config, uint8_t *key, 
                             uint32_t key_length, weak_key_result_t *result);
 bool crypto_analyze_rolling_code(uint8_t *encrypted_data, uint32_t length,
                                   rolling_crypto_analysis_t *analysis);
-bool crypto_entropy_analysis(uint8_t *data, uint32_t length,
+bool crypto_entropy_analysis(uint8_t *data, uint32_t length, 
                               entropy_result_t *result);
 void crypto_analyzer_cleanup(crypto_config_t *config);
 

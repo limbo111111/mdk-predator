@@ -1,6 +1,6 @@
 /**
  * Unit tests for Key Fob Analyzer Module
- *
+ * 
  * These tests validate the key fob analyzer functionality without
  * requiring actual hardware.
  */
@@ -37,7 +37,7 @@ static int tests_failed = 0;
 void test_keyfob_init_valid() {
     keyfob_config_t config;
     bool result = keyfob_analyzer_init(&config);
-
+    
     TEST_ASSERT(result == true, "Init should succeed with valid config");
     TEST_ASSERT(config.frequency == 315000000, "Default frequency should be 315 MHz");
     TEST_ASSERT(config.bandwidth == 200000, "Default bandwidth should be 200 kHz");
@@ -50,7 +50,7 @@ void test_keyfob_init_valid() {
  */
 void test_keyfob_init_null() {
     bool result = keyfob_analyzer_init(NULL);
-
+    
     TEST_ASSERT(result == false, "Init should fail with NULL config");
 }
 
@@ -60,10 +60,10 @@ void test_keyfob_init_null() {
 void test_keyfob_capture_valid() {
     keyfob_config_t config;
     signal_data_t signal;
-
+    
     keyfob_analyzer_init(&config);
     bool result = keyfob_capture_signal(&config, &signal);
-
+    
     TEST_ASSERT(result == true, "Capture should succeed with valid parameters");
 }
 
@@ -73,7 +73,7 @@ void test_keyfob_capture_valid() {
 void test_keyfob_capture_null_config() {
     signal_data_t signal;
     bool result = keyfob_capture_signal(NULL, &signal);
-
+    
     TEST_ASSERT(result == false, "Capture should fail with NULL config");
 }
 
@@ -83,9 +83,9 @@ void test_keyfob_capture_null_config() {
 void test_keyfob_capture_null_signal() {
     keyfob_config_t config;
     keyfob_analyzer_init(&config);
-
+    
     bool result = keyfob_capture_signal(&config, NULL);
-
+    
     TEST_ASSERT(result == false, "Capture should fail with NULL signal buffer");
 }
 
@@ -95,15 +95,15 @@ void test_keyfob_capture_null_signal() {
 void test_keyfob_analyze_valid() {
     signal_data_t signal;
     keyfob_analysis_t result_data;
-
+    
     // Setup mock signal data
     signal.data = NULL;
     signal.length = 0;
     signal.frequency = 315000000;
     signal.timestamp = 0;
-
+    
     bool result = keyfob_analyze_signal(&signal, &result_data);
-
+    
     TEST_ASSERT(result == true, "Analyze should succeed with valid parameters");
 }
 
@@ -113,7 +113,7 @@ void test_keyfob_analyze_valid() {
 void test_keyfob_analyze_null_signal() {
     keyfob_analysis_t result_data;
     bool result = keyfob_analyze_signal(NULL, &result_data);
-
+    
     TEST_ASSERT(result == false, "Analyze should fail with NULL signal");
 }
 
@@ -124,9 +124,9 @@ void test_keyfob_analyze_null_result() {
     signal_data_t signal;
     signal.data = NULL;
     signal.length = 0;
-
+    
     bool result = keyfob_analyze_signal(&signal, NULL);
-
+    
     TEST_ASSERT(result == false, "Analyze should fail with NULL result buffer");
 }
 
@@ -136,12 +136,12 @@ void test_keyfob_analyze_null_result() {
 void test_keyfob_rolling_code_valid() {
     signal_data_t signal;
     rolling_code_info_t info;
-
+    
     signal.data = NULL;
     signal.length = 0;
-
+    
     bool result = keyfob_detect_rolling_code(&signal, &info);
-
+    
     TEST_ASSERT(result == true, "Rolling code detection should succeed with valid parameters");
 }
 
@@ -151,7 +151,7 @@ void test_keyfob_rolling_code_valid() {
 void test_keyfob_rolling_code_null_signal() {
     rolling_code_info_t info;
     bool result = keyfob_detect_rolling_code(NULL, &info);
-
+    
     TEST_ASSERT(result == false, "Rolling code detection should fail with NULL signal");
 }
 
@@ -162,9 +162,9 @@ void test_keyfob_rolling_code_null_info() {
     signal_data_t signal;
     signal.data = NULL;
     signal.length = 0;
-
+    
     bool result = keyfob_detect_rolling_code(&signal, NULL);
-
+    
     TEST_ASSERT(result == false, "Rolling code detection should fail with NULL info buffer");
 }
 
@@ -174,10 +174,10 @@ void test_keyfob_rolling_code_null_info() {
 void test_keyfob_cleanup_valid() {
     keyfob_config_t config;
     keyfob_analyzer_init(&config);
-
+    
     // Should not crash
     keyfob_analyzer_cleanup(&config);
-
+    
     TEST_ASSERT(true, "Cleanup should succeed with valid config");
 }
 
@@ -187,7 +187,7 @@ void test_keyfob_cleanup_valid() {
 void test_keyfob_cleanup_null() {
     // Should not crash
     keyfob_analyzer_cleanup(NULL);
-
+    
     TEST_ASSERT(true, "Cleanup should handle NULL config gracefully");
 }
 
@@ -198,7 +198,7 @@ int main(void) {
     printf("========================================\n");
     printf("Key Fob Analyzer Unit Tests\n");
     printf("========================================\n");
-
+    
     RUN_TEST(test_keyfob_init_valid);
     RUN_TEST(test_keyfob_init_null);
     RUN_TEST(test_keyfob_capture_valid);
@@ -212,12 +212,12 @@ int main(void) {
     RUN_TEST(test_keyfob_rolling_code_null_info);
     RUN_TEST(test_keyfob_cleanup_valid);
     RUN_TEST(test_keyfob_cleanup_null);
-
+    
     printf("\n========================================\n");
     printf("Test Results:\n");
     printf("  Passed: %d\n", tests_passed);
     printf("  Failed: %d\n", tests_failed);
     printf("========================================\n");
-
+    
     return tests_failed > 0 ? 1 : 0;
 }

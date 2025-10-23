@@ -122,7 +122,7 @@ Use this template for new test files:
 ```c
 /**
  * Unit tests for [Module Name]
- *
+ * 
  * These tests validate the [module] functionality without
  * requiring actual hardware.
  */
@@ -169,15 +169,15 @@ int main(void) {
     printf("========================================\n");
     printf("[Module Name] Unit Tests\n");
     printf("========================================\n");
-
+    
     RUN_TEST(test_example);
-
+    
     printf("\n========================================\n");
     printf("Test Results:\n");
     printf("  Passed: %d\n", tests_passed);
     printf("  Failed: %d\n", tests_failed);
     printf("========================================\n");
-
+    
     return tests_failed > 0 ? 1 : 0;
 }
 ```
@@ -193,10 +193,10 @@ int main(void) {
    void test_example() {
        // Arrange - Set up test data
        config_t config;
-
+       
        // Act - Call the function
        bool result = function_init(&config);
-
+       
        // Assert - Verify results
        TEST_ASSERT(result == true, "Should succeed");
    }

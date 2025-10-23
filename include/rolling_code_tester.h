@@ -58,9 +58,9 @@ typedef struct {
 /* Function prototypes */
 bool rolling_code_tester_init(rolling_code_config_t *config);
 bool test_keeloq_code(uint32_t encrypted, uint64_t key, keeloq_result_t *result);
-bool analyze_rolling_sequence(signal_data_t *signals, uint32_t count,
+bool analyze_rolling_sequence(signal_data_t *signals, uint32_t count, 
                                sequence_analysis_t *analysis);
-bool test_replay_vulnerability(rolling_code_config_t *config,
+bool test_replay_vulnerability(rolling_code_config_t *config, 
                                 signal_data_t *signal,
                                 replay_test_result_t *result);
 void rolling_code_tester_cleanup(rolling_code_config_t *config);
