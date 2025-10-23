@@ -1,6 +1,6 @@
 /**
  * MDK-Predator Main Header
- *
+ * 
  * Main integration for Mayhem-MDK Predator Security Suite
  */
 

@@ -1,6 +1,6 @@
 /**
  * MDK-Predator Main Integration Module
- *
+ * 
  * Main entry point and integration for all security modules
  * on the Mayhem-MDK platform
  */
@@ -27,15 +27,15 @@ bool mdk_predator_init(mdk_predator_config_t *config) {
     if (!config) {
         return false;
     }
-
+    
     // Initialize HackRF/Mayhem-MDK hardware with config
     if (!mdk_hardware_init()) {
         return false;
     }
-
+    
     // Copy configuration
     g_config = *config;
-
+    
     // Apply hardware configuration
     // Note: In production, this would call HackRF API functions
     // hackrf_set_sample_rate(g_config.hardware.hackrf_sample_rate);
@@ -43,14 +43,14 @@ bool mdk_predator_init(mdk_predator_config_t *config) {
     // hackrf_set_lna_gain(g_config.hardware.hackrf_lna_gain);
     // hackrf_set_vga_gain(g_config.hardware.hackrf_vga_gain);
     // hackrf_set_txvga_gain(g_config.hardware.hackrf_txvga_gain);
-
+    
     // Apply security configuration
     if (!g_config.security.allow_transmit) {
         // Disable transmit functions
     }
-
+    
     g_initialized = true;
-
+    
     return true;
 }
 
@@ -61,7 +61,7 @@ bool mdk_hardware_init(void) {
     // Initialize HackRF One hardware
     // Configure for Mayhem-MDK module
     // Set up GPIO, SPI, I2C interfaces
-
+    
     return true;
 }
 
@@ -72,11 +72,11 @@ bool mdk_get_status(mdk_status_t *status) {
     if (!status || !g_initialized) {
         return false;
     }
-
+    
     status->is_initialized = g_initialized;
     status->hardware_ready = true;
     status->active_module = g_config.default_module;
-
+    
     return true;
 }
 
@@ -87,9 +87,9 @@ bool mdk_set_active_module(security_module_t module) {
     if (!g_initialized) {
         return false;
     }
-
+    
     g_config.default_module = module;
-
+    
     // Configure hardware for specific module
     switch (module) {
         case MODULE_AUTOMOTIVE:
@@ -110,7 +110,7 @@ bool mdk_set_active_module(security_module_t module) {
         default:
             return false;
     }
-
+    
     return true;
 }
 
@@ -121,18 +121,18 @@ bool mdk_run_diagnostic(diagnostic_result_t *result) {
     if (!result || !g_initialized) {
         return false;
     }
-
+    
     result->hardware_ok = true;
     result->rf_frontend_ok = true;
     result->firmware_version = 1;
-
+    
     // Test each module
     result->automotive_ok = true;
     result->wifi_ok = true;
     result->bluetooth_ok = true;
     result->subghz_ok = true;
     result->crypto_ok = true;
-
+    
     return true;
 }
 
@@ -143,7 +143,7 @@ void mdk_predator_cleanup(void) {
     if (g_initialized) {
         // Cleanup hardware
         mdk_hardware_cleanup();
-
+        
         g_initialized = false;
     }
 }

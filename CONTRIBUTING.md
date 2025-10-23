@@ -50,12 +50,12 @@ bool example_function(example_t *config) {
     if (!config) {
         return false;
     }
-
+    
     // Perform operation
     for (int i = 0; i < count; i++) {
         // Process item
     }
-
+    
     return true;
 }
 ```
@@ -181,7 +181,7 @@ mdk-predator/
    ```bash
    # Ubuntu/Debian
    sudo apt-get install gcc-arm-none-eabi
-
+   
    # macOS
    brew install arm-none-eabi-gcc
    ```

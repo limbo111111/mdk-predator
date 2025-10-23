@@ -126,14 +126,14 @@ If a pre-built `.ppma` file is provided with the release:
    ```bash
    # Create external app directory
    mkdir -p /path/to/mayhem-firmware/firmware/application/external/mdk_predator
-
+   
    # Copy application files
    cp -r app/* /path/to/mayhem-firmware/firmware/application/external/mdk_predator/
-
+   
    # Copy source and headers
    cp -r src /path/to/mayhem-firmware/firmware/application/external/mdk_predator/
    cp -r include /path/to/mayhem-firmware/firmware/application/external/mdk_predator/
-
+   
    # Copy configuration
    cp mdk_predator.conf /path/to/mayhem-firmware/firmware/application/external/mdk_predator/
    ```
@@ -182,7 +182,7 @@ This method is the easiest and doesn't require firmware updates.
    ```bash
    # Copy the .ppma file
    cp mdk_predator.ppma /path/to/sd_card/APPS/
-
+   
    # Copy configuration
    mkdir -p /path/to/sd_card/MDK-PREDATOR/config
    cp mdk_predator.conf /path/to/sd_card/MDK-PREDATOR/config/
@@ -237,7 +237,7 @@ This method integrates MDK-Predator directly into the firmware (advanced users).
 
 4. **Initial Configuration**
    - Application will initialize with default settings
-   - Status should show "Initialized"
+   - Status should show "Initialized" 
    - All modules should be available
 
 ### Detailed Configuration
@@ -251,22 +251,22 @@ This method integrates MDK-Predator directly into the firmware (advanced users).
    [General]
    default_module=automotive
    enable_logging=true
-
+   
    [Hardware]
    sample_rate=2000000
    bandwidth=1750000
    lna_gain=8
    vga_gain=20
-
+   
    [Security]
    allow_transmit=false
    require_confirmation=true
    log_all_activity=true
-
+   
    [Automotive]
    default_frequency=433920000
    default_bandwidth=200000
-
+   
    [SubGHz]
    frequency_min=300000000
    frequency_max=928000000
