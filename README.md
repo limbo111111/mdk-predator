@@ -75,13 +75,39 @@ MDK-Predator
 
 ### Library (for development)
 
+**Linux/macOS:**
 ```bash
 make
+```
+
+**Windows (PowerShell):**
+```powershell
+.\scripts\build.ps1
+```
+
+**Windows (CMD):**
+```cmd
+scripts\build.bat
 ```
 
 The compiled library will be available at `build/lib/libmdk_predator.a`.
 
 ### PortaPack Application
+
+**Linux/macOS:**
+```bash
+./scripts/build_portapack_app.sh -m /path/to/mayhem-firmware
+```
+
+**Windows (PowerShell):**
+```powershell
+.\scripts\build_portapack_app.ps1 -MayhemPath "C:\path\to\mayhem-firmware"
+```
+
+**Windows (CMD):**
+```cmd
+scripts\build_portapack_app.bat -m "C:\path\to\mayhem-firmware"
+```
 
 See [DEPLOYMENT.md](docs/DEPLOYMENT.md) for complete instructions on:
 - Building the PortaPack application (.ppma)
@@ -89,10 +115,18 @@ See [DEPLOYMENT.md](docs/DEPLOYMENT.md) for complete instructions on:
 - Integrating with Mayhem firmware
 - Deploying to Mayhem-MDK module
 
+**Windows users**: See [BUILDING_WINDOWS.md](docs/BUILDING_WINDOWS.md) for detailed Windows build instructions.
+
 ### Clean Build
 
+**Linux/macOS:**
 ```bash
 make clean
+```
+
+**Windows:**
+```powershell
+.\scripts\build.ps1 -Clean
 ```
 
 ## Testing

@@ -311,9 +311,18 @@ vga_gain=20                 # VGA gain
 Download from releases - easiest option!
 
 ### Option 2: Build with Script
+
+**Linux/macOS:**
 ```bash
 ./scripts/build_portapack_app.sh -m /path/to/mayhem-firmware
 ```
+
+**Windows:**
+```powershell
+.\scripts\build_portapack_app.ps1 -MayhemPath "C:\path\to\mayhem-firmware"
+```
+
+See [BUILDING_WINDOWS.md](docs/BUILDING_WINDOWS.md) for detailed Windows instructions.
 
 ### Option 3: Manual Build
 See [DEPLOYMENT.md](docs/DEPLOYMENT.md) for instructions
