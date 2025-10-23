@@ -130,6 +130,10 @@ $(TEST_BIN_DIR)/crypto/%: $(TEST_DIR)/crypto/%.c $(CRYPTO_SRC) test-directories
 	$(TEST_CC) $(TEST_CFLAGS) $(TEST_INCLUDES) $< $(CRYPTO_SRC) -lm -o $@
 
 # Compile test binaries - integration
+$(TEST_BIN_DIR)/integration/test_input_validation: $(TEST_DIR)/integration/test_input_validation.c test-directories
+	@echo "Building test: $@"
+	$(TEST_CC) $(TEST_CFLAGS) $(TEST_INCLUDES) $< -o $@
+
 $(TEST_BIN_DIR)/integration/%: $(TEST_DIR)/integration/%.c $(ALL_SRC) test-directories
 	@echo "Building test: $@"
 	$(TEST_CC) $(TEST_CFLAGS) $(TEST_INCLUDES) $< $(filter-out $(MAIN_SRC),$(ALL_SRC)) $(MAIN_SRC) -lm -o $@

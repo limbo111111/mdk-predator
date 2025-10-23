@@ -70,6 +70,8 @@ bool crypto_test_weak_keys(crypto_config_t *config, uint8_t *key,
         return false;
     }
     
+    (void)key_length;  // Reserved for future implementation
+    
     result->is_weak = false;
     result->entropy = 0.0f;
     
@@ -90,6 +92,8 @@ bool crypto_analyze_rolling_code(uint8_t *encrypted_data, uint32_t length,
     if (!encrypted_data || !analysis) {
         return false;
     }
+    
+    (void)length;  // Reserved for future implementation
     
     // Analyze rolling code cryptography
     analysis->algorithm_detected = false;

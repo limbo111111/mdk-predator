@@ -41,7 +41,6 @@ bool test_keeloq_code(uint32_t encrypted, uint64_t key, keeloq_result_t *result)
     
     for (int i = 0; i < 528; i++) {
         uint32_t r = (key >> (i & 63)) & 1;
-        uint32_t y = x >> 31;
         x = (x << 1) | ((x >> 31) ^ (x >> 26) ^ (x >> 20) ^ (x >> 9) ^ r);
     }
     

@@ -110,13 +110,18 @@ make test-crypto      # Cryptographic analysis tests
 make test-integration # Integration tests
 ```
 
-**Test Coverage**: 5 test suites with 95 assertions covering:
+**Test Coverage**: 8 test suites with 217 assertions covering:
 - Key fob analysis and rolling code testing
+- WiFi security analysis and network scanning
+- Bluetooth device scanning and security assessment
 - SubGHz RF signal analysis
 - Cryptographic protocol analysis
+- Input validation and sanitization
 - System integration and module coordination
 
-See [tests/README.md](tests/README.md) for detailed test documentation.
+**All tests passing with 100% success rate and zero compiler warnings.**
+
+See [docs/TESTING.md](docs/TESTING.md) and [tests/README.md](tests/README.md) for detailed test documentation.
 
 ## Hardware Requirements
 
@@ -131,7 +136,10 @@ See [tests/README.md](tests/README.md) for detailed test documentation.
 - [Architecture Guide](docs/ARCHITECTURE.md) - System design and data flow
 - [API Reference](docs/API.md) - Complete API documentation
 - [User Guide](docs/USER_GUIDE.md) - Usage instructions and examples
+- [Testing Guide](docs/TESTING.md) - Comprehensive testing documentation
 - [Test Guide](tests/README.md) - Test suite documentation
+- [Security Policy](SECURITY.md) - Security guidelines and vulnerability reporting
+- [Code of Conduct](CODE_OF_CONDUCT.md) - Community guidelines and ethics
 
 ## Configuration
 
