@@ -1,6 +1,6 @@
 /*
  * MDK-Predator PortaPack Mayhem Application
- * 
+ *
  * This file provides the PortaPack Mayhem application integration
  * for the MDK-Predator security research suite.
  */
@@ -137,7 +137,7 @@ void AutomotiveView::start_key_fob_analyzer() {
         button_key_fob.set_text("Start Capture");
         return;
     }
-    
+
     keyfob_config_t config;
     config.frequency = 433920000; // 433.92 MHz
     config.bandwidth = 200000;    // 200 kHz
@@ -237,7 +237,7 @@ void WiFiView::start_network_scan() {
         text_scan_status.set("Status: Stopped");
         return;
     }
-    
+
     wifi_config_t config;
     config.mode = WIFI_MODE_SCAN;
     config.channel = 0; // All channels
@@ -248,24 +248,24 @@ void WiFiView::start_network_scan() {
         console.writeln("WiFi Scanner: Started");
         console.writeln("Scanning 2.4GHz channels...");
         text_scan_status.set("Status: Scanning");
-        
+
         // Simulate finding networks
         networks_found = 0;
         console.writeln("");
         console.writeln("Discovered networks:");
-        
+
         // Example networks (in real implementation would come from actual scan)
         const char* example_networks[] = {
             "Network-A  Ch:1  -45dBm WPA2",
             "Network-B  Ch:6  -67dBm WPA2",
             "Network-C  Ch:11 -72dBm WEP"
         };
-        
+
         for (size_t i = 0; i < 3; i++) {
             console.writeln(example_networks[i]);
             networks_found++;
         }
-        
+
         update_scan_display();
         console.writeln("");
         console.writeln("Scan complete!");
@@ -333,7 +333,7 @@ void BluetoothView::start_device_scan() {
         text_scan_status.set("Status: Stopped");
         return;
     }
-    
+
     bluetooth_config_t config;
     config.scan_type = BT_SCAN_BOTH;
     config.scan_duration = 10; // 10 seconds
@@ -344,24 +344,24 @@ void BluetoothView::start_device_scan() {
         console.writeln("Bluetooth Scanner: Started");
         console.writeln("Scanning Classic + BLE...");
         text_scan_status.set("Status: Scanning");
-        
+
         // Simulate finding devices
         devices_found = 0;
         console.writeln("");
         console.writeln("Discovered devices:");
-        
+
         // Example devices (in real implementation would come from actual scan)
         const char* example_devices[] = {
             "Phone-A    [BLE] -55dBm",
             "Headset-B  [Classic] -68dBm",
             "Watch-C    [BLE] -73dBm"
         };
-        
+
         for (size_t i = 0; i < 3; i++) {
             console.writeln(example_devices[i]);
             devices_found++;
         }
-        
+
         update_scan_display();
         console.writeln("");
         console.writeln("Scan complete!");
@@ -432,7 +432,7 @@ void SubGHzView::start_spectrum_scan() {
         button_spectrum.set_text("Spectrum Scanner");
         return;
     }
-    
+
     subghz_config_t config;
     config.frequency_min = 300000000;  // 300 MHz
     config.frequency_max = 928000000;  // 928 MHz
@@ -466,7 +466,7 @@ void SubGHzView::start_signal_capture() {
         button_capture.set_text("Signal Capture");
         return;
     }
-    
+
     is_capturing = true;
     button_capture.set_text("Stop Capture");
     console.writeln("Signal Capture: Started");
