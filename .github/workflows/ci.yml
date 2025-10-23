@@ -63,12 +63,12 @@ jobs:
     - name: Check file permissions
       run: |
         echo "Checking file permissions..."
-        find . -type f -name "*.c" -o -name "*.h" | while read file; do
-          if [ -x "$file" ]; then
-            echo "Warning: $file is executable"
-            exit 1
-          fi
-        done
+        executable_files=$(find . -type f \( -name "*.c" -o -name "*.h" \) -executable)
+        if [ -n "$executable_files" ]; then
+          echo "Error: Found executable source files:"
+          echo "$executable_files"
+          exit 1
+        fi
         echo "File permissions OK ✓"
     
     - name: Check for trailing whitespace
