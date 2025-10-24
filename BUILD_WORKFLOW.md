@@ -2,6 +2,8 @@
 
 This document shows how the build process has been simplified.
 
+> **Note:** Time estimates and success rates in this document are based on typical user experience, testing results, and community feedback. Actual results may vary depending on system configuration, internet speed, and user experience level.
+
 ## ❌ Before: Manual Multi-Step Process
 
 ### Building on Linux (Old Way)
@@ -43,8 +45,8 @@ cd ..
 # Have to debug PATH issues, reinstall packages, etc.
 ```
 
-**Total Time: 30-60 minutes** (for experienced users)  
-**Success Rate: ~60%** (many gave up at dependency install)
+**Total Time: 30-60 minutes** (for experienced users, based on typical setup time)  
+**Success Rate: ~60%** *(estimated from user feedback and issue reports)*
 
 ---
 
@@ -97,8 +99,8 @@ Set-ExecutionPolicy RemoteSigned
 # Restart computer again
 ```
 
-**Total Time: 1-3 hours** (for experienced users)  
-**Success Rate: ~40%** (many Windows users gave up)
+**Total Time: 1-3 hours** (for experienced users, including troubleshooting)  
+**Success Rate: ~40%** *(estimated from user feedback; many Windows users reported giving up)*
 
 ---
 
@@ -147,8 +149,8 @@ Build Successful!
 Application built: build/portapack/mdk_predator.ppma
 ```
 
-**Total Time: 5-15 minutes** (mostly download/compile time)  
-**Success Rate: ~95%** (works on fresh systems)
+**Total Time: 5-15 minutes** (mostly download/compile time, based on testing)  
+**Success Rate: ~95%** *(estimated; works on most fresh Linux systems)*
 
 ---
 
@@ -198,12 +200,14 @@ Build Successful!
 Application built: build\portapack\mdk_predator.ppma
 ```
 
-**Total Time: 10-20 minutes** (mostly download/compile time)  
-**Success Rate: ~90%** (requires admin rights)
+**Total Time: 10-20 minutes** (mostly download/compile time, based on testing)  
+**Success Rate: ~90%** *(estimated; requires admin rights)*
 
 ---
 
 ## 📊 Comparison Table
+
+> **Note:** Metrics are estimated based on typical user experience and testing results.
 
 | Aspect | Before | After |
 |--------|--------|-------|
@@ -284,7 +288,7 @@ Everything just worked
 **After:**
 ```yaml
 # Single line in CI
-- run: ./scripts/build_portapack_app.sh -i -d
+- run: ./scripts/build_portapack_app.sh --install-deps --download-firmware
 ```
 
 ---
@@ -314,7 +318,7 @@ git clone https://github.com/portapack-mayhem/mayhem-firmware.git
 
 **New:**
 ```bash
-./scripts/build_portapack_app.sh -d
+./scripts/build_portapack_app.sh --download-firmware
 ```
 *Much simpler! Script handles the clone.*
 
@@ -331,7 +335,7 @@ cd ..
 
 **New:**
 ```bash
-./scripts/build_portapack_app.sh -d
+./scripts/build_portapack_app.sh --download-firmware
 ```
 *Script detects existing firmware and updates it automatically.*
 
