@@ -21,6 +21,11 @@ MDK_ROOT="$(dirname "$SCRIPT_DIR")"
 # Default paths
 MAYHEM_PATH=""
 OUTPUT_DIR="$MDK_ROOT/build/portapack"
+DEFAULT_MAYHEM_CLONE_PATH="$MDK_ROOT/build/mayhem-firmware"
+
+# Flags
+INSTALL_DEPS=0
+DOWNLOAD_FIRMWARE=0
 
 # Functions
 print_info() {
@@ -42,14 +47,22 @@ Usage: $0 [OPTIONS]
 Build MDK-Predator as a PortaPack Mayhem external application.
 
 OPTIONS:
-    -m, --mayhem PATH      Path to PortaPack Mayhem firmware source
-    -o, --output PATH      Output directory for built application (default: build/portapack)
-    -c, --clean            Clean before building
-    -h, --help             Show this help message
+    -m, --mayhem PATH          Path to PortaPack Mayhem firmware source
+    -o, --output PATH          Output directory for built application (default: build/portapack)
+    -c, --clean                Clean before building
+    -i, --install-deps         Install required dependencies (ARM toolchain, CMake, Python)
+    -d, --download-firmware    Download Mayhem firmware if not present
+    -h, --help                 Show this help message
 
 EXAMPLES:
+    # Install dependencies and download firmware automatically
+    $0 --install-deps --download-firmware
+
     # Build with Mayhem firmware at specific path
     $0 -m ~/portapack-mayhem
+
+    # Install deps, download firmware, and build in one command
+    $0 -i -d
 
     # Clean build
     $0 -m ~/portapack-mayhem -c
@@ -58,32 +71,150 @@ EXAMPLES:
     $0 -m ~/portapack-mayhem -o /tmp/mdk-build
 
 REQUIREMENTS:
-    - PortaPack Mayhem firmware source
-    - ARM toolchain (arm-none-eabi-gcc)
-    - CMake 3.16+
-    - Python 3.7+
+    - PortaPack Mayhem firmware source (can be auto-downloaded with -d)
+    - ARM toolchain (arm-none-eabi-gcc) (can be auto-installed with -i)
+    - CMake 3.16+ (can be auto-installed with -i)
+    - Python 3.7+ (can be auto-installed with -i)
 
 EOF
+}
+
+install_dependencies() {
+    print_info "Installing build dependencies..."
+    
+    # Detect OS
+    if [ -f /etc/os-release ]; then
+        . /etc/os-release
+        OS=$ID
+    else
+        print_error "Cannot detect operating system"
+        exit 1
+    fi
+    
+    case $OS in
+        ubuntu|debian)
+            print_info "Detected Debian/Ubuntu system"
+            print_info "Installing ARM toolchain, CMake, Python..."
+            sudo apt-get update
+            sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi \
+                cmake python3 python3-pip git make dfu-util
+            ;;
+        fedora|rhel|centos)
+            print_info "Detected Red Hat based system"
+            print_info "Installing ARM toolchain, CMake, Python..."
+            sudo dnf install -y arm-none-eabi-gcc-cs arm-none-eabi-newlib \
+                cmake python3 python3-pip git make dfu-util
+            ;;
+        arch|manjaro)
+            print_info "Detected Arch based system"
+            print_info "Installing ARM toolchain, CMake, Python..."
+            sudo pacman -S --noconfirm arm-none-eabi-gcc arm-none-eabi-newlib \
+                cmake python python-pip git make dfu-util
+            ;;
+        *)
+            print_warning "Unsupported OS: $OS"
+            print_info "Please install manually:"
+            print_info "  - ARM GCC toolchain (arm-none-eabi-gcc)"
+            print_info "  - CMake 3.16+"
+            print_info "  - Python 3.7+"
+            print_info "  - Git, Make, dfu-util"
+            exit 1
+            ;;
+    esac
+    
+    print_info "Dependencies installed successfully"
+}
+
+download_mayhem_firmware() {
+    print_info "Downloading Mayhem firmware..."
+    
+    # Check if git is installed
+    if ! command -v git &> /dev/null; then
+        print_error "Git is not installed. Please install git first."
+        exit 1
+    fi
+    
+    # Set default path if not specified
+    if [ -z "$MAYHEM_PATH" ]; then
+        MAYHEM_PATH="$DEFAULT_MAYHEM_CLONE_PATH"
+        print_info "Using default firmware location: $MAYHEM_PATH"
+    fi
+    
+    # Check if directory already exists
+    if [ -d "$MAYHEM_PATH" ]; then
+        print_warning "Directory already exists: $MAYHEM_PATH"
+        
+        # Check if it's a git repo
+        if [ -d "$MAYHEM_PATH/.git" ]; then
+            print_info "Updating existing Mayhem firmware..."
+            cd "$MAYHEM_PATH"
+            git pull
+            git submodule update --init --recursive
+            cd - > /dev/null
+            print_info "Firmware updated successfully"
+            return 0
+        else
+            print_error "Directory exists but is not a git repository"
+            print_error "Please remove or specify a different path with -m"
+            exit 1
+        fi
+    fi
+    
+    # Clone the firmware
+    print_info "Cloning Mayhem firmware from GitHub..."
+    git clone --depth 1 https://github.com/portapack-mayhem/mayhem-firmware.git "$MAYHEM_PATH"
+    
+    # Initialize submodules
+    print_info "Initializing submodules..."
+    cd "$MAYHEM_PATH"
+    git submodule update --init --recursive
+    cd - > /dev/null
+    
+    print_info "Mayhem firmware downloaded successfully to: $MAYHEM_PATH"
 }
 
 check_requirements() {
     print_info "Checking build requirements..."
     
+    local missing_deps=()
+    
     # Check for arm-none-eabi-gcc
     if ! command -v arm-none-eabi-gcc &> /dev/null; then
-        print_error "ARM toolchain not found. Please install arm-none-eabi-gcc"
-        exit 1
+        print_warning "ARM toolchain not found"
+        missing_deps+=("arm-none-eabi-gcc")
+    else
+        print_info "ARM toolchain: $(arm-none-eabi-gcc --version | head -1)"
     fi
     
     # Check for cmake
     if ! command -v cmake &> /dev/null; then
-        print_error "CMake not found. Please install CMake 3.16+"
-        exit 1
+        print_warning "CMake not found"
+        missing_deps+=("cmake")
+    else
+        print_info "CMake: $(cmake --version | head -1)"
     fi
     
     # Check for python3
     if ! command -v python3 &> /dev/null; then
-        print_error "Python 3 not found. Please install Python 3.7+"
+        print_warning "Python 3 not found"
+        missing_deps+=("python3")
+    else
+        print_info "Python: $(python3 --version)"
+    fi
+    
+    # Check for make
+    if ! command -v make &> /dev/null; then
+        print_warning "Make not found"
+        missing_deps+=("make")
+    else
+        print_info "Make: $(make --version | head -1)"
+    fi
+    
+    if [ ${#missing_deps[@]} -gt 0 ]; then
+        print_error "Missing dependencies: ${missing_deps[*]}"
+        echo ""
+        print_info "You can install them automatically with: $0 --install-deps"
+        echo ""
         exit 1
     fi
     
@@ -91,14 +222,22 @@ check_requirements() {
 }
 
 verify_mayhem_path() {
+    # If download firmware was requested but no path set, it will be set by download function
     if [ -z "$MAYHEM_PATH" ]; then
-        print_error "Mayhem firmware path not specified. Use -m or --mayhem option."
-        print_usage
-        exit 1
+        if [ $DOWNLOAD_FIRMWARE -eq 0 ]; then
+            print_error "Mayhem firmware path not specified."
+            print_info "Either use -m to specify the path, or use -d to download automatically."
+            print_usage
+            exit 1
+        else
+            # Path will be set by download_mayhem_firmware
+            return 0
+        fi
     fi
     
     if [ ! -d "$MAYHEM_PATH" ]; then
         print_error "Mayhem firmware directory not found: $MAYHEM_PATH"
+        print_info "Use -d or --download-firmware to download it automatically"
         exit 1
     fi
     
@@ -238,6 +377,14 @@ main() {
                 do_clean=1
                 shift
                 ;;
+            -i|--install-deps)
+                INSTALL_DEPS=1
+                shift
+                ;;
+            -d|--download-firmware)
+                DOWNLOAD_FIRMWARE=1
+                shift
+                ;;
             -h|--help)
                 print_usage
                 exit 0
@@ -249,6 +396,16 @@ main() {
                 ;;
         esac
     done
+    
+    # Install dependencies if requested
+    if [ $INSTALL_DEPS -eq 1 ]; then
+        install_dependencies
+    fi
+    
+    # Download firmware if requested
+    if [ $DOWNLOAD_FIRMWARE -eq 1 ]; then
+        download_mayhem_firmware
+    fi
     
     # Verify paths
     verify_mayhem_path
