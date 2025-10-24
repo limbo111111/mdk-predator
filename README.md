@@ -73,26 +73,69 @@ MDK-Predator
 
 ## Building
 
+### Quick Start - Automated Build with Dependencies
+
+**Never built before? Start here!**
+
+**Linux/macOS:**
+```bash
+# Install dependencies and download firmware automatically
+./scripts/build_portapack_app.sh --install-deps --download-firmware
+
+# Or use short flags
+./scripts/build_portapack_app.sh -i -d
+```
+
+**Windows (PowerShell as Administrator):**
+```powershell
+# Install dependencies and download firmware automatically
+.\scripts\build_portapack_app.ps1 -InstallDeps -DownloadFirmware
+```
+
+**Windows (CMD as Administrator):**
+```cmd
+scripts\build_portapack_app.bat --install-deps --download-firmware
+```
+
+This will:
+1. Install ARM toolchain, CMake, Python, and other dependencies
+2. Download the Mayhem firmware from GitHub
+3. Build the MDK-Predator application (.ppma file)
+4. Place output in `build/portapack/`
+
 ### Library (for development)
 
 **Linux/macOS:**
 ```bash
+# Install dependencies first (if needed)
+./scripts/build.sh --install-deps
+
+# Build library
 make
+# Or use the build script
+./scripts/build.sh
 ```
 
 **Windows (PowerShell):**
 ```powershell
+# Install dependencies first (if needed)
+.\scripts\build.ps1 -InstallDeps
+
+# Build library
 .\scripts\build.ps1
 ```
 
 **Windows (CMD):**
 ```cmd
+scripts\build.bat --install-deps
 scripts\build.bat
 ```
 
 The compiled library will be available at `build/lib/libmdk_predator.a`.
 
 ### PortaPack Application
+
+**If you have Mayhem firmware already:**
 
 **Linux/macOS:**
 ```bash
@@ -109,6 +152,23 @@ The compiled library will be available at `build/lib/libmdk_predator.a`.
 scripts\build_portapack_app.bat -m "C:\path\to\mayhem-firmware"
 ```
 
+**If you need to download Mayhem firmware:**
+
+**Linux/macOS:**
+```bash
+# Download firmware and build
+./scripts/build_portapack_app.sh --download-firmware
+
+# Or specify where to download it
+./scripts/build_portapack_app.sh -d -m /custom/path
+```
+
+**Windows:**
+```powershell
+# Download firmware and build
+.\scripts\build_portapack_app.ps1 -DownloadFirmware
+```
+
 See [DEPLOYMENT.md](docs/DEPLOYMENT.md) for complete instructions on:
 - Building the PortaPack application (.ppma)
 - Installing to SD card
@@ -117,11 +177,28 @@ See [DEPLOYMENT.md](docs/DEPLOYMENT.md) for complete instructions on:
 
 **Windows users**: See [BUILDING_WINDOWS.md](docs/BUILDING_WINDOWS.md) for detailed Windows build instructions.
 
+### Build Script Options
+
+**Library Build Options:**
+- `-i, --install-deps` / `-InstallDeps`: Install build dependencies automatically
+- `-c, --clean` / `-Clean`: Clean build artifacts before building
+- `-t, --test` / `-Test`: Run tests after building
+- `-T, --target` / `-Target`: Build specific module (automotive, wireless, crypto)
+
+**PortaPack Build Options:**
+- `-i, --install-deps` / `-InstallDeps`: Install build dependencies automatically
+- `-d, --download-firmware` / `-DownloadFirmware`: Download Mayhem firmware from GitHub
+- `-m, --mayhem` / `-MayhemPath`: Specify path to Mayhem firmware
+- `-c, --clean` / `-Clean`: Clean before building
+- `-o, --output` / `-OutputDir`: Custom output directory
+
 ### Clean Build
 
 **Linux/macOS:**
 ```bash
 make clean
+# Or
+./scripts/build.sh --clean
 ```
 
 **Windows:**
