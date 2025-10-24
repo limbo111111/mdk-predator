@@ -23,6 +23,8 @@ if /i "%~1"=="-clean" set PS_ARGS=%PS_ARGS% -Clean
 if /i "%~1"=="--clean" set PS_ARGS=%PS_ARGS% -Clean
 if /i "%~1"=="-test" set PS_ARGS=%PS_ARGS% -Test
 if /i "%~1"=="--test" set PS_ARGS=%PS_ARGS% -Test
+if /i "%~1"=="-i" set PS_ARGS=%PS_ARGS% -InstallDeps
+if /i "%~1"=="--install-deps" set PS_ARGS=%PS_ARGS% -InstallDeps
 if /i "%~1"=="-help" set PS_ARGS=%PS_ARGS% -Help
 if /i "%~1"=="--help" set PS_ARGS=%PS_ARGS% -Help
 if /i "%~1"=="-h" set PS_ARGS=%PS_ARGS% -Help

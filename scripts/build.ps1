@@ -6,6 +6,7 @@
 param(
     [switch]$Clean,
     [switch]$Test,
+    [switch]$InstallDeps,
     [switch]$Help,
     [string]$Target = "all"
 )
@@ -44,13 +45,17 @@ Usage: .\build.ps1 [OPTIONS]
 Build MDK-Predator library on Windows using ARM toolchain.
 
 OPTIONS:
-    -Clean          Clean build artifacts before building
-    -Test           Run tests after building
-    -Target <name>  Build specific target (default: all)
-                    Options: all, automotive, wireless, crypto
-    -Help           Show this help message
+    -InstallDeps        Install required dependencies (ARM toolchain, Make)
+    -Clean              Clean build artifacts before building
+    -Test               Run tests after building
+    -Target <name>      Build specific target (default: all)
+                        Options: all, automotive, wireless, crypto
+    -Help               Show this help message
 
 EXAMPLES:
+    # Install dependencies and build
+    .\build.ps1 -InstallDeps
+
     # Build library
     .\build.ps1
 
@@ -64,8 +69,8 @@ EXAMPLES:
     .\build.ps1 -Target automotive
 
 REQUIREMENTS:
-    - ARM toolchain (arm-none-eabi-gcc)
-    - GNU Make (via MinGW, Cygwin, or standalone)
+    - ARM toolchain (arm-none-eabi-gcc) (can be auto-installed with -InstallDeps)
+    - GNU Make (via MinGW, Cygwin, or standalone) (can be auto-installed with -InstallDeps)
     - PowerShell 5.0+
 
 For PortaPack application build, use build_portapack_app.ps1
@@ -102,31 +107,90 @@ function Test-Dependency {
     return $true
 }
 
+function Install-Dependencies {
+    Write-Info "Installing build dependencies using Chocolatey..."
+    Write-Host ""
+    
+    # Check if running as administrator
+    $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+    
+    if (-not $isAdmin) {
+        Write-Error-Custom "Administrator privileges required to install dependencies"
+        Write-Host ""
+        Write-Host "Please run PowerShell as Administrator and try again:"
+        Write-Host "  Right-click PowerShell -> Run as Administrator"
+        Write-Host ""
+        Write-Host "Alternatively, install dependencies manually:"
+        Write-Host "  - ARM GCC Toolchain: https://developer.arm.com/downloads/-/gnu-rm"
+        Write-Host "  - Make: choco install make (or via MinGW/Cygwin/Git Bash)"
+        Write-Host ""
+        exit 1
+    }
+    
+    # Check if Chocolatey is installed
+    $chocoInstalled = $null -ne (Get-Command choco -ErrorAction SilentlyContinue)
+    
+    if (-not $chocoInstalled) {
+        Write-Info "Chocolatey not found. Installing Chocolatey..."
+        Write-Host ""
+        
+        Set-ExecutionPolicy Bypass -Scope Process -Force
+        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+        
+        try {
+            Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+            Write-Info "Chocolatey installed successfully"
+        } catch {
+            Write-Error-Custom "Failed to install Chocolatey: $_"
+            Write-Host ""
+            Write-Host "Please install Chocolatey manually from: https://chocolatey.org/install"
+            Write-Host "Then run this script again with -InstallDeps"
+            exit 1
+        }
+        
+        # Refresh environment variables
+        $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+    }
+    
+    Write-Info "Installing dependencies via Chocolatey..."
+    Write-Host ""
+    
+    # Install ARM toolchain
+    Write-Info "Installing ARM GCC toolchain..."
+    choco install gcc-arm-embedded -y
+    
+    # Install Make
+    Write-Info "Installing Make..."
+    choco install make -y
+    
+    # Install GCC for tests
+    Write-Info "Installing MinGW GCC (for tests)..."
+    choco install mingw -y
+    
+    Write-Host ""
+    Write-Info "Dependencies installed successfully!"
+    Write-Info "You may need to restart your terminal for PATH changes to take effect."
+    Write-Host ""
+    
+    # Refresh environment variables
+    $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+}
+
 function Test-AllDependencies {
     Write-Info "Checking build dependencies..."
     Write-Host ""
     
-    $allGood = $true
+    $missingDeps = @()
     
     # Check for ARM toolchain
     if (-not (Test-Dependency "arm-none-eabi-gcc" "ARM GCC Toolchain" "--version")) {
-        $allGood = $false
-        Write-Host ""
-        Write-Warning-Custom "ARM toolchain not found."
-        Write-Host "Install from: https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads"
+        $missingDeps += "arm-none-eabi-gcc"
         Write-Host ""
     }
     
     # Check for make
     if (-not (Test-Dependency "make" "GNU Make" "--version")) {
-        $allGood = $false
-        Write-Host ""
-        Write-Warning-Custom "GNU Make not found."
-        Write-Host "Install options:"
-        Write-Host "  1. MinGW: https://sourceforge.net/projects/mingw/"
-        Write-Host "  2. Cygwin: https://www.cygwin.com/"
-        Write-Host "  3. Chocolatey: choco install make"
-        Write-Host "  4. Git Bash includes make"
+        $missingDeps += "make"
         Write-Host ""
     }
     
@@ -135,14 +199,26 @@ function Test-AllDependencies {
         # Good
     }
     
-    if (-not $allGood) {
-        Write-Error-Custom "Missing required dependencies. Please install them and try again."
+    # Check for gcc if testing
+    if ($Test) {
+        if (-not (Test-Dependency "gcc" "GCC (for tests)" "--version")) {
+            $missingDeps += "gcc"
+            Write-Host ""
+        }
+    }
+    
+    if ($missingDeps.Count -gt 0) {
+        Write-Error-Custom "Missing dependencies: $($missingDeps -join ', ')"
+        Write-Host ""
+        Write-Info "You can install them automatically with: .\build.ps1 -InstallDeps"
+        Write-Host ""
         exit 1
     }
     
     Write-Host ""
     Write-Info "All dependencies satisfied!"
     Write-Host ""
+}
 }
 
 function Invoke-Clean {
@@ -231,6 +307,11 @@ function Main {
     if ($Help) {
         Show-Usage
         exit 0
+    }
+    
+    # Install dependencies if requested
+    if ($InstallDeps) {
+        Install-Dependencies
     }
     
     # Show build info
