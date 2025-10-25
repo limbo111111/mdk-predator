@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "bluetooth_analyzer.h"
+#include "wireless/bluetooth_analyzer.h"
 
 /* Test counter */
 static int tests_passed = 0;

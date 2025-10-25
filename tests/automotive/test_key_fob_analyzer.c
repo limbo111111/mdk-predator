@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include "key_fob_analyzer.h"
+#include "automotive/key_fob_analyzer.h"
 
 /* Test counter */
 static int tests_passed = 0;

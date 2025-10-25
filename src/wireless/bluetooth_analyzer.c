@@ -7,7 +7,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
-#include "bluetooth_analyzer.h"
+#include "wireless/bluetooth_analyzer.h"
 
 /**
  * Initialize Bluetooth analyzer

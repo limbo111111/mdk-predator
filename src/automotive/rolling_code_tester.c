@@ -8,7 +8,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
-#include "rolling_code_tester.h"
+#include "automotive/rolling_code_tester.h"
 
 /* KeeLoq algorithm constants */
 #define KEELOQ_NLF 0x3A5C742E

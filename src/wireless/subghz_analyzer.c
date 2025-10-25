@@ -7,7 +7,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
-#include "subghz_analyzer.h"
+#include "wireless/subghz_analyzer.h"
 
 /* Common SubGHz frequencies */
 static const uint32_t SUBGHZ_FREQUENCIES[] = {
