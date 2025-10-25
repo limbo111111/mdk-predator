@@ -26,6 +26,17 @@ This document provides examples of using the updated build scripts and demonstra
 scripts\build_portapack_app.bat --install-deps --download-firmware
 ```
 
+#### On Windows (WSL Debian/Ubuntu) - RECOMMENDED:
+```bash
+# In WSL terminal
+./scripts/build_portapack_app_wsl.sh --install-deps --download-firmware
+
+# Short version
+./scripts/build_portapack_app_wsl.sh -i -d
+```
+
+**Why WSL?** WSL provides better compatibility with ARM toolchains and build tools on Windows. See [BUILD_APPROACH.md](BUILD_APPROACH.md) for details.
+
 ### What This Does:
 1. **Installs Dependencies**:
    - ARM GCC toolchain (arm-none-eabi-gcc)
@@ -33,7 +44,8 @@ scripts\build_portapack_app.bat --install-deps --download-firmware
    - Python 3.7+
    - Make
    - Git
-   - dfu-util (Linux)
+   - dfu-util (Linux/WSL)
+   - build-essential (WSL)
 
 2. **Downloads Mayhem Firmware**:
    - Clones from https://github.com/portapack-mayhem/mayhem-firmware
@@ -42,7 +54,7 @@ scripts\build_portapack_app.bat --install-deps --download-firmware
 
 3. **Builds Application**:
    - Integrates MDK-Predator with Mayhem firmware
-   - Compiles external application
+   - Compiles external application ONLY (not full firmware)
    - Creates `mdk_predator.ppma` file
    - Output in: `build/portapack/`
 

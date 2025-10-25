@@ -7,7 +7,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
-#include "wifi_analyzer.h"
+#include "wireless/wifi_analyzer.h"
 
 /**
  * Initialize WiFi analyzer
