@@ -121,7 +121,7 @@ This document summarizes all the fixes and improvements made to enable reliable 
 ### Test Results:
 ```
 Test Suites: 8/8 passed
-Assertions: 217/217 passed
+Assertions: 217/217 passed (verified by actual test run)
 - Key Fob Analyzer: 17 assertions
 - Rolling Code Tester: 18 assertions
 - Bluetooth Analyzer: 31 assertions
@@ -131,6 +131,8 @@ Assertions: 217/217 passed
 - Input Validation: 58 assertions
 - Integration Tests: 24 assertions
 ```
+
+*Note: Counts reflect current test suite status verified by running `make test-run`.*
 
 ## Recommended Build Methods
 
