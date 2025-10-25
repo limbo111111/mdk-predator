@@ -97,6 +97,12 @@ MDK-Predator
 scripts\build_portapack_app.bat --install-deps --download-firmware
 ```
 
+**Windows Simple Build (Alternative):**
+```powershell
+# Simpler script with better error messages
+.\scripts\simple_build_windows.ps1 -MayhemPath .\mayhem-firmware
+```
+
 **Windows (WSL Debian/Ubuntu) - RECOMMENDED for Windows users:**
 ```bash
 # In WSL terminal
@@ -110,6 +116,8 @@ This will:
 4. Place output in `build/portapack/`
 
 **Note:** For Windows users, WSL provides better build compatibility. See [BUILD_APPROACH.md](BUILD_APPROACH.md) for details.
+
+**Windows Build Issues?** See [scripts/WINDOWS_BUILD_FIXES.md](scripts/WINDOWS_BUILD_FIXES.md) for solutions to common CMake/nmake errors.
 
 ### Library (for development)
 
