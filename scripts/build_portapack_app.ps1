@@ -85,6 +85,15 @@ NOTES:
     - Build process integrates MDK-Predator with Mayhem firmware
     - Output will be a .ppma file for PortaPack
     - Use -InstallDeps to install via Chocolatey (requires admin rights)
+    
+ALTERNATIVE: WSL (Windows Subsystem for Linux)
+    For a more reliable build experience on Windows, consider using WSL:
+    1. Install WSL: wsl --install
+    2. Install Debian/Ubuntu from Microsoft Store
+    3. Run: scripts/build_portapack_app_wsl.sh -i -d
+    
+    WSL provides a native Linux environment and often has better compatibility
+    with ARM toolchains and build tools.
 
 "@
 }
@@ -444,11 +453,28 @@ function Invoke-Build {
         
         # Build external apps
         Write-Info "Building external applications..."
-        & make external_apps
+        
+        # Try using cmake --build first (more portable on Windows)
+        Write-Info "Attempting to build with CMake..."
+        & cmake --build . --target external_apps
         
         if ($LASTEXITCODE -ne 0) {
-            Write-Error-Custom "Build failed"
-            exit 1
+            Write-Warning-Custom "CMake build failed, trying make..."
+            
+            # Fallback to make if cmake --build fails
+            & make external_apps
+            
+            if ($LASTEXITCODE -ne 0) {
+                Write-Error-Custom "Build failed with both cmake and make"
+                Write-Host ""
+                Write-Host "Troubleshooting tips:"
+                Write-Host "  1. Ensure make is installed (choco install make)"
+                Write-Host "  2. Check that ARM toolchain is in PATH"
+                Write-Host "  3. Try running in Git Bash or MSYS2"
+                Write-Host "  4. Consider using WSL for building (see build_portapack_app_wsl.sh)"
+                Write-Host ""
+                exit 1
+            }
         }
         
         Write-Host ""
@@ -463,11 +489,40 @@ function Invoke-Build {
 function Copy-Output {
     Write-Info "Copying built application..."
     
-    $appFile = Join-Path $MayhemPath "firmware\application\external\mdk_predator.ppma"
+    # Try multiple possible locations for the .ppma file
+    $possibleLocations = @(
+        (Join-Path $MayhemPath "firmware\application\external\mdk_predator.ppma"),
+        (Join-Path $MayhemPath "build\firmware\application\external\mdk_predator.ppma"),
+        (Join-Path $MayhemPath "firmware\application\mdk_predator.ppma")
+    )
     
-    if (-not (Test-Path $appFile)) {
-        Write-Error-Custom "Built application not found: $appFile"
+    $appFile = $null
+    foreach ($location in $possibleLocations) {
+        if (Test-Path $location) {
+            $appFile = $location
+            Write-Info "Found application at: $appFile"
+            break
+        }
+    }
+    
+    if (-not $appFile) {
+        Write-Error-Custom "Built application not found in expected locations:"
+        foreach ($location in $possibleLocations) {
+            Write-Host "  - $location"
+        }
+        Write-Host ""
         Write-Warning-Custom "Check build logs for errors"
+        Write-Host ""
+        
+        # Try to find any .ppma files
+        Write-Info "Searching for .ppma files in build directory..."
+        $foundFiles = Get-ChildItem -Path (Join-Path $MayhemPath "build") -Filter "*.ppma" -Recurse -ErrorAction SilentlyContinue
+        if ($foundFiles) {
+            Write-Info "Found .ppma files:"
+            foreach ($file in $foundFiles) {
+                Write-Host "  - $($file.FullName)"
+            }
+        }
         exit 1
     }
     

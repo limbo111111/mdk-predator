@@ -356,10 +356,39 @@ For issues or questions:
 - PowerShell 5.1+ included by default
 - Windows Defender may flag ARM toolchain binaries (add exceptions if needed)
 
-### Windows Subsystem for Linux (WSL)
-- You can also use the Linux build scripts in WSL
-- Run: `./scripts/build_portapack_app.sh`
-- See: Linux build instructions in main README
+### Windows Subsystem for Linux (WSL) - RECOMMENDED
+
+WSL provides the best build experience on Windows with native Linux toolchain support.
+
+**Setup WSL:**
+```powershell
+# In Windows PowerShell (as Administrator)
+wsl --install
+
+# Install Ubuntu from Microsoft Store
+# Restart computer if prompted
+```
+
+**Build with WSL:**
+```bash
+# In WSL Ubuntu terminal
+cd /mnt/c/path/to/mdk-predator
+
+# Use the WSL-optimized build script
+./scripts/build_portapack_app_wsl.sh --install-deps --download-firmware
+
+# Or short version
+./scripts/build_portapack_app_wsl.sh -i -d
+```
+
+**Advantages of WSL:**
+- ✅ Better ARM toolchain compatibility
+- ✅ Native Linux build environment
+- ✅ Faster and more reliable builds
+- ✅ Access Windows files via `/mnt/c/`
+- ✅ Can output to Windows directories
+
+**See:** [BUILD_APPROACH.md](../BUILD_APPROACH.md) for detailed comparison of build methods.
 
 ### Git Bash
 - Git Bash includes make and can run PowerShell scripts

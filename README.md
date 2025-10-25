@@ -97,11 +97,19 @@ MDK-Predator
 scripts\build_portapack_app.bat --install-deps --download-firmware
 ```
 
+**Windows (WSL Debian/Ubuntu) - RECOMMENDED for Windows users:**
+```bash
+# In WSL terminal
+./scripts/build_portapack_app_wsl.sh --install-deps --download-firmware
+```
+
 This will:
 1. Install ARM toolchain, CMake, Python, and other dependencies
 2. Download the Mayhem firmware from GitHub
 3. Build the MDK-Predator application (.ppma file)
 4. Place output in `build/portapack/`
+
+**Note:** For Windows users, WSL provides better build compatibility. See [BUILD_APPROACH.md](BUILD_APPROACH.md) for details.
 
 ### Library (for development)
 
@@ -168,6 +176,17 @@ scripts\build_portapack_app.bat -m "C:\path\to\mayhem-firmware"
 # Download firmware and build
 .\scripts\build_portapack_app.ps1 -DownloadFirmware
 ```
+
+**Windows (WSL):**
+```bash
+# Download firmware and build
+./scripts/build_portapack_app_wsl.sh --download-firmware
+```
+
+See [BUILD_APPROACH.md](BUILD_APPROACH.md) for details on:
+- External app build vs. full firmware build
+- Why you only need to build the .ppma file
+- Platform-specific build recommendations
 
 See [DEPLOYMENT.md](docs/DEPLOYMENT.md) for complete instructions on:
 - Building the PortaPack application (.ppma)
