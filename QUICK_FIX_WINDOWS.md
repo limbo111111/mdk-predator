@@ -80,7 +80,7 @@ The scripts now:
 
 ## Still Having Issues?
 
-See [WINDOWS_BUILD_FIXES.md](WINDOWS_BUILD_FIXES.md) for comprehensive troubleshooting.
+See [scripts/WINDOWS_BUILD_FIXES.md](scripts/WINDOWS_BUILD_FIXES.md) for comprehensive troubleshooting.
 
 ## Files Updated
 
