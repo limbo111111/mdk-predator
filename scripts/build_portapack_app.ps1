@@ -194,9 +194,17 @@ function Install-Dependencies {
     Write-Info "Installing Git..."
     choco install git -y
     
-    # Install Make
-    Write-Info "Installing Make..."
+    # Install Make and build tools
+    Write-Info "Installing Make and build tools..."
     choco install make -y
+    
+    # Install MinGW for better Windows build compatibility
+    Write-Info "Installing MinGW..."
+    choco install mingw -y
+    
+    # Install Ninja as an alternative build system
+    Write-Info "Installing Ninja build system..."
+    choco install ninja -y
     
     Write-Host ""
     Write-Info "Dependencies installed successfully!"
@@ -442,10 +450,48 @@ function Invoke-Build {
     try {
         # Configure with CMake
         Write-Info "Running CMake configuration..."
-        & cmake ..
         
-        if ($LASTEXITCODE -ne 0) {
-            Write-Error-Custom "CMake configuration failed"
+        # Try different generators for better Windows compatibility
+        $generators = @("MinGW Makefiles", "Unix Makefiles", "Ninja")
+        $cmakeSuccess = $false
+        $lastError = ""
+        
+        foreach ($generator in $generators) {
+            Write-Info "Trying CMake generator: $generator"
+            
+            # Clean CMakeCache if previous attempt failed
+            $cacheFile = Join-Path $buildDir "CMakeCache.txt"
+            if (Test-Path $cacheFile) {
+                Remove-Item $cacheFile -Force -ErrorAction SilentlyContinue
+            }
+            
+            # Try to configure with this generator
+            $output = & cmake .. -G $generator 2>&1
+            
+            if ($LASTEXITCODE -eq 0) {
+                Write-Info "CMake configuration successful with $generator"
+                $cmakeSuccess = $true
+                break
+            } else {
+                $lastError = $output | Out-String
+                Write-Warning-Custom "Generator $generator failed, trying next..."
+            }
+        }
+        
+        if (-not $cmakeSuccess) {
+            Write-Error-Custom "CMake configuration failed with all generators"
+            Write-Host ""
+            Write-Host "Last error:"
+            Write-Host $lastError
+            Write-Host ""
+            Write-Host "Troubleshooting tips:"
+            Write-Host "  1. Make sure make is installed (choco install make)"
+            Write-Host "  2. Install MinGW (choco install mingw)"
+            Write-Host "  3. Install Ninja (choco install ninja)"
+            Write-Host "  4. Make sure ARM toolchain is in PATH"
+            Write-Host "  5. RECOMMENDED: Use WSL for better compatibility"
+            Write-Host "     Run: wsl scripts/build_portapack_app_wsl.sh -i -d"
+            Write-Host ""
             exit 1
         }
         
