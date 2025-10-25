@@ -2,6 +2,19 @@
 
 This document summarizes all the fixes and improvements made to enable reliable Windows builds of MDK-Predator.
 
+## Critical Fix: Shell Script Line Endings
+
+**The Issue:**
+When cloning the repository on Windows, shell scripts may get CRLF line endings instead of LF, causing this error in WSL:
+```
+bash: ./build_portapack_app.sh: /bin/bash^M: bad interpreter: No such file or directory
+```
+
+**The Solution:**
+A `.gitattributes` file now ensures all scripts maintain the correct line endings automatically, regardless of the platform used to clone the repository. This fix applies to **all scripts** in the repository.
+
+---
+
 ## Issues Fixed
 
 ### 1. Windows Compilation Reliability
@@ -43,7 +56,27 @@ This document summarizes all the fixes and improvements made to enable reliable 
 
 **File:** `scripts/build_portapack_app_wsl.sh`
 
-### 4. App Integration Structure
+### 4. Shell Script Line Endings
+**Problem:** Shell scripts fail in WSL with error: `/bin/bash^M: bad interpreter: No such file or directory`
+
+This occurs when Windows users clone the repository without proper Git configuration, causing Git to convert LF line endings to CRLF.
+
+**Solution:**
+- Created `.gitattributes` file to enforce line ending rules across all platforms
+- Shell scripts (`*.sh`) always use LF line endings
+- Windows scripts (`*.bat`, `*.ps1`) always use CRLF line endings
+- Source code, Makefiles, and documentation use LF line endings
+- Binary files are not modified
+
+**Benefits:**
+- Scripts work correctly in WSL regardless of how the repository is cloned
+- No manual line ending conversion needed
+- Prevents the "bad interpreter" error
+- Works automatically for all users
+
+**File:** `.gitattributes`
+
+### 5. App Integration Structure
 **Problem:** Include directory structure didn't match what the PortaPack app expected, which would cause build failures.
 
 **Solution:**
@@ -182,6 +215,7 @@ cd /mnt/c/path/to/mdk-predator
 | **Error Handling** | Basic | Comprehensive with troubleshooting |
 | **File Detection** | Single path | Multiple paths with search |
 | **Include Structure** | Flat | Organized by module |
+| **Line Endings** | Git default (breaks WSL) | Enforced via .gitattributes |
 | **Documentation** | Basic | Comprehensive with examples |
 
 ## Files Changed
@@ -190,6 +224,7 @@ cd /mnt/c/path/to/mdk-predator
 - `scripts/build_portapack_app_wsl.sh` - WSL build script
 - `BUILD_APPROACH.md` - Build strategy documentation
 - `WINDOWS_BUILD_FIX.md` - This file
+- `.gitattributes` - Git line ending configuration
 
 ### Modified Files:
 - `scripts/build_portapack_app.ps1` - Enhanced Windows script
@@ -209,6 +244,9 @@ The following items have been verified:
 - [x] Windows PowerShell script searches multiple .ppma locations
 - [x] WSL script detects WSL environment
 - [x] WSL script can access Windows filesystem
+- [x] Shell scripts have LF line endings enforced by .gitattributes
+- [x] Windows scripts have CRLF line endings enforced by .gitattributes
+- [x] All scripts execute without line ending errors
 - [x] Include directory structure matches app expectations
 - [x] All source files use correct include paths
 - [x] All test files use correct include paths

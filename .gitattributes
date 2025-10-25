@@ -1,0 +1,61 @@
+# Git attributes for cross-platform compatibility
+# Ensures proper line endings across Windows, Linux, and macOS
+
+# Default behavior: Let Git normalize line endings to LF in repository
+# and convert to platform-specific on checkout
+* text=auto
+
+# Shell scripts must always use LF line endings
+# This prevents the "bad interpreter: /bin/bash^M" error in WSL
+*.sh text eol=lf
+
+# Windows batch and PowerShell scripts should use CRLF
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+*.cmd text eol=crlf
+
+# Source code files should use LF
+*.c text eol=lf
+*.h text eol=lf
+*.cpp text eol=lf
+*.hpp text eol=lf
+*.mk text eol=lf
+
+# Makefiles must use LF
+Makefile text eol=lf
+makefile text eol=lf
+*.mak text eol=lf
+
+# Documentation files use LF
+*.md text eol=lf
+*.txt text eol=lf
+
+# Configuration files use LF
+*.conf text eol=lf
+*.cfg text eol=lf
+*.ini text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.json text eol=lf
+
+# Binary files should not be modified
+*.bin binary
+*.elf binary
+*.hex binary
+*.o binary
+*.a binary
+*.so binary
+*.exe binary
+*.dll binary
+*.dylib binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.tar binary
+*.gz binary
+*.bz2 binary
+*.7z binary
