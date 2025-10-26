@@ -1,0 +1,75 @@
+version: '3.9'
+
+services:
+  # Main build service for mdk-predator
+  mdk-predator-build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mdk-predator:latest
+    volumes:
+      # Mount current directory (mdk-predator source) to /workspace/mdk-predator
+      - "./:/workspace/mdk-predator:ro"
+      # Mount mayhem-firmware directory (will be auto-cloned if not present)
+      - "mayhem-firmware:/workspace/mayhem-firmware"
+      # Mount output directory for built files
+      - "./build/docker-output:/workspace/output"
+    environment:
+      # Set to 1 to clean build directory before building
+      - CLEAN_BUILD=0
+      # Set to 1 to update mayhem firmware from git
+      - UPDATE_FIRMWARE=0
+    # Default: build with make
+    # Override with: docker-compose run mdk-predator-build ninja
+    command: ["make"]
+
+  # Alternative: Build with ninja (faster)
+  mdk-predator-build-ninja:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mdk-predator:latest
+    volumes:
+      - "./:/workspace/mdk-predator:ro"
+      - "mayhem-firmware:/workspace/mayhem-firmware"
+      - "./build/docker-output:/workspace/output"
+    environment:
+      - CLEAN_BUILD=0
+      - UPDATE_FIRMWARE=0
+    command: ["ninja"]
+
+  # Clean build variant
+  mdk-predator-build-clean:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mdk-predator:latest
+    volumes:
+      - "./:/workspace/mdk-predator:ro"
+      - "mayhem-firmware:/workspace/mayhem-firmware"
+      - "./build/docker-output:/workspace/output"
+    environment:
+      - CLEAN_BUILD=1
+      - UPDATE_FIRMWARE=0
+    command: ["make"]
+
+  # Interactive shell for debugging
+  mdk-predator-shell:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mdk-predator:latest
+    volumes:
+      - "./:/workspace/mdk-predator"
+      - "mayhem-firmware:/workspace/mayhem-firmware"
+      - "./build/docker-output:/workspace/output"
+    environment:
+      - CLEAN_BUILD=0
+      - UPDATE_FIRMWARE=0
+    command: ["bash"]
+    stdin_open: true
+    tty: true
+
+volumes:
+  # Named volume for mayhem-firmware to persist between builds
+  mayhem-firmware:

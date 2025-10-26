@@ -1,0 +1,67 @@
+# Git files
+.git
+.gitignore
+.gitattributes
+
+# Build artifacts
+build/
+*.o
+*.a
+*.so
+*.elf
+*.bin
+*.hex
+*.ppma
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Documentation (not needed in container)
+docs/
+*.md
+
+# Test artifacts
+test_signals/
+test_results/
+tests/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.log
+
+# Backup files
+*.bak
+*.orig
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Docker files (prevent recursion)
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# CI/CD
+.github/
+
+# Scripts not needed in container
+scripts/build*.sh
+scripts/build*.ps1
+scripts/build*.bat
+scripts/simple_build*
+
+# Keep only essential files for build
+!app/
+!src/
+!include/
+!mdk_predator.conf
+!docker-entrypoint.sh
