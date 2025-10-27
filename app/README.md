@@ -32,8 +32,9 @@ The scripts automatically:
 1. Download the Mayhem firmware (if needed)
 2. Copy all MDK-Predator files to the correct location
 3. **Register MDK-Predator in the external.cmake file**
-4. Build only the external application (fast)
-5. Generate the `mdk_predator.ppma` file
+4. **Verify all files are properly linked before building**
+5. Build only the external application (fast)
+6. Generate the `mdk_predator.ppma` file
 
 ### Manual Integration (Advanced)
 

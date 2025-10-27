@@ -311,6 +311,153 @@ integrate_with_mayhem() {
     print_info "Integration complete"
 }
 
+verify_file_links() {
+    print_info "Verifying all files are properly linked in Mayhem firmware..."
+    
+    local external_dir="$MAYHEM_PATH/firmware/application/external/mdk_predator"
+    local external_cmake="$MAYHEM_PATH/firmware/application/external/external.cmake"
+    local verification_failed=0
+    
+    # Define all required files
+    local required_cpp_files=(
+        "main.cpp"
+        "mdk_predator_app.cpp"
+    )
+    
+    local required_hpp_files=(
+        "mdk_predator_app.hpp"
+    )
+    
+    local required_c_files=(
+        "src/mdk_predator.c"
+        "src/automotive/key_fob_analyzer.c"
+        "src/automotive/rolling_code_tester.c"
+        "src/wireless/wifi_analyzer.c"
+        "src/wireless/bluetooth_analyzer.c"
+        "src/wireless/subghz_analyzer.c"
+        "src/crypto/crypto_analyzer.c"
+    )
+    
+    local required_h_files=(
+        "include/mdk_predator.h"
+        "include/input_validation.h"
+        "include/automotive/key_fob_analyzer.h"
+        "include/automotive/rolling_code_tester.h"
+        "include/wireless/wifi_analyzer.h"
+        "include/wireless/bluetooth_analyzer.h"
+        "include/wireless/subghz_analyzer.h"
+        "include/crypto/crypto_analyzer.h"
+    )
+    
+    local required_other_files=(
+        "manifest.json"
+        "mdk_predator.conf"
+    )
+    
+    # Check CPP files
+    print_info "Checking C++ source files..."
+    for file in "${required_cpp_files[@]}"; do
+        if [ ! -f "$external_dir/$file" ]; then
+            print_error "Missing C++ file: $file"
+            verification_failed=1
+        else
+            print_info "  ✓ $file"
+        fi
+    done
+    
+    # Check HPP files
+    print_info "Checking C++ header files..."
+    for file in "${required_hpp_files[@]}"; do
+        if [ ! -f "$external_dir/$file" ]; then
+            print_error "Missing C++ header: $file"
+            verification_failed=1
+        else
+            print_info "  ✓ $file"
+        fi
+    done
+    
+    # Check C files
+    print_info "Checking C source files..."
+    for file in "${required_c_files[@]}"; do
+        if [ ! -f "$external_dir/$file" ]; then
+            print_error "Missing C file: $file"
+            verification_failed=1
+        else
+            print_info "  ✓ $file"
+        fi
+    done
+    
+    # Check H files
+    print_info "Checking C header files..."
+    for file in "${required_h_files[@]}"; do
+        if [ ! -f "$external_dir/$file" ]; then
+            print_error "Missing C header: $file"
+            verification_failed=1
+        else
+            print_info "  ✓ $file"
+        fi
+    done
+    
+    # Check other required files
+    print_info "Checking configuration files..."
+    for file in "${required_other_files[@]}"; do
+        if [ ! -f "$external_dir/$file" ]; then
+            print_error "Missing file: $file"
+            verification_failed=1
+        else
+            print_info "  ✓ $file"
+        fi
+    done
+    
+    # Verify external.cmake registration
+    print_info "Verifying external.cmake registration..."
+    local cmake_verification_failed=0
+    
+    # Check if all source files are registered in external.cmake
+    for file in "${required_cpp_files[@]}"; do
+        if ! grep -q "external/mdk_predator/$file" "$external_cmake"; then
+            print_error "File not registered in external.cmake: $file"
+            cmake_verification_failed=1
+            verification_failed=1
+        fi
+    done
+    
+    for file in "${required_c_files[@]}"; do
+        if ! grep -q "external/mdk_predator/$file" "$external_cmake"; then
+            print_error "File not registered in external.cmake: $file"
+            cmake_verification_failed=1
+            verification_failed=1
+        fi
+    done
+    
+    # Check if mdk_predator is registered in EXTAPPLIST
+    if ! grep -Eq 'set\s*\(\s*EXTAPPLIST[^\)]*mdk_predator|list\s*\(\s*APPEND\s+EXTAPPLIST[^\)]*mdk_predator' "$external_cmake"; then
+        print_error "mdk_predator not found in EXTAPPLIST in external.cmake"
+        cmake_verification_failed=1
+        verification_failed=1
+    fi
+    
+    if [ $cmake_verification_failed -eq 0 ]; then
+        print_info "  ✓ All files registered in external.cmake"
+    fi
+    
+    # Final verification result
+    if [ $verification_failed -eq 1 ]; then
+        echo ""
+        print_error "File verification FAILED!"
+        print_error "Some required files are missing or not properly linked."
+        print_error "Please check the error messages above."
+        echo ""
+        exit 1
+    fi
+    
+    echo ""
+    print_info "✓ All files verified successfully!"
+    print_info "✓ All files are properly linked in Mayhem firmware"
+    print_info "✓ Ready to build MDK-Predator"
+    echo ""
+}
+
 build_application() {
     print_info "Building PortaPack firmware with MDK-Predator..."
     
@@ -458,6 +605,7 @@ main() {
     
     # Build process
     integrate_with_mayhem
+    verify_file_links
     build_application
     copy_output
     

@@ -210,6 +210,17 @@ mdk_predator
 
 This registration is **essential** - without it, the CMake build system won't compile MDK-Predator.
 
+### File Verification
+
+**NEW:** The build scripts now automatically verify all files are properly linked before building:
+
+1. **File Existence Check**: Verifies all 20+ source, header, and configuration files are copied
+2. **CMake Registration Check**: Confirms all files are registered in `external.cmake`
+3. **Structure Validation**: Ensures directory structure is intact
+4. **Early Failure**: Stops build immediately if any file is missing or not linked
+
+This verification step prevents cryptic build errors and ensures a successful build.
+
 ### Build Configuration Verification (Legacy)
 
 The `app_build.mk` file is kept for compatibility with older Makefile-based builds:
