@@ -587,8 +587,8 @@ function Test-FileLinks {
             }
         }
         
-        # Check if mdk_predator is in EXTAPPLIST
-        if ($cmakeContent -notmatch "mdk_predator") {
+        # Check if mdk_predator is registered in EXTAPPLIST
+        if ($cmakeContent -notmatch 'set\s*\(\s*EXTAPPLIST[^\)]*mdk_predator[^\)]*\)') {
             Write-Error-Custom "mdk_predator not found in EXTAPPLIST in external.cmake"
             $cmakeVerificationFailed = $true
             $verificationFailed = $true
