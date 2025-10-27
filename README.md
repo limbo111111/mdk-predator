@@ -73,9 +73,41 @@ MDK-Predator
 
 ## Building
 
+### 🐳 Docker Build (Recommended - No Dependencies Required!)
+
+**Best option for Windows users and anyone who wants zero dependency hassle!**
+
+Docker provides a complete, pre-configured build environment. No need to install ARM toolchain, CMake, Python, or any dependencies.
+
+**Windows (PowerShell):**
+```powershell
+.\docker-build.ps1
+```
+
+**Windows (CMD):**
+```cmd
+docker-build.bat
+```
+
+**Linux/macOS:**
+```bash
+chmod +x docker-build.sh  # First time only
+./docker-build.sh
+```
+
+**Output:** `build/docker-output/mdk_predator.ppma`
+
+**Requirements:**
+- Docker Desktop (Windows/macOS) or Docker Engine (Linux)
+- Download: https://www.docker.com/get-started
+
+**See:** [DOCKER_QUICKSTART.md](DOCKER_QUICKSTART.md) for quick start or [DOCKER_BUILD.md](DOCKER_BUILD.md) for full guide.
+
+---
+
 ### Quick Start - Automated Build with Dependencies
 
-**Never built before? Start here!**
+**Alternative method - installs dependencies locally**
 
 **Linux/macOS:**
 ```bash
@@ -103,7 +135,7 @@ scripts\build_portapack_app.bat --install-deps --download-firmware
 .\scripts\simple_build_windows.ps1 -MayhemPath .\mayhem-firmware
 ```
 
-**Windows (WSL Debian/Ubuntu) - RECOMMENDED for Windows users:**
+**Windows (WSL Debian/Ubuntu):**
 ```bash
 # In WSL terminal
 ./scripts/build_portapack_app_wsl.sh --install-deps --download-firmware
@@ -115,7 +147,7 @@ This will:
 3. Build the MDK-Predator application (.ppma file)
 4. Place output in `build/portapack/`
 
-**Note:** For Windows users, WSL provides better build compatibility. See [BUILD_APPROACH.md](BUILD_APPROACH.md) for details.
+**Note:** For Windows users, Docker build is recommended. If using native build, WSL provides better compatibility than native Windows. See [BUILD_APPROACH.md](BUILD_APPROACH.md) for details.
 
 **Windows Build Issues?** See [scripts/WINDOWS_BUILD_FIXES.md](scripts/WINDOWS_BUILD_FIXES.md) for solutions to common CMake/nmake errors.
 
@@ -269,13 +301,23 @@ See [docs/TESTING.md](docs/TESTING.md) and [tests/README.md](tests/README.md) fo
 
 ## Documentation
 
+### Building
+- **[Docker Quick Start](DOCKER_QUICKSTART.md)** - Build with Docker in 5 minutes (recommended)!
+- **[Docker Build Guide](DOCKER_BUILD.md)** - Complete Docker build documentation
+- [Build Approach](BUILD_APPROACH.md) - Native build system overview
+
+### Getting Started
 - **[Quick Start Guide](QUICKSTART.md)** - Get running in 5 minutes!
 - **[Deployment Guide](docs/DEPLOYMENT.md)** - Install to PortaPack H4M
+
+### Technical Documentation
 - [Architecture Guide](docs/ARCHITECTURE.md) - System design and data flow
 - [API Reference](docs/API.md) - Complete API documentation
 - [User Guide](docs/USER_GUIDE.md) - Usage instructions and examples
 - [Testing Guide](docs/TESTING.md) - Comprehensive testing documentation
 - [Test Guide](tests/README.md) - Test suite documentation
+
+### Policies
 - [Security Policy](SECURITY.md) - Security guidelines and vulnerability reporting
 - [Code of Conduct](CODE_OF_CONDUCT.md) - Community guidelines and ethics
 
