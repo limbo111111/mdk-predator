@@ -227,12 +227,12 @@ if (-not $configured) {
 }
 
 # Step 5: Build
-Write-Step "Building external applications..."
+Write-Step "Building application and external apps..."
 
 if ($buildCmd -eq "ninja") {
-    & ninja external_apps
+    & ninja application
 } else {
-    & $buildCmd external_apps
+    & $buildCmd application
 }
 
 $buildSuccess = $LASTEXITCODE -eq 0
