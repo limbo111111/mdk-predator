@@ -533,9 +533,9 @@ build_application() {
     
     echo ""
     
-    # Build external apps only (not full firmware)
-    print_info "Building external applications..."
-    if ! make external_apps; then
+    # Build application (which includes external apps)
+    print_info "Building application and external apps..."
+    if ! make application; then
         print_error "Build failed"
         exit 1
     fi

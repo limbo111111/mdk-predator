@@ -699,18 +699,18 @@ function Invoke-Build {
         
         Write-Host ""
         
-        # Build external apps
-        Write-Info "Building external applications..."
+        # Build application (which includes external apps)
+        Write-Info "Building application and external apps..."
         
         # Try using cmake --build first (more portable on Windows)
         Write-Info "Attempting to build with CMake..."
-        & cmake --build . --target external_apps
+        & cmake --build . --target application
         
         if ($LASTEXITCODE -ne 0) {
             Write-Warning-Custom "CMake build failed, trying make..."
             
             # Fallback to make if cmake --build fails
-            & make external_apps
+            & make application
             
             if ($LASTEXITCODE -ne 0) {
                 Write-Error-Custom "Build failed with both cmake and make"
