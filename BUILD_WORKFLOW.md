@@ -117,8 +117,10 @@ Set-ExecutionPolicy RemoteSigned
 1. ✅ Script detects your Linux distribution
 2. ✅ Automatically installs all dependencies
 3. ✅ Downloads Mayhem firmware
-4. ✅ Configures and builds application
-5. ✅ Creates ready-to-use .ppma file
+4. ✅ Copies all MDK-Predator files to firmware
+5. ✅ **Verifies all files are properly linked**
+6. ✅ Configures and builds application
+7. ✅ Creates ready-to-use .ppma file
 
 **Output:**
 ```
@@ -139,6 +141,40 @@ Set-ExecutionPolicy RemoteSigned
 [INFO] All requirements satisfied
 
 [INFO] Integrating MDK-Predator with Mayhem firmware...
+[INFO] Copying application files...
+[INFO] Copying source files...
+[INFO] Copying configuration...
+[INFO] Registering MDK-Predator in external.cmake...
+[INFO] Integration complete
+
+[INFO] Verifying all files are properly linked in Mayhem firmware...
+[INFO] Checking C++ source files...
+[INFO]   ✓ main.cpp
+[INFO]   ✓ mdk_predator_app.cpp
+[INFO] Checking C++ header files...
+[INFO]   ✓ mdk_predator_app.hpp
+[INFO] Checking C source files...
+[INFO]   ✓ src/mdk_predator.c
+[INFO]   ✓ src/automotive/key_fob_analyzer.c
+[INFO]   ✓ src/automotive/rolling_code_tester.c
+[INFO]   ✓ src/wireless/wifi_analyzer.c
+[INFO]   ✓ src/wireless/bluetooth_analyzer.c
+[INFO]   ✓ src/wireless/subghz_analyzer.c
+[INFO]   ✓ src/crypto/crypto_analyzer.c
+[INFO] Checking C header files...
+[INFO]   ✓ include/mdk_predator.h
+[INFO]   ✓ include/input_validation.h
+[INFO]   ✓ (all other header files)
+[INFO] Checking configuration files...
+[INFO]   ✓ manifest.json
+[INFO]   ✓ mdk_predator.conf
+[INFO] Verifying external.cmake registration...
+[INFO]   ✓ All files registered in external.cmake
+
+[INFO] ✓ All files verified successfully!
+[INFO] ✓ All files are properly linked in Mayhem firmware
+[INFO] ✓ Ready to build MDK-Predator
+
 [INFO] Building PortaPack firmware with MDK-Predator...
 [INFO] Build complete
 
