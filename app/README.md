@@ -59,13 +59,13 @@ If you prefer to integrate manually:
    #mdk_predator
    external/mdk_predator/main.cpp
    external/mdk_predator/mdk_predator_app.cpp
-   external/mdk_predator/../src/mdk_predator.c
-   external/mdk_predator/../src/automotive/key_fob_analyzer.c
-   external/mdk_predator/../src/automotive/rolling_code_tester.c
-   external/mdk_predator/../src/wireless/wifi_analyzer.c
-   external/mdk_predator/../src/wireless/bluetooth_analyzer.c
-   external/mdk_predator/../src/wireless/subghz_analyzer.c
-   external/mdk_predator/../src/crypto/crypto_analyzer.c
+   external/mdk_predator/src/mdk_predator.c
+   external/mdk_predator/src/automotive/key_fob_analyzer.c
+   external/mdk_predator/src/automotive/rolling_code_tester.c
+   external/mdk_predator/src/wireless/wifi_analyzer.c
+   external/mdk_predator/src/wireless/bluetooth_analyzer.c
+   external/mdk_predator/src/wireless/subghz_analyzer.c
+   external/mdk_predator/src/crypto/crypto_analyzer.c
    ```
    
    Add to `EXTAPPLIST`:
