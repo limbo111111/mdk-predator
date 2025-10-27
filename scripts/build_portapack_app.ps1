@@ -381,6 +381,7 @@ function Invoke-Integration {
     Write-Info "Integrating MDK-Predator with Mayhem firmware..."
     
     $externalDir = Join-Path $MayhemPath "firmware\application\external\mdk_predator"
+    $externalCmake = Join-Path $MayhemPath "firmware\application\external\external.cmake"
     
     # Create external app directory
     if (-not (Test-Path $externalDir)) {
@@ -411,6 +412,45 @@ function Invoke-Integration {
     $configFile = Join-Path $RootDir "mdk_predator.conf"
     if (Test-Path $configFile) {
         Copy-Item -Path $configFile -Destination $externalDir -Force
+    }
+    
+    # Register in external.cmake if not already registered
+    Write-Info "Registering MDK-Predator in external.cmake..."
+    if (Test-Path $externalCmake) {
+        $cmakeContent = Get-Content $externalCmake -Raw
+        
+        if ($cmakeContent -notmatch "external/mdk_predator/main\.cpp") {
+            # Backup the original file
+            Copy-Item $externalCmake "$externalCmake.backup" -Force
+            
+            # Register MDK-Predator sources
+            $mdkSources = @"
+
+	#mdk_predator
+	external/mdk_predator/main.cpp
+	external/mdk_predator/mdk_predator_app.cpp
+	external/mdk_predator/src/mdk_predator.c
+	external/mdk_predator/src/automotive/key_fob_analyzer.c
+	external/mdk_predator/src/automotive/rolling_code_tester.c
+	external/mdk_predator/src/wireless/wifi_analyzer.c
+	external/mdk_predator/src/wireless/bluetooth_analyzer.c
+	external/mdk_predator/src/wireless/subghz_analyzer.c
+	external/mdk_predator/src/crypto/crypto_analyzer.c
+"@
+            
+            # Add sources after set(EXTCPPSRC
+            $cmakeContent = $cmakeContent -replace '(set\(EXTCPPSRC)', "`$1$mdkSources"
+            
+            # Add to app list after set(EXTAPPLIST
+            $cmakeContent = $cmakeContent -replace '(set\(EXTAPPLIST)', "`$1`n`tmdk_predator"
+            
+            # Write back to file
+            Set-Content -Path $externalCmake -Value $cmakeContent
+            
+            Write-Info "MDK-Predator registered in external.cmake"
+        } else {
+            Write-Info "MDK-Predator already registered in external.cmake"
+        }
     }
     
     Write-Info "Integration complete"

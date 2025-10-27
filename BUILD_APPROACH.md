@@ -126,10 +126,14 @@ All three build scripts (`build_portapack_app.sh`, `build_portapack_app.ps1`, `b
 
 2. **Integrate MDK-Predator**
    - Copies files to `firmware/application/external/mdk_predator/`:
-     - `app/*` (application wrapper)
+     - `app/*` (application wrapper including main.cpp)
      - `src/*` (core implementation)
      - `include/*` (headers)
      - `mdk_predator.conf` (configuration)
+   - **Registers MDK-Predator in `external/external.cmake`:**
+     - Adds source files to `EXTCPPSRC` variable
+     - Adds app name to `EXTAPPLIST` variable
+     - This step is **critical** - without it, the build system won't compile MDK-Predator
 
 3. **Configure with CMake**
    - Sets up build environment
@@ -163,9 +167,10 @@ Our scripts specifically use `make external_apps` to avoid building the entire f
 MDK-Predator includes all necessary files for external app integration:
 
 ✅ **Application Wrapper** (`app/`)
+- `main.cpp` - External app entry point (required by CMake build system)
 - `mdk_predator_app.cpp` - Main application implementation
 - `mdk_predator_app.hpp` - UI definitions and class declarations
-- `app_build.mk` - Build configuration for Mayhem build system
+- `app_build.mk` - Build configuration for legacy Makefile system
 - `manifest.json` - Application metadata
 
 ✅ **Core Implementation** (`src/`)
@@ -180,9 +185,34 @@ MDK-Predator includes all necessary files for external app integration:
 ✅ **Configuration** 
 - `mdk_predator.conf` - Runtime configuration
 
-### Build Configuration Verification
+### CMake Registration
 
-The `app_build.mk` file properly configures the build:
+The build scripts automatically register MDK-Predator in the Mayhem firmware's `external/external.cmake` file by adding:
+
+**Source files to `EXTCPPSRC`:**
+```cmake
+#mdk_predator
+external/mdk_predator/main.cpp
+external/mdk_predator/mdk_predator_app.cpp
+external/mdk_predator/src/mdk_predator.c
+external/mdk_predator/src/automotive/key_fob_analyzer.c
+external/mdk_predator/src/automotive/rolling_code_tester.c
+external/mdk_predator/src/wireless/wifi_analyzer.c
+external/mdk_predator/src/wireless/bluetooth_analyzer.c
+external/mdk_predator/src/wireless/subghz_analyzer.c
+external/mdk_predator/src/crypto/crypto_analyzer.c
+```
+
+**App name to `EXTAPPLIST`:**
+```cmake
+mdk_predator
+```
+
+This registration is **essential** - without it, the CMake build system won't compile MDK-Predator.
+
+### Build Configuration Verification (Legacy)
+
+The `app_build.mk` file is kept for compatibility with older Makefile-based builds:
 
 ```makefile
 app_mdk_predator_SOURCES = \
