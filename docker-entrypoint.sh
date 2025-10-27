@@ -121,7 +121,7 @@ build_with_make() {
     cmake ..
     
     print_info "Building firmware and external apps (including mdk_predator)..."
-    make "$@"
+    make application "$@"
     
     print_info "Build completed successfully!"
 }
@@ -144,7 +144,7 @@ build_with_ninja() {
     cmake -G Ninja ..
     
     print_info "Building firmware and external apps (including mdk_predator)..."
-    ninja "$@"
+    ninja application "$@"
     
     print_info "Build completed successfully!"
 }
