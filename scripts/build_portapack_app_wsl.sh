@@ -309,6 +309,7 @@ integrate_with_mayhem() {
     print_info "Integrating MDK-Predator with Mayhem firmware..."
     
     local external_dir="$MAYHEM_PATH/firmware/application/external/mdk_predator"
+    local external_cmake="$MAYHEM_PATH/firmware/application/external/external.cmake"
     
     # Create external app directory
     mkdir -p "$external_dir"
@@ -325,6 +326,43 @@ integrate_with_mayhem() {
     # Copy configuration
     print_info "Copying configuration..."
     cp "$MDK_ROOT/mdk_predator.conf" "$external_dir/"
+    
+    # Register in external.cmake if not already registered
+    print_info "Registering MDK-Predator in external.cmake..."
+    if ! grep -q "external/mdk_predator/main.cpp" "$external_cmake" 2>/dev/null; then
+        # Backup the original file
+        cp "$external_cmake" "$external_cmake.backup"
+        
+        # Find the line with "set(EXTCPPSRC" and add MDK-Predator sources after it
+        # Using a temporary file for safe editing
+        awk '
+            /^set\(EXTCPPSRC/ {
+                print
+                print ""
+                print "\t#mdk_predator"
+                print "\texternal/mdk_predator/main.cpp"
+                print "\texternal/mdk_predator/mdk_predator_app.cpp"
+                print "\texternal/mdk_predator/../src/mdk_predator.c"
+                print "\texternal/mdk_predator/../src/automotive/key_fob_analyzer.c"
+                print "\texternal/mdk_predator/../src/automotive/rolling_code_tester.c"
+                print "\texternal/mdk_predator/../src/wireless/wifi_analyzer.c"
+                print "\texternal/mdk_predator/../src/wireless/bluetooth_analyzer.c"
+                print "\texternal/mdk_predator/../src/wireless/subghz_analyzer.c"
+                print "\texternal/mdk_predator/../src/crypto/crypto_analyzer.c"
+                next
+            }
+            /^set\(EXTAPPLIST/ {
+                print
+                print "\tmdk_predator"
+                next
+            }
+            { print }
+        ' "$external_cmake.backup" > "$external_cmake"
+        
+        print_info "MDK-Predator registered in external.cmake"
+    else
+        print_info "MDK-Predator already registered in external.cmake"
+    fi
     
     print_info "Integration complete"
     echo ""
