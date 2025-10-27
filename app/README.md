@@ -4,40 +4,82 @@ This directory contains the PortaPack Mayhem application wrapper for MDK-Predato
 
 ## Files
 
+- **main.cpp** - External app entry point (required by Mayhem firmware)
 - **mdk_predator_app.cpp** - Main application implementation
 - **mdk_predator_app.hpp** - Application header with UI definitions
 - **manifest.json** - Application metadata for PortaPack
-- **app_build.mk** - Build configuration for PortaPack integration
+- **app_build.mk** - Build configuration for PortaPack integration (legacy)
 - **README.md** - This file
 
 ## Building the Application
 
-### Prerequisites
+### Automatic Build (Recommended)
 
-1. PortaPack Mayhem firmware source code
-2. ARM toolchain (arm-none-eabi-gcc)
-3. MDK-Predator library built
+Use the provided build scripts which handle all integration automatically:
 
-### Integration Steps
+```bash
+# Linux/macOS
+./scripts/build_portapack_app.sh --install-deps --download-firmware
+
+# Windows PowerShell
+.\scripts\build_portapack_app.ps1 -InstallDeps -DownloadFirmware
+
+# WSL Debian/Ubuntu
+./scripts/build_portapack_app_wsl.sh --install-deps --download-firmware
+```
+
+The scripts automatically:
+1. Download the Mayhem firmware (if needed)
+2. Copy all MDK-Predator files to the correct location
+3. **Register MDK-Predator in the external.cmake file**
+4. Build only the external application (fast)
+5. Generate the `mdk_predator.ppma` file
+
+### Manual Integration (Advanced)
+
+If you prefer to integrate manually:
 
 1. Copy the MDK-Predator app files to your PortaPack Mayhem source:
    ```bash
-   cp -r app/* /path/to/portapack-mayhem/firmware/application/external/mdk_predator/
+   cp -r app/* /path/to/mayhem-firmware/firmware/application/external/mdk_predator/
    ```
 
 2. Copy the MDK-Predator library and headers:
    ```bash
-   cp -r src /path/to/portapack-mayhem/firmware/application/external/mdk_predator/
-   cp -r include /path/to/portapack-mayhem/firmware/application/external/mdk_predator/
+   cp -r src /path/to/mayhem-firmware/firmware/application/external/mdk_predator/
+   cp -r include /path/to/mayhem-firmware/firmware/application/external/mdk_predator/
    ```
 
-3. Build the PortaPack firmware with the external app:
+3. **Register MDK-Predator in external.cmake:**
+   
+   Edit `/path/to/mayhem-firmware/firmware/application/external/external.cmake`:
+   
+   Add to `EXTCPPSRC`:
+   ```cmake
+   #mdk_predator
+   external/mdk_predator/main.cpp
+   external/mdk_predator/mdk_predator_app.cpp
+   external/mdk_predator/../src/mdk_predator.c
+   external/mdk_predator/../src/automotive/key_fob_analyzer.c
+   external/mdk_predator/../src/automotive/rolling_code_tester.c
+   external/mdk_predator/../src/wireless/wifi_analyzer.c
+   external/mdk_predator/../src/wireless/bluetooth_analyzer.c
+   external/mdk_predator/../src/wireless/subghz_analyzer.c
+   external/mdk_predator/../src/crypto/crypto_analyzer.c
+   ```
+   
+   Add to `EXTAPPLIST`:
+   ```cmake
+   mdk_predator
+   ```
+
+4. Build the external apps:
    ```bash
-   cd /path/to/portapack-mayhem
+   cd /path/to/mayhem-firmware
    mkdir build
    cd build
    cmake ..
-   make firmware
+   make external_apps
    ```
 
 ### Output
