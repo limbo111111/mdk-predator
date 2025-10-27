@@ -457,6 +457,168 @@ function Invoke-Integration {
     Write-Host ""
 }
 
+function Test-FileLinks {
+    Write-Info "Verifying all files are properly linked in Mayhem firmware..."
+    
+    $externalDir = Join-Path $MayhemPath "firmware\application\external\mdk_predator"
+    $externalCmake = Join-Path $MayhemPath "firmware\application\external\external.cmake"
+    $verificationFailed = $false
+    
+    # Define all required files
+    $requiredCppFiles = @(
+        "main.cpp",
+        "mdk_predator_app.cpp"
+    )
+    
+    $requiredHppFiles = @(
+        "mdk_predator_app.hpp"
+    )
+    
+    $requiredCFiles = @(
+        "src\mdk_predator.c",
+        "src\automotive\key_fob_analyzer.c",
+        "src\automotive\rolling_code_tester.c",
+        "src\wireless\wifi_analyzer.c",
+        "src\wireless\bluetooth_analyzer.c",
+        "src\wireless\subghz_analyzer.c",
+        "src\crypto\crypto_analyzer.c"
+    )
+    
+    $requiredHFiles = @(
+        "include\mdk_predator.h",
+        "include\input_validation.h",
+        "include\automotive\key_fob_analyzer.h",
+        "include\automotive\rolling_code_tester.h",
+        "include\wireless\wifi_analyzer.h",
+        "include\wireless\bluetooth_analyzer.h",
+        "include\wireless\subghz_analyzer.h",
+        "include\crypto\crypto_analyzer.h"
+    )
+    
+    $requiredOtherFiles = @(
+        "manifest.json",
+        "mdk_predator.conf"
+    )
+    
+    # Check CPP files
+    Write-Info "Checking C++ source files..."
+    foreach ($file in $requiredCppFiles) {
+        $filePath = Join-Path $externalDir $file
+        if (-not (Test-Path $filePath)) {
+            Write-Error-Custom "Missing C++ file: $file"
+            $verificationFailed = $true
+        } else {
+            Write-Info "  ✓ $file"
+        }
+    }
+    
+    # Check HPP files
+    Write-Info "Checking C++ header files..."
+    foreach ($file in $requiredHppFiles) {
+        $filePath = Join-Path $externalDir $file
+        if (-not (Test-Path $filePath)) {
+            Write-Error-Custom "Missing C++ header: $file"
+            $verificationFailed = $true
+        } else {
+            Write-Info "  ✓ $file"
+        }
+    }
+    
+    # Check C files
+    Write-Info "Checking C source files..."
+    foreach ($file in $requiredCFiles) {
+        $filePath = Join-Path $externalDir $file
+        if (-not (Test-Path $filePath)) {
+            Write-Error-Custom "Missing C file: $file"
+            $verificationFailed = $true
+        } else {
+            Write-Info "  ✓ $file"
+        }
+    }
+    
+    # Check H files
+    Write-Info "Checking C header files..."
+    foreach ($file in $requiredHFiles) {
+        $filePath = Join-Path $externalDir $file
+        if (-not (Test-Path $filePath)) {
+            Write-Error-Custom "Missing C header: $file"
+            $verificationFailed = $true
+        } else {
+            Write-Info "  ✓ $file"
+        }
+    }
+    
+    # Check other required files
+    Write-Info "Checking configuration files..."
+    foreach ($file in $requiredOtherFiles) {
+        $filePath = Join-Path $externalDir $file
+        if (-not (Test-Path $filePath)) {
+            Write-Error-Custom "Missing file: $file"
+            $verificationFailed = $true
+        } else {
+            Write-Info "  ✓ $file"
+        }
+    }
+    
+    # Verify external.cmake registration
+    Write-Info "Verifying external.cmake registration..."
+    $cmakeVerificationFailed = $false
+    
+    if (Test-Path $externalCmake) {
+        $cmakeContent = Get-Content $externalCmake -Raw
+        
+        # Check if all CPP source files are registered
+        foreach ($file in $requiredCppFiles) {
+            $unixPath = $file -replace '\\', '/'
+            if ($cmakeContent -notmatch "external/mdk_predator/$unixPath") {
+                Write-Error-Custom "File not registered in external.cmake: $file"
+                $cmakeVerificationFailed = $true
+                $verificationFailed = $true
+            }
+        }
+        
+        # Check if all C source files are registered
+        foreach ($file in $requiredCFiles) {
+            $unixPath = $file -replace '\\', '/'
+            if ($cmakeContent -notmatch "external/mdk_predator/$unixPath") {
+                Write-Error-Custom "File not registered in external.cmake: $file"
+                $cmakeVerificationFailed = $true
+                $verificationFailed = $true
+            }
+        }
+        
+        # Check if mdk_predator is in EXTAPPLIST
+        if ($cmakeContent -notmatch "mdk_predator") {
+            Write-Error-Custom "mdk_predator not found in EXTAPPLIST in external.cmake"
+            $cmakeVerificationFailed = $true
+            $verificationFailed = $true
+        }
+        
+        if (-not $cmakeVerificationFailed) {
+            Write-Info "  ✓ All files registered in external.cmake"
+        }
+    } else {
+        Write-Error-Custom "external.cmake not found!"
+        $verificationFailed = $true
+    }
+    
+    # Final verification result
+    if ($verificationFailed) {
+        Write-Host ""
+        Write-Error-Custom "File verification FAILED!"
+        Write-Error-Custom "Some required files are missing or not properly linked."
+        Write-Error-Custom "Please check the error messages above."
+        Write-Host ""
+        exit 1
+    }
+    
+    Write-Host ""
+    Write-Info "✓ All files verified successfully!"
+    Write-Info "✓ All files are properly linked in Mayhem firmware"
+    Write-Info "✓ Ready to build MDK-Predator"
+    Write-Host ""
+}
+
 function Invoke-Clean {
     Write-Info "Cleaning build artifacts..."
     
@@ -701,6 +863,7 @@ function Main {
     
     # Build process
     Invoke-Integration
+    Test-FileLinks
     Invoke-Build
     Copy-Output
     
