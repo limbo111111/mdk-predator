@@ -22,9 +22,11 @@ The verification system performs comprehensive checks before building:
 
 Verifies that all required files are present in the Mayhem firmware directory:
 
-**C++ Files:**
+**C++ Source Files:**
 - `main.cpp` - External app entry point
 - `mdk_predator_app.cpp` - Main application implementation
+
+**C++ Header Files:**
 - `mdk_predator_app.hpp` - Application header
 
 **C Source Files:**
