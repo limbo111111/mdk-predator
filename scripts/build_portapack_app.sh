@@ -430,8 +430,8 @@ verify_file_links() {
         fi
     done
     
-    # Check if mdk_predator is in EXTAPPLIST
-    if ! grep -q "mdk_predator" "$external_cmake"; then
+    # Check if mdk_predator is registered in EXTAPPLIST
+    if ! grep -Eq 'set\s*\(\s*EXTAPPLIST[^\)]*mdk_predator|list\s*\(\s*APPEND\s+EXTAPPLIST[^\)]*mdk_predator' "$external_cmake"; then
         print_error "mdk_predator not found in EXTAPPLIST in external.cmake"
         cmake_verification_failed=1
         verification_failed=1
