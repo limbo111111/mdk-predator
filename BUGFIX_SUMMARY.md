@@ -14,7 +14,14 @@
 - Submodules were only initialized during initial clone or when UPDATE_FIRMWARE=1
 - This caused compilation to fail with:
   ```
+  In file included from /workspace/mayhem-firmware/hackrf/firmware/common/usb.c:32:
+  /workspace/mayhem-firmware/hackrf/firmware/libopencm3/include/libopencm3/dispatch/nvic.h:30:11: 
   fatal error: libopencm3/lpc43xx/m0/nvic.h: No such file or directory
+     30 | # include <libopencm3/lpc43xx/m0/nvic.h>
+        |           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  compilation terminated.
+  make[3]: *** [firmware/application/CMakeFiles/application.elf.dir/build.make:1141: 
+              firmware/application/CMakeFiles/application.elf.dir/__/__/hackrf/firmware/common/usb.c.obj] Error 1
   ```
 - The error occurred when building `hackrf/firmware/common/usb.c`
 - The missing file is part of the libopencm3 submodule

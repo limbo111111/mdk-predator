@@ -280,6 +280,8 @@ cd /mnt/c/path/to/mdk-predator
 ### Build fails with "libopencm3/lpc43xx/m0/nvic.h: No such file or directory"
 **Error Example:**
 ```
+In file included from /workspace/mayhem-firmware/hackrf/firmware/common/usb.c:32:
+/workspace/mayhem-firmware/hackrf/firmware/libopencm3/include/libopencm3/dispatch/nvic.h:30:11: 
 fatal error: libopencm3/lpc43xx/m0/nvic.h: No such file or directory
    30 | # include <libopencm3/lpc43xx/m0/nvic.h>
       |           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -305,7 +307,7 @@ compilation terminated.
    git submodule update --init --recursive
    ```
 
-**Prevention:** This issue has been fixed in all build scripts (v1.1+). The scripts now verify submodules before building.
+**Prevention:** This issue has been fixed in all build scripts. The scripts now verify submodules before building.
 
 ### Build fails with "arm-none-eabi-gcc not found"
 **Solution:** Install ARM toolchain
