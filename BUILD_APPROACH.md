@@ -277,6 +277,38 @@ cd /mnt/c/path/to/mdk-predator
 
 ## Troubleshooting Build Issues
 
+### Build fails with "libopencm3/lpc43xx/m0/nvic.h: No such file or directory"
+**Error Example:**
+```
+In file included from /workspace/mayhem-firmware/hackrf/firmware/common/usb.c:32:
+/workspace/mayhem-firmware/hackrf/firmware/libopencm3/include/libopencm3/dispatch/nvic.h:30:11: 
+fatal error: libopencm3/lpc43xx/m0/nvic.h: No such file or directory
+   30 | # include <libopencm3/lpc43xx/m0/nvic.h>
+      |           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+```
+
+**Root Cause:** Git submodules in mayhem-firmware are not initialized
+
+**Solution:** The build scripts now automatically detect and fix this issue. If you encounter this error:
+
+1. **Automatic fix (recommended):** Just run the build script again - it will detect missing submodules and initialize them
+   ```bash
+   # Linux/macOS
+   ./scripts/build_portapack_app.sh -m /path/to/mayhem-firmware
+   
+   # Windows
+   .\scripts\build_portapack_app.ps1 -MayhemPath "C:\path\to\mayhem-firmware"
+   ```
+
+2. **Manual fix (if automatic fails):**
+   ```bash
+   cd /path/to/mayhem-firmware
+   git submodule update --init --recursive
+   ```
+
+**Prevention:** This issue has been fixed in all build scripts. The scripts now verify submodules before building.
+
 ### Build fails with "arm-none-eabi-gcc not found"
 **Solution:** Install ARM toolchain
 ```bash

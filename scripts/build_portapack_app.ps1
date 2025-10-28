@@ -377,6 +377,74 @@ function Test-MayhemPath {
     Write-Host ""
 }
 
+function Test-Submodules {
+    Write-Info "Verifying git submodules are initialized..."
+    
+    # Check if the directory is a git repository
+    $gitPath = Join-Path $MayhemPath ".git"
+    if (-not (Test-Path $gitPath)) {
+        Write-Warning-Custom "Mayhem firmware is not a git repository, skipping submodule check"
+        return
+    }
+    
+    # Check for critical submodules that must exist for successful build
+    $criticalPaths = @(
+        "hackrf\firmware\libopencm3",
+        "hackrf\firmware\libopencm3\include\libopencm3\lpc43xx\m0\nvic.h"
+    )
+    
+    $missingSubmodules = $false
+    
+    foreach ($path in $criticalPaths) {
+        $fullPath = Join-Path $MayhemPath $path
+        if (-not (Test-Path $fullPath)) {
+            Write-Error-Custom "Missing critical submodule or file: $path"
+            $missingSubmodules = $true
+        }
+    }
+    
+    if ($missingSubmodules) {
+        Write-Host ""
+        Write-Error-Custom "Git submodules are not properly initialized!"
+        Write-Error-Custom "This will cause compilation errors like:"
+        Write-Error-Custom "  fatal error: libopencm3/lpc43xx/m0/nvic.h: No such file or directory"
+        Write-Host ""
+        Write-Info "Attempting to initialize submodules now..."
+        
+        Push-Location $MayhemPath
+        try {
+            git submodule update --init --recursive
+            if ($LASTEXITCODE -ne 0) {
+                throw "git submodule failed"
+            }
+            Write-Info "Submodules initialized successfully"
+        }
+        catch {
+            Write-Host ""
+            Write-Error-Custom "Failed to initialize submodules automatically"
+            Write-Error-Custom "Please run manually:"
+            Write-Error-Custom "  cd $MayhemPath"
+            Write-Error-Custom "  git submodule update --init --recursive"
+            Write-Host ""
+            Pop-Location
+            exit 1
+        }
+        Pop-Location
+        
+        # Verify again
+        foreach ($path in $criticalPaths) {
+            $fullPath = Join-Path $MayhemPath $path
+            if (-not (Test-Path $fullPath)) {
+                Write-Error-Custom "Still missing: $path after submodule init"
+                exit 1
+            }
+        }
+    }
+    
+    Write-Info "✓ All required submodules are properly initialized"
+    Write-Host ""
+}
+
 function Invoke-Integration {
     Write-Info "Integrating MDK-Predator with Mayhem firmware..."
     
@@ -852,6 +920,9 @@ function Main {
     
     # Verify Mayhem path
     Test-MayhemPath
+    
+    # Verify submodules are initialized
+    Test-Submodules
     
     # Check dependencies
     Test-AllDependencies
