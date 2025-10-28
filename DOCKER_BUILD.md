@@ -145,7 +145,7 @@ docker-compose run --rm mdk-predator-shell
 ### Custom Build Command
 ```bash
 # Build with specific make target
-docker-compose run --rm mdk-predator-build make external_apps -j8
+docker-compose run --rm mdk-predator-build make application -j8
 
 # Build with specific cmake options
 docker-compose run --rm mdk-predator-shell
@@ -153,7 +153,7 @@ docker-compose run --rm mdk-predator-shell
 cd /workspace/mayhem-firmware
 mkdir build && cd build
 cmake -DCUSTOM_OPTION=ON ..
-make external_apps
+make application
 ```
 
 ## Output Files
@@ -245,7 +245,7 @@ ls -la
 cd /workspace/mayhem-firmware
 mkdir build && cd build
 cmake ..
-make external_apps
+make application
 ```
 
 ## Troubleshooting

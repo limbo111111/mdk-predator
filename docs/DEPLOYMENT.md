@@ -144,16 +144,11 @@ If a pre-built `.ppma` file is provided with the release:
    mkdir build
    cd build
    cmake ..
-   make firmware
+   # Build application (which includes external apps)
+   make application
    ```
 
-4. **Build External Application**
-   ```bash
-   # Build the external app
-   make external_apps
-   ```
-
-5. **Locate Built Application**
+4. **Locate Built Application**
    The build process creates:
    - `firmware/application/external/mdk_predator.ppma`
 

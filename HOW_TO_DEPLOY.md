@@ -306,8 +306,8 @@ cd build
 # Configure with CMake
 cmake ..
 
-# Build external apps
-make external_apps
+# Build application (which includes external apps)
+make application
 ```
 
 This will create: `firmware/application/external/mdk_predator.ppma`

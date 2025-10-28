@@ -63,7 +63,7 @@ If you want to fix it manually:
    ```powershell
    cd mayhem-firmware\build
    cmake .. -G "MinGW Makefiles"
-   make external_apps
+   make application
    ```
 
 ## Why This Error Happens

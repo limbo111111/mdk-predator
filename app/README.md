@@ -74,13 +74,13 @@ If you prefer to integrate manually:
    mdk_predator
    ```
 
-4. Build the external apps:
+4. Build the application (which includes external apps):
    ```bash
    cd /path/to/mayhem-firmware
    mkdir build
    cd build
    cmake ..
-   make external_apps
+   make application
    ```
 
 ### Output
