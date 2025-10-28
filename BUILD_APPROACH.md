@@ -8,7 +8,7 @@ This document clarifies the build process for MDK-Predator and explains whether 
 
 The build scripts (`build_portapack_app.sh`, `build_portapack_app.ps1`, `build_portapack_app_wsl.sh`) are configured to:
 1. Integrate MDK-Predator as an external application
-2. Build ONLY the external apps (`make external_apps` target)
+2. Build the application (which includes external apps via `make application` target)
 3. Generate a standalone `.ppma` file that works with existing Mayhem firmware
 
 ## Build Options Comparison
@@ -39,7 +39,7 @@ The build scripts (`build_portapack_app.sh`, `build_portapack_app.ps1`, `build_p
 **What happens:**
 1. Downloads Mayhem firmware source (needed for headers and build system)
 2. Integrates MDK-Predator into `firmware/application/external/mdk_predator/`
-3. Runs `make external_apps` to build ONLY external applications
+3. Runs `make application` to build the application (which includes external apps)
 4. Outputs `mdk_predator.ppma` file to `build/portapack/`
 
 **Installation:**
@@ -140,10 +140,9 @@ All three build scripts (`build_portapack_app.sh`, `build_portapack_app.ps1`, `b
    - Detects ARM toolchain
    - Configures for external apps only
 
-4. **Build External Apps**
-   - Runs `make external_apps` target
-   - Compiles ONLY external applications
-   - Does NOT build firmware core
+4. **Build Application**
+   - Runs `make application` target
+   - Compiles the application including external apps
    - Generates `.ppma` files
 
 5. **Copy Output**
@@ -154,11 +153,11 @@ All three build scripts (`build_portapack_app.sh`, `build_portapack_app.ps1`, `b
 
 The Mayhem firmware build system has multiple targets:
 
-- `make firmware` - Builds entire firmware (kernel + all apps) → **NOT USED**
-- `make external_apps` - Builds only external applications → **USED BY OUR SCRIPTS**
+- `make firmware` - Builds entire firmware (kernel + all apps)
+- `make application` - Builds the application (which includes external apps) → **USED BY OUR SCRIPTS**
 - `make clean` - Cleans build artifacts
 
-Our scripts specifically use `make external_apps` to avoid building the entire firmware.
+Our scripts specifically use `make application` to build the application with external apps.
 
 ## Integration Verification
 
