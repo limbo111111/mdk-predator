@@ -4,7 +4,47 @@
 
 ### Bugs Fixed
 
-#### 1. UI Layout Overlap Bug ("Whitetrails")
+#### 1. Build Error: Missing libopencm3 Submodule Headers
+**Severity:** Critical
+**Impact:** Build failure preventing application compilation
+**Root Cause:** Git submodules in mayhem-firmware not being initialized when firmware directory already exists.
+
+**Details:**
+- When mayhem-firmware directory existed (e.g., from previous build or cached Docker volume)
+- Submodules were only initialized during initial clone or when UPDATE_FIRMWARE=1
+- This caused compilation to fail with:
+  ```
+  fatal error: libopencm3/lpc43xx/m0/nvic.h: No such file or directory
+  ```
+- The error occurred when building `hackrf/firmware/common/usb.c`
+- The missing file is part of the libopencm3 submodule
+
+**Fix:**
+- Added `verify_submodules()` function to all build scripts:
+  - `scripts/build_portapack_app.sh` (Linux/macOS)
+  - `scripts/build_portapack_app.ps1` (Windows PowerShell)
+  - `scripts/build_portapack_app_wsl.sh` (WSL)
+  - `docker-entrypoint.sh` (Docker builds)
+- Function checks for critical paths before building:
+  - `hackrf/firmware/libopencm3` (submodule directory)
+  - `hackrf/firmware/libopencm3/include/libopencm3/lpc43xx/m0/nvic.h` (specific header)
+- Automatically runs `git submodule update --init --recursive` if missing
+- Provides clear error messages matching the compilation error
+- Exits with helpful manual fix instructions if automatic init fails
+
+**Files Modified:**
+- `scripts/build_portapack_app.sh`
+- `scripts/build_portapack_app.ps1`
+- `scripts/build_portapack_app_wsl.sh`
+- `docker-entrypoint.sh`
+
+**Prevention of Similar Issues:**
+- Checks entire libopencm3 directory (prevents all libopencm3 header errors)
+- Runs before build in all code paths
+- Works for both fresh clones and existing firmware directories
+- Handles all build environments (Linux, macOS, Windows native, WSL, Docker)
+
+#### 2. UI Layout Overlap Bug ("Whitetrails")
 **Severity:** High
 **Impact:** Visual artifacts, poor user experience
 **Root Cause:** Text elements were positioned to overlap with console widget, causing "whitetrails" visual artifacts on screen.
@@ -30,7 +70,7 @@
 **Files Modified:**
 - `app/mdk_predator_app.hpp`
 
-#### 2. Resource Leak Bug
+#### 3. Resource Leak Bug
 **Severity:** Medium
 **Impact:** Potential resource leaks, improper hardware state cleanup
 **Root Cause:** Missing cleanup function calls when users stop operations (capture/scan).
@@ -102,11 +142,12 @@ All elements properly positioned, no overlaps, all fit on 320px screen.
 
 ### Summary
 
-This fix addresses the "whitetrails" visual artifact issue and a resource leak bug:
+This fix addresses critical build issues and application bugs:
 
-1. **Whitetrails Fixed:** All UI elements are now properly positioned without overlap
-2. **Resource Leaks Fixed:** Cleanup functions are now called when stopping operations
-3. **All Tests Pass:** No regressions introduced
-4. **Code Quality:** Clean code with proper error handling
+1. **Build Error Fixed:** Submodule initialization is now verified before building, preventing "libopencm3/lpc43xx/m0/nvic.h: No such file or directory" errors
+2. **Whitetrails Fixed:** All UI elements are now properly positioned without overlap
+3. **Resource Leaks Fixed:** Cleanup functions are now called when stopping operations
+4. **All Tests Pass:** No regressions introduced
+5. **Code Quality:** Clean code with proper error handling
 
-The application is now ready for use with improved visual quality and proper resource management.
+The application is now ready for use with improved visual quality, proper resource management, and reliable builds across all platforms.
