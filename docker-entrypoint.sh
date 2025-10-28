@@ -107,7 +107,7 @@ integrate_mdk_predator() {
         print_info "Registering MDK-Predator in external.cmake..."
         
         # Check if already registered
-        if ! grep -q "external/mdk_predator/main.cpp" "$external_cmake" 2>/dev/null; then
+        if ! (grep -q "external/mdk_predator/src/crypto/crypto_analyzer.c" "$external_cmake" 2>/dev/null && grep -q "mdk_predator" "$external_cmake" 2>/dev/null); then
             # Backup the original file
             cp "$external_cmake" "$external_cmake.backup"
             
