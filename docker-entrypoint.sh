@@ -113,20 +113,24 @@ integrate_mdk_predator() {
             
             # Add MDK-Predator sources to EXTCPPSRC and app to EXTAPPLIST
             awk '
+                BEGIN { done=0 }
                 /^set\(EXTCPPSRC/ {
-                    print
-                    print ""
-                    print "\t#mdk_predator"
-                    print "\texternal/mdk_predator/main.cpp"
-                    print "\texternal/mdk_predator/mdk_predator_app.cpp"
-                    print "\texternal/mdk_predator/src/mdk_predator.c"
-                    print "\texternal/mdk_predator/src/automotive/key_fob_analyzer.c"
-                    print "\texternal/mdk_predator/src/automotive/rolling_code_tester.c"
-                    print "\texternal/mdk_predator/src/wireless/wifi_analyzer.c"
-                    print "\texternal/mdk_predator/src/wireless/bluetooth_analyzer.c"
-                    print "\texternal/mdk_predator/src/wireless/subghz_analyzer.c"
-                    print "\texternal/mdk_predator/src/crypto/crypto_analyzer.c"
-                    next
+                    if (!done) {
+                        print
+                        print ""
+                        print "\t#mdk_predator"
+                        print "\texternal/mdk_predator/main.cpp"
+                        print "\texternal/mdk_predator/mdk_predator_app.cpp"
+                        print "\texternal/mdk_predator/src/mdk_predator.c"
+                        print "\texternal/mdk_predator/src/automotive/key_fob_analyzer.c"
+                        print "\texternal/mdk_predator/src/automotive/rolling_code_tester.c"
+                        print "\texternal/mdk_predator/src/wireless/wifi_analyzer.c"
+                        print "\texternal/mdk_predator/src/wireless/bluetooth_analyzer.c"
+                        print "\texternal/mdk_predator/src/wireless/subghz_analyzer.c"
+                        print "\texternal/mdk_predator/src/crypto/crypto_analyzer.c"
+                        done=1
+                        next
+                    }
                 }
                 /^set\(EXTAPPLIST/ {
                     print
