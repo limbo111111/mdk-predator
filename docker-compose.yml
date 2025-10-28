@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   # Main build service for mdk-predator
   mdk-predator-build:

@@ -38,10 +38,10 @@ echo Build MDK-Predator using Docker (no local dependencies required!)
 echo.
 echo OPTIONS:
 echo     -c, --clean             Clean build (remove previous build artifacts)
-echo     -u, --update-firmware   Update mayhem firmware from git
-echo     -n, --ninja             Use Ninja build system (faster)
-echo     -s, --shell             Open interactive shell in container
-echo     -r, --rebuild           Rebuild Docker image
+echo     -u, --update-firmware   Update mayhem firmware from git (includes submodules)
+echo     -n, --ninja             Use Ninja build system (faster than Make)
+echo     -s, --shell             Open interactive shell in container for debugging
+echo     -r, --rebuild           Rebuild Docker image (use after pulling updates)
 echo     -h, --help              Show this help message
 echo.
 echo EXAMPLES:
@@ -50,6 +50,11 @@ echo     %~nx0 --clean           Clean build
 echo     %~nx0 --ninja           Build with Ninja (faster)
 echo     %~nx0 -c -u -n          Clean build with Ninja and update firmware
 echo     %~nx0 --shell           Open shell for debugging
+echo     %~nx0 --rebuild         Rebuild Docker image (after git pull or build errors)
+echo.
+echo TROUBLESHOOTING:
+echo     If you get build errors after pulling updates, try:
+echo     %~nx0 --rebuild --clean --update-firmware
 echo.
 echo REQUIREMENTS:
 echo     - Docker Desktop for Windows
