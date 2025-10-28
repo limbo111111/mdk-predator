@@ -249,6 +249,62 @@ verify_mayhem_path() {
     print_info "Mayhem firmware found at: $MAYHEM_PATH"
 }
 
+verify_submodules() {
+    print_info "Verifying git submodules are initialized..."
+    
+    # Check if the directory is a git repository
+    if [ ! -d "$MAYHEM_PATH/.git" ]; then
+        print_warning "Mayhem firmware is not a git repository, skipping submodule check"
+        return 0
+    fi
+    
+    # Check for critical submodules that must exist for successful build
+    local critical_paths=(
+        "hackrf/firmware/libopencm3"
+        "hackrf/firmware/libopencm3/include/libopencm3/lpc43xx/m0/nvic.h"
+    )
+    
+    local missing_submodules=0
+    
+    for path in "${critical_paths[@]}"; do
+        if [ ! -e "$MAYHEM_PATH/$path" ]; then
+            print_error "Missing critical submodule or file: $path"
+            missing_submodules=1
+        fi
+    done
+    
+    if [ $missing_submodules -eq 1 ]; then
+        echo ""
+        print_error "Git submodules are not properly initialized!"
+        print_error "This will cause compilation errors like:"
+        print_error "  fatal error: libopencm3/lpc43xx/m0/nvic.h: No such file or directory"
+        echo ""
+        print_info "Attempting to initialize submodules now..."
+        cd "$MAYHEM_PATH"
+        if ! git submodule update --init --recursive; then
+            echo ""
+            print_error "Failed to initialize submodules automatically"
+            print_error "Please run manually:"
+            print_error "  cd $MAYHEM_PATH"
+            print_error "  git submodule update --init --recursive"
+            echo ""
+            exit 1
+        fi
+        cd - > /dev/null
+        print_info "Submodules initialized successfully"
+        
+        # Verify again
+        for path in "${critical_paths[@]}"; do
+            if [ ! -e "$MAYHEM_PATH/$path" ]; then
+                print_error "Still missing: $path after submodule init"
+                exit 1
+            fi
+        done
+    fi
+    
+    print_info "✓ All required submodules are properly initialized"
+}
+
 integrate_with_mayhem() {
     print_info "Integrating MDK-Predator with Mayhem firmware..."
     
@@ -594,6 +650,9 @@ main() {
     
     # Verify paths
     verify_mayhem_path
+    
+    # Verify submodules are initialized
+    verify_submodules
     
     # Check requirements
     check_requirements

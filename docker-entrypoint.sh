@@ -52,6 +52,58 @@ clone_mayhem_firmware() {
     fi
 }
 
+# Function to verify submodules are initialized
+verify_submodules() {
+    print_step "Verifying git submodules are initialized..."
+    
+    cd /workspace/mayhem-firmware
+    
+    # Check for critical submodules that must exist for successful build
+    local critical_paths=(
+        "hackrf/firmware/libopencm3"
+        "hackrf/firmware/libopencm3/include/libopencm3/lpc43xx/m0/nvic.h"
+    )
+    
+    local missing_submodules=0
+    
+    for path in "${critical_paths[@]}"; do
+        if [ ! -e "$path" ]; then
+            print_error "Missing critical submodule or file: $path"
+            missing_submodules=1
+        fi
+    done
+    
+    if [ $missing_submodules -eq 1 ]; then
+        echo ""
+        print_error "Git submodules are not properly initialized!"
+        print_error "This will cause compilation errors like:"
+        print_error "  fatal error: libopencm3/lpc43xx/m0/nvic.h: No such file or directory"
+        echo ""
+        print_info "Attempting to initialize submodules now..."
+        if ! git submodule update --init --recursive; then
+            echo ""
+            print_error "Failed to initialize submodules automatically"
+            print_error "Please run manually:"
+            print_error "  cd /workspace/mayhem-firmware"
+            print_error "  git submodule update --init --recursive"
+            echo ""
+            exit 1
+        fi
+        print_info "Submodules initialized successfully"
+        
+        # Verify again
+        for path in "${critical_paths[@]}"; do
+            if [ ! -e "$path" ]; then
+                print_error "Still missing: $path after submodule init"
+                exit 1
+            fi
+        done
+    fi
+    
+    print_info "✓ All required submodules are properly initialized"
+    cd /workspace
+}
+
 # Function to integrate mdk-predator with mayhem firmware
 integrate_mdk_predator() {
     print_step "Integrating MDK-Predator with Mayhem firmware..."
@@ -259,6 +311,9 @@ do_build() {
     
     # Clone/update mayhem firmware
     clone_mayhem_firmware
+    
+    # Verify submodules are initialized
+    verify_submodules
     
     # Integrate mdk-predator
     integrate_mdk_predator
