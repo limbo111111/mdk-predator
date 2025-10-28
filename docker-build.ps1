@@ -38,10 +38,10 @@ Build MDK-Predator using Docker (no local dependencies required!)
 
 OPTIONS:
     -Clean              Clean build (remove previous build artifacts)
-    -UpdateFirmware     Update mayhem firmware from git
-    -Ninja              Use Ninja build system (faster)
-    -Shell              Open interactive shell in container
-    -Rebuild            Rebuild Docker image
+    -UpdateFirmware     Update mayhem firmware from git (includes submodules)
+    -Ninja              Use Ninja build system (faster than Make)
+    -Shell              Open interactive shell in container for debugging
+    -Rebuild            Rebuild Docker image (use after pulling updates)
     -Help               Show this help message
 
 EXAMPLES:
@@ -60,8 +60,12 @@ EXAMPLES:
     # Open shell for debugging
     .\docker-build.ps1 -Shell
 
-    # Rebuild Docker image
+    # Rebuild Docker image (after git pull or build errors)
     .\docker-build.ps1 -Rebuild
+
+TROUBLESHOOTING:
+    If you get build errors after pulling updates, try:
+    .\docker-build.ps1 -Rebuild -Clean -UpdateFirmware
 
 REQUIREMENTS:
     - Docker Desktop for Windows

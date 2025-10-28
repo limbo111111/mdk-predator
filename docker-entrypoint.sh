@@ -100,6 +100,55 @@ integrate_mdk_predator() {
         cp /workspace/mdk-predator/mdk_predator.conf "$external_dir/"
     fi
     
+    # Register in external.cmake
+    local external_cmake="/workspace/mayhem-firmware/firmware/application/external/external.cmake"
+    
+    if [ -f "$external_cmake" ]; then
+        print_info "Registering MDK-Predator in external.cmake..."
+        
+        # Check if already registered
+        if ! (grep -q "external/mdk_predator/src/crypto/crypto_analyzer.c" "$external_cmake" 2>/dev/null && grep -q "mdk_predator" "$external_cmake" 2>/dev/null); then
+            # Backup the original file
+            cp "$external_cmake" "$external_cmake.backup"
+            
+            # Add MDK-Predator sources to EXTCPPSRC and app to EXTAPPLIST
+            awk '
+                BEGIN { done=0 }
+                /^set\(EXTCPPSRC/ {
+                    if (!done) {
+                        print
+                        print ""
+                        print "\t#mdk_predator"
+                        print "\texternal/mdk_predator/main.cpp"
+                        print "\texternal/mdk_predator/mdk_predator_app.cpp"
+                        print "\texternal/mdk_predator/src/mdk_predator.c"
+                        print "\texternal/mdk_predator/src/automotive/key_fob_analyzer.c"
+                        print "\texternal/mdk_predator/src/automotive/rolling_code_tester.c"
+                        print "\texternal/mdk_predator/src/wireless/wifi_analyzer.c"
+                        print "\texternal/mdk_predator/src/wireless/bluetooth_analyzer.c"
+                        print "\texternal/mdk_predator/src/wireless/subghz_analyzer.c"
+                        print "\texternal/mdk_predator/src/crypto/crypto_analyzer.c"
+                        done=1
+                        next
+                    }
+                }
+                /^set\(EXTAPPLIST/ {
+                    print
+                    print "\tmdk_predator"
+                    next
+                }
+                { print }
+            ' "$external_cmake.backup" > "$external_cmake"
+            
+            print_info "MDK-Predator registered in external.cmake"
+        else
+            print_info "MDK-Predator already registered in external.cmake"
+        fi
+    else
+        print_warning "external.cmake not found - build may fail!"
+        print_warning "This might be an older version of mayhem-firmware"
+    fi
+    
     print_info "Integration complete"
 }
 
