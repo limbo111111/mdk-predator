@@ -4,14 +4,13 @@
 
 ### Bugs Fixed
 
-#### 1. Build Error: Missing libopencm3 Submodule Headers
+#### 1. Build Error: Missing libopencm3 Generated Headers
 **Severity:** Critical
 **Impact:** Build failure preventing application compilation
-**Root Cause:** Git submodules in mayhem-firmware not being initialized when firmware directory already exists.
+**Root Cause:** The `nvic.h` header file is generated during the libopencm3 build process, not part of the source code. The build was attempting to compile the application before libopencm3 was built, causing the header file to be missing.
 
 **Details:**
-- When mayhem-firmware directory existed (e.g., from previous build or cached Docker volume)
-- Submodules were only initialized during initial clone or when UPDATE_FIRMWARE=1
+- The error occurred when building `hackrf/firmware/common/usb.c`
 - This caused compilation to fail with:
   ```
   In file included from /workspace/mayhem-firmware/hackrf/firmware/common/usb.c:32:
@@ -23,33 +22,37 @@
   make[3]: *** [firmware/application/CMakeFiles/application.elf.dir/build.make:1141: 
               firmware/application/CMakeFiles/application.elf.dir/__/__/hackrf/firmware/common/usb.c.obj] Error 1
   ```
-- The error occurred when building `hackrf/firmware/common/usb.c`
-- The missing file is part of the libopencm3 submodule
+- The missing file `nvic.h` is GENERATED during the libopencm3 build from `irq.yaml` files
+- Previous fix only verified submodules were initialized but didn't ensure libopencm3 was built
 
 **Fix:**
-- Added `verify_submodules()` function to all build scripts:
+- Added `build_libopencm3()` function to all build scripts:
   - `scripts/build_portapack_app.sh` (Linux/macOS)
-  - `scripts/build_portapack_app.ps1` (Windows PowerShell)
+  - `scripts/build_portapack_app.ps1` (Windows PowerShell - Build-Libopencm3)
   - `scripts/build_portapack_app_wsl.sh` (WSL)
   - `docker-entrypoint.sh` (Docker builds)
-- Function checks for critical paths before building:
-  - `hackrf/firmware/libopencm3` (submodule directory)
-  - `hackrf/firmware/libopencm3/include/libopencm3/lpc43xx/m0/nvic.h` (specific header)
-- Automatically runs `git submodule update --init --recursive` if missing
-- Provides clear error messages matching the compilation error
-- Exits with helpful manual fix instructions if automatic init fails
+- Function explicitly builds libopencm3 with `make TARGETS=lpc43xx` before application build
+- Verifies that `nvic.h` is generated after build
+- Skips build if libopencm3 is already built (checks for lib file and nvic.h)
+- Called after `verify_submodules()` and before application build in all scripts
 
 **Files Modified:**
 - `scripts/build_portapack_app.sh`
 - `scripts/build_portapack_app.ps1`
 - `scripts/build_portapack_app_wsl.sh`
 - `docker-entrypoint.sh`
+- `.gitignore` (allow tests/build/ directory)
+
+**Files Added:**
+- `tests/build/test_libopencm3_build.sh` (test to prevent regression)
+- `tests/build/README.md` (documentation for build tests)
 
 **Prevention of Similar Issues:**
-- Checks entire libopencm3 directory (prevents all libopencm3 header errors)
-- Runs before build in all code paths
-- Works for both fresh clones and existing firmware directories
-- Handles all build environments (Linux, macOS, Windows native, WSL, Docker)
+- Explicit build step ensures libopencm3 is always built before application
+- Verification that nvic.h is generated catches any build issues early
+- Test suite verifies all build scripts have the fix applied
+- Test runs in CI/CD to prevent regression
+- Works for both fresh builds and incremental builds
 
 #### 2. UI Layout Overlap Bug ("Whitetrails")
 **Severity:** High
