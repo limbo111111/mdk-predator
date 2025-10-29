@@ -10,6 +10,9 @@
 #define I2C_MASTER_SCL_PIN 22
 #define I2C_MASTER_FREQUENCY 100000
 
+// Maximum number of parallel streams for hardware acceleration
+#define MDK_MAX_PARALLEL_STREAMS 4
+
 void i2c_master_init();
 void i2c_master_write(uint8_t device_addr, uint8_t *data, size_t size);
 void i2c_master_read(uint8_t device_addr, uint8_t *data, size_t size);
