@@ -189,35 +189,35 @@ test_functions_verify_nvic_generation() {
     fi
 }
 
-# Test 10: Verify build functions build for lpc43xx target
+# Test 10: Verify build functions build for lpc43xx/m4 and lpc43xx/m0 targets
 test_functions_build_lpc43xx_target() {
     TESTS_RUN=$((TESTS_RUN + 1))
     local found=0
 
     # Check docker-entrypoint.sh
-    if grep -A 50 "build_libopencm3()" "docker-entrypoint.sh" | grep -q "TARGETS=lpc43xx"; then
+    if grep -A 50 "build_libopencm3()" "docker-entrypoint.sh" | grep -q 'TARGETS="lpc43xx/m4 lpc43xx/m0"'; then
         found=$((found + 1))
     fi
 
     # Check build_portapack_app.sh
-    if grep -A 50 "build_libopencm3()" "scripts/build_portapack_app.sh" | grep -q "TARGETS=lpc43xx"; then
+    if grep -A 50 "build_libopencm3()" "scripts/build_portapack_app.sh" | grep -q 'TARGETS="lpc43xx/m4 lpc43xx/m0"'; then
         found=$((found + 1))
     fi
 
     # Check build_portapack_app_wsl.sh
-    if grep -A 50 "build_libopencm3()" "scripts/build_portapack_app_wsl.sh" | grep -q "TARGETS=lpc43xx"; then
+    if grep -A 50 "build_libopencm3()" "scripts/build_portapack_app_wsl.sh" | grep -q 'TARGETS="lpc43xx/m4 lpc43xx/m0"'; then
         found=$((found + 1))
     fi
 
     # Check build_portapack_app.ps1
-    if grep -A 50 "function Build-Libopencm3" "scripts/build_portapack_app.ps1" | grep -q "TARGETS=lpc43xx"; then
+    if grep -A 50 "function Build-Libopencm3" "scripts/build_portapack_app.ps1" | grep -q 'TARGETS="lpc43xx/m4 lpc43xx/m0"'; then
         found=$((found + 1))
     fi
 
     if [ $found -eq 4 ]; then
-        test_pass "All build functions build for lpc43xx target"
+        test_pass "All build functions build for lpc43xx/m4 and lpc43xx/m0 targets"
     else
-        test_fail "Only $found/4 build functions build for lpc43xx target"
+        test_fail "Only $found/4 build functions build for lpc43xx/m4 and lpc43xx/m0 targets"
     fi
 }
 

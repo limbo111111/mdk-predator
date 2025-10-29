@@ -134,7 +134,7 @@ fi
 # Build libopencm3 first (required)
 print_info "Building libopencm3..."
 cd "$MAYHEM_DIR/hackrf/firmware/libopencm3"
-make TARGETS=lpc43xx -j$(nproc)
+make TARGETS="lpc43xx/m4 lpc43xx/m0" -j$(nproc)
 
 # Configure and build
 cd "$MAYHEM_DIR"

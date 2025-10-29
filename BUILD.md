@@ -116,7 +116,7 @@ If you prefer full control:
 4. Build:
    ```bash
    cd hackrf/firmware/libopencm3
-   make TARGETS=lpc43xx
+   make TARGETS="lpc43xx/m4 lpc43xx/m0"
    cd ../../../
    mkdir build && cd build
    cmake ..

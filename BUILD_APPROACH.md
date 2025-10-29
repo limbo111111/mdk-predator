@@ -292,7 +292,7 @@ compilation terminated.
 
 **Solution:** This issue is now automatically fixed by the build scripts. They will:
 1. Verify git submodules are initialized
-2. Build libopencm3 with `make TARGETS=lpc43xx` to generate `nvic.h` and other headers
+2. Build libopencm3 with `make TARGETS="lpc43xx/m4 lpc43xx/m0"` to generate `nvic.h` and other headers
 3. Verify that `nvic.h` was successfully generated
 4. Then build the application
 
@@ -311,7 +311,7 @@ Simply run your build command and the scripts will handle it:
 **Manual fix (if automatic build fails):**
 ```bash
 cd /path/to/mayhem-firmware/hackrf/firmware/libopencm3
-make TARGETS=lpc43xx
+make TARGETS="lpc43xx/m4 lpc43xx/m0"
 # Verify nvic.h was generated
 ls include/libopencm3/lpc43xx/m0/nvic.h
 ```

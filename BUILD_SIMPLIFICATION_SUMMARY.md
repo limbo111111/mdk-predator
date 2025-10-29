@@ -120,7 +120,7 @@ The new build scripts are modeled directly after the mayhem-firmware standard bu
    cd mayhem-firmware
    git submodule update --init hackrf/firmware/libopencm3
    cd hackrf/firmware/libopencm3
-   make TARGETS=lpc43xx
+   make TARGETS="lpc43xx/m4 lpc43xx/m0"
    cd ../../../
    mkdir build && cd build
    cmake ..
@@ -132,7 +132,7 @@ The new build scripts are modeled directly after the mayhem-firmware standard bu
    - Initialize submodules (`git submodule update --init`)
    - Copy MDK-Predator to `external/mdk_predator/`
    - Register in `external.cmake`
-   - Build libopencm3 (`make TARGETS=lpc43xx`)
+   - Build libopencm3 (`make TARGETS="lpc43xx/m4 lpc43xx/m0"`)
    - Build application (`cmake .. && make application`)
    - Extract .ppma file
 

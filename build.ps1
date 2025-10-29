@@ -144,7 +144,7 @@ if (-not ($cmakeContent -match "mdk_predator")) {
 # Build libopencm3 first (required)
 Write-Info "Building libopencm3..."
 Push-Location (Join-Path $MayhemPath "hackrf\firmware\libopencm3")
-make TARGETS=lpc43xx
+make TARGETS="lpc43xx/m4 lpc43xx/m0"
 Pop-Location
 
 # Configure and build
