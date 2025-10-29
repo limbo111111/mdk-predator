@@ -435,6 +435,47 @@ verify_submodules() {
     echo ""
 }
 
+build_libopencm3() {
+    print_info "Building libopencm3 library..."
+    
+    local libopencm3_path="$MAYHEM_PATH/hackrf/firmware/libopencm3"
+    
+    if [ ! -d "$libopencm3_path" ]; then
+        print_error "libopencm3 directory not found: $libopencm3_path"
+        print_error "Please run verify_submodules first"
+        exit 1
+    fi
+    
+    cd "$libopencm3_path"
+    
+    # Check if already built
+    if [ -f "lib/libopencm3_lpc43xx.a" ] && [ -f "include/libopencm3/lpc43xx/m0/nvic.h" ]; then
+        print_info "libopencm3 already built, skipping..."
+        cd "$SCRIPT_DIR"
+        return 0
+    fi
+    
+    print_info "Building libopencm3 for LPC43xx (this may take a few minutes)..."
+    
+    # Build libopencm3
+    if ! make TARGETS=lpc43xx 2>&1; then
+        print_error "libopencm3 build failed"
+        cd "$SCRIPT_DIR"
+        exit 1
+    fi
+    
+    # Verify the generated header exists
+    if [ ! -f "include/libopencm3/lpc43xx/m0/nvic.h" ]; then
+        print_error "nvic.h was not generated during libopencm3 build"
+        print_error "This is unexpected - please check the build logs"
+        cd "$SCRIPT_DIR"
+        exit 1
+    fi
+    
+    print_info "✓ libopencm3 built successfully"
+    cd "$SCRIPT_DIR"
+}
+
 integrate_with_mayhem() {
     print_info "Integrating MDK-Predator with Mayhem firmware..."
     
@@ -818,6 +859,9 @@ check_mayhem_path
 
 # Verify submodules are initialized
 verify_submodules
+
+# Build libopencm3 first (generates nvic.h and other headers)
+build_libopencm3
 
 # Check dependencies
 check_dependencies

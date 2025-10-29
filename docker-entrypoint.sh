@@ -282,6 +282,48 @@ integrate_mdk_predator() {
     print_info "Integration complete"
 }
 
+# Function to build libopencm3
+build_libopencm3() {
+    print_step "Building libopencm3 library..."
+    
+    local libopencm3_path="/workspace/mayhem-firmware/hackrf/firmware/libopencm3"
+    
+    if [ ! -d "$libopencm3_path" ]; then
+        print_error "libopencm3 directory not found: $libopencm3_path"
+        print_error "Please run verify_submodules first"
+        exit 1
+    fi
+    
+    cd "$libopencm3_path"
+    
+    # Check if already built
+    if [ -f "lib/libopencm3_lpc43xx.a" ] && [ -f "include/libopencm3/lpc43xx/m0/nvic.h" ]; then
+        print_info "libopencm3 already built, skipping..."
+        cd /workspace
+        return 0
+    fi
+    
+    print_info "Building libopencm3 for LPC43xx (this may take a few minutes)..."
+    
+    # Build libopencm3
+    if ! make TARGETS=lpc43xx 2>&1; then
+        print_error "libopencm3 build failed"
+        cd /workspace
+        exit 1
+    fi
+    
+    # Verify the generated header exists
+    if [ ! -f "include/libopencm3/lpc43xx/m0/nvic.h" ]; then
+        print_error "nvic.h was not generated during libopencm3 build"
+        print_error "This is unexpected - please check the build logs"
+        cd /workspace
+        exit 1
+    fi
+    
+    print_info "✓ libopencm3 built successfully"
+    cd /workspace
+}
+
 # Function to build with make
 build_with_make() {
     print_step "Building with Make..."
@@ -392,6 +434,9 @@ do_build() {
     
     # Verify submodules are initialized
     verify_submodules
+    
+    # Build libopencm3 first (generates nvic.h and other headers)
+    build_libopencm3
     
     # Integrate mdk-predator
     integrate_mdk_predator

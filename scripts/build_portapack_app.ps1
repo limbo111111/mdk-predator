@@ -543,6 +543,56 @@ function Test-Submodules {
     Write-Host ""
 }
 
+function Build-Libopencm3 {
+    Write-Info "Building libopencm3 library..."
+    
+    $libopencm3Path = Join-Path $MayhemPath "hackrf\firmware\libopencm3"
+    
+    if (-not (Test-Path $libopencm3Path)) {
+        Write-Error-Custom "libopencm3 directory not found: $libopencm3Path"
+        Write-Error-Custom "Please run Test-Submodules first"
+        exit 1
+    }
+    
+    Push-Location $libopencm3Path
+    
+    try {
+        # Check if already built
+        $libFile = Join-Path $libopencm3Path "lib\libopencm3_lpc43xx.a"
+        $nvicHeader = Join-Path $libopencm3Path "include\libopencm3\lpc43xx\m0\nvic.h"
+        
+        if ((Test-Path $libFile) -and (Test-Path $nvicHeader)) {
+            Write-Info "libopencm3 already built, skipping..."
+            Pop-Location
+            return
+        }
+        
+        Write-Info "Building libopencm3 for LPC43xx (this may take a few minutes)..."
+        
+        # Build libopencm3
+        make TARGETS=lpc43xx 2>&1 | Out-Null
+        
+        if ($LASTEXITCODE -ne 0) {
+            Write-Error-Custom "libopencm3 build failed"
+            Pop-Location
+            exit 1
+        }
+        
+        # Verify the generated header exists
+        if (-not (Test-Path $nvicHeader)) {
+            Write-Error-Custom "nvic.h was not generated during libopencm3 build"
+            Write-Error-Custom "This is unexpected - please check the build logs"
+            Pop-Location
+            exit 1
+        }
+        
+        Write-Info "✓ libopencm3 built successfully"
+    }
+    finally {
+        Pop-Location
+    }
+}
+
 function Invoke-Integration {
     Write-Info "Integrating MDK-Predator with Mayhem firmware..."
     
@@ -1021,6 +1071,9 @@ function Main {
     
     # Verify submodules are initialized
     Test-Submodules
+    
+    # Build libopencm3 first (generates nvic.h and other headers)
+    Build-Libopencm3
     
     # Check dependencies
     Test-AllDependencies
