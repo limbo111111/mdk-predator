@@ -1,4 +1,5 @@
 // Existing content of the file
+#include "mdk_hardware_interface.h"
 
 private:
     bool use_hardware_accel;

@@ -6,6 +6,9 @@
 #include "mdk_hardware_interface.h"
 #include <string.h>
 
+// Global streams array definition
+StreamData streams[4];
+
 static mdk_accel_config_t g_accel_config;
 static bool g_mdk_initialized = false;
 static bool g_mdk_available = false;
@@ -16,6 +19,7 @@ bool mdk_hardware_detect(mdk_device_info_t *info) {
     info->api_version = 1;
     info->module_version = 1;
     strncpy(info->module_name, "ESP32-S3-MDK", sizeof(info->module_name) - 1);
+    info->module_name[sizeof(info->module_name) - 1] = '\0';
     info->features = 0x0F;
     
     g_mdk_available = true;
@@ -38,6 +42,11 @@ bool mdk_hardware_init(mdk_accel_config_t *config) {
 bool mdk_accel_bruteforce(mdk_bruteforce_task_t *task) {
     if (!task || !g_mdk_initialized) return false;
     
+    // Validate parallel_streams to avoid division by zero
+    if (g_accel_config.parallel_streams == 0) {
+        return false;
+    }
+    
     uint32_t range = task->end_code - task->start_code;
     uint32_t chunk_size = range / g_accel_config.parallel_streams;
     
@@ -55,7 +64,8 @@ bool mdk_accel_bruteforce(mdk_bruteforce_task_t *task) {
                     task->progress_callback(code - task->start_code, range);
                 }
                 
-                if (task->result_code && *task->found == false) {
+                // Check if the hash matches the target
+                if (result == task->target_hash && task->result_code && *task->found == false) {
                     *task->result_code = code;
                     *task->found = true;
                     return true;
