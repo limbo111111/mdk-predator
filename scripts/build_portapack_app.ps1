@@ -465,9 +465,11 @@ function Test-Submodules {
     Write-Info "Verifying git submodules are initialized..."
     
     # Check for critical submodules that must exist for successful build
+    # Note: nvic.h is generated during build, so we check for source files instead
     $criticalPaths = @(
         "hackrf\firmware\libopencm3",
-        "hackrf\firmware\libopencm3\include\libopencm3\lpc43xx\m0\nvic.h"
+        "hackrf\firmware\libopencm3\include\libopencm3\lpc43xx",
+        "hackrf\firmware\libopencm3\include\libopencm3\lpc43xx\m0\irq.yaml"
     )
     
     $missingSubmodules = $false
