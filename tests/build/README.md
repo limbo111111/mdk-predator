@@ -74,12 +74,12 @@ test_something() {
 main() {
     echo "Running tests..."
     test_something
-    
+
     # Print summary
     echo "Tests run: $TESTS_RUN"
     echo "Tests passed: $TESTS_PASSED"
     echo "Tests failed: $TESTS_FAILED"
-    
+
     [ $TESTS_FAILED -eq 0 ] && exit 0 || exit 1
 }
 

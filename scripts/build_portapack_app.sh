@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # MDK-Predator PortaPack Application Build Script
-# 
+#
 # This script helps integrate MDK-Predator with PortaPack Mayhem firmware
 # and builds the application for deployment.
 #
@@ -81,7 +81,7 @@ EOF
 
 install_dependencies() {
     print_info "Installing build dependencies..."
-    
+
     # Detect OS
     if [ -f /etc/os-release ]; then
         . /etc/os-release
@@ -90,7 +90,7 @@ install_dependencies() {
         print_error "Cannot detect operating system"
         exit 1
     fi
-    
+
     case $OS in
         ubuntu|debian)
             print_info "Detected Debian/Ubuntu system"
@@ -121,29 +121,29 @@ install_dependencies() {
             exit 1
             ;;
     esac
-    
+
     print_info "Dependencies installed successfully"
 }
 
 download_mayhem_firmware() {
     print_info "Downloading Mayhem firmware..."
-    
+
     # Check if git is installed
     if ! command -v git &> /dev/null; then
         print_error "Git is not installed. Please install git first."
         exit 1
     fi
-    
+
     # Set default path if not specified
     if [ -z "$MAYHEM_PATH" ]; then
         MAYHEM_PATH="$DEFAULT_MAYHEM_CLONE_PATH"
         print_info "Using default firmware location: $MAYHEM_PATH"
     fi
-    
+
     # Check if directory already exists
     if [ -d "$MAYHEM_PATH" ]; then
         print_warning "Directory already exists: $MAYHEM_PATH"
-        
+
         # Check if it's a git repo
         if [ -d "$MAYHEM_PATH/.git" ]; then
             print_info "Updating existing Mayhem firmware..."
@@ -159,25 +159,25 @@ download_mayhem_firmware() {
             exit 1
         fi
     fi
-    
+
     # Clone the firmware
     print_info "Cloning Mayhem firmware from GitHub..."
     git clone --depth 1 https://github.com/portapack-mayhem/mayhem-firmware.git "$MAYHEM_PATH"
-    
+
     # Initialize submodules
     print_info "Initializing submodules..."
     cd "$MAYHEM_PATH"
     git submodule update --init --recursive
     cd - > /dev/null
-    
+
     print_info "Mayhem firmware downloaded successfully to: $MAYHEM_PATH"
 }
 
 check_requirements() {
     print_info "Checking build requirements..."
-    
+
     local missing_deps=()
-    
+
     # Check for arm-none-eabi-gcc
     if ! command -v arm-none-eabi-gcc &> /dev/null; then
         print_warning "ARM toolchain not found"
@@ -185,7 +185,7 @@ check_requirements() {
     else
         print_info "ARM toolchain: $(arm-none-eabi-gcc --version | head -1)"
     fi
-    
+
     # Check for cmake
     if ! command -v cmake &> /dev/null; then
         print_warning "CMake not found"
@@ -193,7 +193,7 @@ check_requirements() {
     else
         print_info "CMake: $(cmake --version | head -1)"
     fi
-    
+
     # Check for python3
     if ! command -v python3 &> /dev/null; then
         print_warning "Python 3 not found"
@@ -201,7 +201,7 @@ check_requirements() {
     else
         print_info "Python: $(python3 --version)"
     fi
-    
+
     # Check for make
     if ! command -v make &> /dev/null; then
         print_warning "Make not found"
@@ -209,7 +209,7 @@ check_requirements() {
     else
         print_info "Make: $(make --version | head -1)"
     fi
-    
+
     if [ ${#missing_deps[@]} -gt 0 ]; then
         print_error "Missing dependencies: ${missing_deps[*]}"
         echo ""
@@ -217,7 +217,7 @@ check_requirements() {
         echo ""
         exit 1
     fi
-    
+
     print_info "All requirements satisfied"
 }
 
@@ -234,41 +234,41 @@ verify_mayhem_path() {
             return 0
         fi
     fi
-    
+
     if [ ! -d "$MAYHEM_PATH" ]; then
         print_error "Mayhem firmware directory not found: $MAYHEM_PATH"
         print_info "Use -d or --download-firmware to download it automatically"
         exit 1
     fi
-    
+
     if [ ! -f "$MAYHEM_PATH/CMakeLists.txt" ]; then
         print_error "Invalid Mayhem firmware directory (CMakeLists.txt not found)"
         exit 1
     fi
-    
+
     print_info "Mayhem firmware found at: $MAYHEM_PATH"
 }
 
 download_libopencm3() {
     print_info "Downloading libopencm3 from HackRF repository..."
-    
+
     local libopencm3_path="$MAYHEM_PATH/hackrf/firmware/libopencm3"
     local hackrf_repo="https://github.com/portapack-mayhem/hackrf.git"
     local hackrf_commit="cf6815aaf9c4bb11c3ad3de97721c67ddf4fcb38"
-    
+
     # Check if git is installed
     if ! command -v git &> /dev/null; then
         print_error "Git is not installed. Please install git first."
         exit 1
     fi
-    
+
     # Create hackrf/firmware directory if it doesn't exist
     mkdir -p "$MAYHEM_PATH/hackrf/firmware"
-    
+
     # Clone the specific commit from HackRF repository into a temporary directory
     local temp_dir=$(mktemp -d)
     print_info "Cloning HackRF repository (this may take a moment)..."
-    
+
     if ! git clone "$hackrf_repo" "$temp_dir/hackrf" --depth 1 --branch master 2>&1; then
         print_warning "Failed to clone with --depth, trying full clone..."
         rm -rf "$temp_dir/hackrf"
@@ -278,15 +278,15 @@ download_libopencm3() {
             exit 1
         fi
     fi
-    
+
     cd "$temp_dir/hackrf"
-    
+
     # Try to checkout the specific commit
     print_info "Checking out commit: $hackrf_commit"
     if ! git checkout "$hackrf_commit" 2>&1; then
         print_warning "Could not checkout specific commit, using latest version"
     fi
-    
+
     # Initialize libopencm3 submodule in the cloned repo
     print_info "Initializing libopencm3 submodule..."
     cd firmware
@@ -296,22 +296,22 @@ download_libopencm3() {
         rm -rf "$temp_dir"
         exit 1
     fi
-    
+
     # Copy libopencm3 to the target location
     print_info "Copying libopencm3 to $libopencm3_path"
     cp -r libopencm3 "$libopencm3_path"
-    
+
     cd - > /dev/null
-    
+
     # Clean up temporary directory
     rm -rf "$temp_dir"
-    
+
     print_info "✓ libopencm3 downloaded successfully"
 }
 
 verify_submodules() {
     print_info "Verifying git submodules are initialized..."
-    
+
     # Check for critical submodules that must exist for successful build
     # Note: nvic.h is generated during build, so we check for source files instead
     local critical_paths=(
@@ -319,16 +319,16 @@ verify_submodules() {
         "hackrf/firmware/libopencm3/include/libopencm3/lpc43xx"
         "hackrf/firmware/libopencm3/include/libopencm3/lpc43xx/m0/irq.yaml"
     )
-    
+
     local missing_submodules=0
-    
+
     for path in "${critical_paths[@]}"; do
         if [ ! -e "$MAYHEM_PATH/$path" ]; then
             print_info "Missing: $path"
             missing_submodules=1
         fi
     done
-    
+
     # If libopencm3 is missing, try different approaches to get it
     if [ $missing_submodules -eq 1 ]; then
         echo ""
@@ -336,7 +336,7 @@ verify_submodules() {
         print_warning "This will cause compilation errors like:"
         print_warning "  fatal error: libopencm3/lpc43xx/m0/nvic.h: No such file or directory"
         echo ""
-        
+
         # If this is a git repository, try submodule init first
         if [ -d "$MAYHEM_PATH/.git" ]; then
             print_info "Attempting to initialize git submodules..."
@@ -344,7 +344,7 @@ verify_submodules() {
             if git submodule update --init --recursive 2>&1; then
                 cd - > /dev/null
                 print_info "Submodules initialized successfully via git"
-                
+
                 # Verify again
                 missing_submodules=0
                 for path in "${critical_paths[@]}"; do
@@ -359,12 +359,12 @@ verify_submodules() {
         else
             print_info "Mayhem firmware is not a git repository"
         fi
-        
+
         # If still missing, download from HackRF repository
         if [ $missing_submodules -eq 1 ]; then
             print_info "Downloading libopencm3 from HackRF repository..."
             download_libopencm3
-            
+
             # Final verification
             for path in "${critical_paths[@]}"; do
                 if [ ! -e "$MAYHEM_PATH/$path" ]; then
@@ -374,39 +374,39 @@ verify_submodules() {
             done
         fi
     fi
-    
+
     print_info "✓ All required submodules are properly initialized"
 }
 
 build_libopencm3() {
     print_info "Building libopencm3 library..."
-    
+
     local libopencm3_path="$MAYHEM_PATH/hackrf/firmware/libopencm3"
-    
+
     if [ ! -d "$libopencm3_path" ]; then
         print_error "libopencm3 directory not found: $libopencm3_path"
         print_error "Please run verify_submodules first"
         exit 1
     fi
-    
+
     cd "$libopencm3_path"
-    
+
     # Check if already built
     if [ -f "lib/libopencm3_lpc43xx.a" ] && [ -f "include/libopencm3/lpc43xx/m0/nvic.h" ]; then
         print_info "libopencm3 already built, skipping..."
         cd "$MDK_ROOT"
         return 0
     fi
-    
+
     print_info "Building libopencm3 for LPC43xx (this may take a few minutes)..."
-    
+
     # Build libopencm3
     if ! make TARGETS=lpc43xx 2>&1; then
         print_error "libopencm3 build failed"
         cd "$MDK_ROOT"
         exit 1
     fi
-    
+
     # Verify the generated header exists
     if [ ! -f "include/libopencm3/lpc43xx/m0/nvic.h" ]; then
         print_error "nvic.h was not generated during libopencm3 build"
@@ -414,39 +414,39 @@ build_libopencm3() {
         cd "$MDK_ROOT"
         exit 1
     fi
-    
+
     print_info "✓ libopencm3 built successfully"
     cd "$MDK_ROOT"
 }
 
 integrate_with_mayhem() {
     print_info "Integrating MDK-Predator with Mayhem firmware..."
-    
+
     local external_dir="$MAYHEM_PATH/firmware/application/external/mdk_predator"
     local external_cmake="$MAYHEM_PATH/firmware/application/external/external.cmake"
-    
+
     # Create external app directory
     mkdir -p "$external_dir"
-    
+
     # Copy application files
     print_info "Copying application files..."
     cp -r "$MDK_ROOT/app"/* "$external_dir/"
-    
+
     # Copy source files
     print_info "Copying source files..."
     cp -r "$MDK_ROOT/src" "$external_dir/"
     cp -r "$MDK_ROOT/include" "$external_dir/"
-    
+
     # Copy configuration
     print_info "Copying configuration..."
     cp "$MDK_ROOT/mdk_predator.conf" "$external_dir/"
-    
+
     # Register in external.cmake if not already registered
     print_info "Registering MDK-Predator in external.cmake..."
     if ! grep -q "external/mdk_predator/main.cpp" "$external_cmake" 2>/dev/null; then
         # Backup the original file
         cp "$external_cmake" "$external_cmake.backup"
-        
+
         # Find the line with "set(EXTCPPSRC" and add MDK-Predator sources after it
         # Using a temporary file for safe editing
         awk '
@@ -472,32 +472,32 @@ integrate_with_mayhem() {
             }
             { print }
         ' "$external_cmake.backup" > "$external_cmake"
-        
+
         print_info "MDK-Predator registered in external.cmake"
     else
         print_info "MDK-Predator already registered in external.cmake"
     fi
-    
+
     print_info "Integration complete"
 }
 
 verify_file_links() {
     print_info "Verifying all files are properly linked in Mayhem firmware..."
-    
+
     local external_dir="$MAYHEM_PATH/firmware/application/external/mdk_predator"
     local external_cmake="$MAYHEM_PATH/firmware/application/external/external.cmake"
     local verification_failed=0
-    
+
     # Define all required files
     local required_cpp_files=(
         "main.cpp"
         "mdk_predator_app.cpp"
     )
-    
+
     local required_hpp_files=(
         "mdk_predator_app.hpp"
     )
-    
+
     local required_c_files=(
         "src/mdk_predator.c"
         "src/automotive/key_fob_analyzer.c"
@@ -507,7 +507,7 @@ verify_file_links() {
         "src/wireless/subghz_analyzer.c"
         "src/crypto/crypto_analyzer.c"
     )
-    
+
     local required_h_files=(
         "include/mdk_predator.h"
         "include/input_validation.h"
@@ -518,12 +518,12 @@ verify_file_links() {
         "include/wireless/subghz_analyzer.h"
         "include/crypto/crypto_analyzer.h"
     )
-    
+
     local required_other_files=(
         "manifest.json"
         "mdk_predator.conf"
     )
-    
+
     # Check CPP files
     print_info "Checking C++ source files..."
     for file in "${required_cpp_files[@]}"; do
@@ -534,7 +534,7 @@ verify_file_links() {
             print_info "  ✓ $file"
         fi
     done
-    
+
     # Check HPP files
     print_info "Checking C++ header files..."
     for file in "${required_hpp_files[@]}"; do
@@ -545,7 +545,7 @@ verify_file_links() {
             print_info "  ✓ $file"
         fi
     done
-    
+
     # Check C files
     print_info "Checking C source files..."
     for file in "${required_c_files[@]}"; do
@@ -556,7 +556,7 @@ verify_file_links() {
             print_info "  ✓ $file"
         fi
     done
-    
+
     # Check H files
     print_info "Checking C header files..."
     for file in "${required_h_files[@]}"; do
@@ -567,7 +567,7 @@ verify_file_links() {
             print_info "  ✓ $file"
         fi
     done
-    
+
     # Check other required files
     print_info "Checking configuration files..."
     for file in "${required_other_files[@]}"; do
@@ -578,11 +578,11 @@ verify_file_links() {
             print_info "  ✓ $file"
         fi
     done
-    
+
     # Verify external.cmake registration
     print_info "Verifying external.cmake registration..."
     local cmake_verification_failed=0
-    
+
     # Check if all source files are registered in external.cmake
     for file in "${required_cpp_files[@]}"; do
         if ! grep -q "external/mdk_predator/$file" "$external_cmake"; then
@@ -591,7 +591,7 @@ verify_file_links() {
             verification_failed=1
         fi
     done
-    
+
     for file in "${required_c_files[@]}"; do
         if ! grep -q "external/mdk_predator/$file" "$external_cmake"; then
             print_error "File not registered in external.cmake: $file"
@@ -599,18 +599,18 @@ verify_file_links() {
             verification_failed=1
         fi
     done
-    
+
     # Check if mdk_predator is registered in EXTAPPLIST
     if ! grep -Eq 'set\s*\(\s*EXTAPPLIST[^\)]*mdk_predator|list\s*\(\s*APPEND\s+EXTAPPLIST[^\)]*mdk_predator' "$external_cmake"; then
         print_error "mdk_predator not found in EXTAPPLIST in external.cmake"
         cmake_verification_failed=1
         verification_failed=1
     fi
-    
+
     if [ $cmake_verification_failed -eq 0 ]; then
         print_info "  ✓ All files registered in external.cmake"
     fi
-    
+
     # Final verification result
     if [ $verification_failed -eq 1 ]; then
         echo ""
@@ -620,7 +620,7 @@ verify_file_links() {
         echo ""
         exit 1
     fi
-    
+
     echo ""
     print_info "✓ All files verified successfully!"
     print_info "✓ All files are properly linked in Mayhem firmware"
@@ -630,49 +630,49 @@ verify_file_links() {
 
 build_application() {
     print_info "Building PortaPack firmware with MDK-Predator..."
-    
+
     local build_dir="$MAYHEM_PATH/build"
-    
+
     # Create build directory
     mkdir -p "$build_dir"
     cd "$build_dir"
-    
+
     # Configure with CMake
     print_info "Running CMake configuration..."
     if ! cmake ..; then
         print_error "CMake configuration failed"
         exit 1
     fi
-    
+
     # Build application (which includes external apps)
     print_info "Building application and external apps..."
     if ! make application; then
         print_error "Build failed"
         exit 1
     fi
-    
+
     print_info "Build complete"
 }
 
 copy_output() {
     print_info "Copying built application..."
-    
+
     local app_file="$MAYHEM_PATH/firmware/application/external/mdk_predator.ppma"
-    
+
     if [ ! -f "$app_file" ]; then
         print_error "Built application not found: $app_file"
         exit 1
     fi
-    
+
     # Create output directory
     mkdir -p "$OUTPUT_DIR"
-    
+
     # Copy application
     cp "$app_file" "$OUTPUT_DIR/"
-    
+
     # Copy configuration
     cp "$MDK_ROOT/mdk_predator.conf" "$OUTPUT_DIR/"
-    
+
     # Create README
     cat > "$OUTPUT_DIR/README.txt" << EOF
 MDK-Predator PortaPack Application
@@ -693,7 +693,7 @@ Installation:
 
 See DEPLOYMENT.md for detailed instructions.
 EOF
-    
+
     print_info "Application copied to: $OUTPUT_DIR"
     print_info "  - mdk_predator.ppma"
     print_info "  - mdk_predator.conf"
@@ -702,21 +702,21 @@ EOF
 
 clean_build() {
     print_info "Cleaning build artifacts..."
-    
+
     if [ -d "$MAYHEM_PATH/build" ]; then
         rm -rf "$MAYHEM_PATH/build"
     fi
-    
+
     if [ -d "$MAYHEM_PATH/firmware/application/external/mdk_predator" ]; then
         rm -rf "$MAYHEM_PATH/firmware/application/external/mdk_predator"
     fi
-    
+
     print_info "Clean complete"
 }
 
 main() {
     local do_clean=0
-    
+
     # Parse arguments
     while [[ $# -gt 0 ]]; do
         case $1 in
@@ -751,40 +751,40 @@ main() {
                 ;;
         esac
     done
-    
+
     # Install dependencies if requested
     if [ $INSTALL_DEPS -eq 1 ]; then
         install_dependencies
     fi
-    
+
     # Download firmware if requested
     if [ $DOWNLOAD_FIRMWARE -eq 1 ]; then
         download_mayhem_firmware
     fi
-    
+
     # Verify paths
     verify_mayhem_path
-    
+
     # Verify submodules are initialized
     verify_submodules
-    
+
     # Build libopencm3 first (generates nvic.h and other headers)
     build_libopencm3
-    
+
     # Check requirements
     check_requirements
-    
+
     # Clean if requested
     if [ $do_clean -eq 1 ]; then
         clean_build
     fi
-    
+
     # Build process
     integrate_with_mayhem
     verify_file_links
     build_application
     copy_output
-    
+
     # Success message
     echo ""
     echo -e "${GREEN}========================================${NC}"

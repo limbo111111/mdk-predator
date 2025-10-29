@@ -181,7 +181,7 @@ MDK-Predator includes all necessary files for external app integration:
 ✅ **Headers** (`include/`)
 - All necessary header files for compilation
 
-✅ **Configuration** 
+✅ **Configuration**
 - `mdk_predator.conf` - Runtime configuration
 
 ### CMake Registration
@@ -281,7 +281,7 @@ cd /mnt/c/path/to/mdk-predator
 **Error Example:**
 ```
 In file included from /workspace/mayhem-firmware/hackrf/firmware/common/usb.c:32:
-/workspace/mayhem-firmware/hackrf/firmware/libopencm3/include/libopencm3/dispatch/nvic.h:30:11: 
+/workspace/mayhem-firmware/hackrf/firmware/libopencm3/include/libopencm3/dispatch/nvic.h:30:11:
 fatal error: libopencm3/lpc43xx/m0/nvic.h: No such file or directory
    30 | # include <libopencm3/lpc43xx/m0/nvic.h>
       |           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -316,7 +316,7 @@ make TARGETS=lpc43xx
 ls include/libopencm3/lpc43xx/m0/nvic.h
 ```
 
-**Prevention:** 
+**Prevention:**
 - All build scripts now include a `build_libopencm3()` function
 - A test suite (`tests/build/test_libopencm3_build.sh`) verifies the fix
 - The build process enforces the correct order: submodules → libopencm3 → application
