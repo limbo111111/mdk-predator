@@ -17,11 +17,23 @@ tests/
 │   └── test_subghz_analyzer.c
 ├── crypto/         # Cryptographic analysis tests
 │   └── test_crypto_analyzer.c
-└── integration/    # Integration tests
-    └── test_mdk_integration.c
+├── integration/    # Integration tests
+│   └── test_mdk_integration.c
+└── build/          # Build system tests
+    ├── test_libopencm3_build.sh
+    └── README.md
 ```
 
 ## Running Tests
+
+### Build System Tests
+
+These tests verify the build scripts and configuration are correct:
+
+```bash
+# Test that libopencm3 build is properly configured
+./tests/build/test_libopencm3_build.sh
+```
 
 ### Build and Run All Tests
 

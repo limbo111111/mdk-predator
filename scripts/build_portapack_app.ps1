@@ -85,13 +85,13 @@ NOTES:
     - Build process integrates MDK-Predator with Mayhem firmware
     - Output will be a .ppma file for PortaPack
     - Use -InstallDeps to install via Chocolatey (requires admin rights)
-    
+
 ALTERNATIVE: WSL (Windows Subsystem for Linux)
     For a more reliable build experience on Windows, consider using WSL:
     1. Install WSL: wsl --install
     2. Install Debian/Ubuntu from Microsoft Store
     3. Run: scripts/build_portapack_app_wsl.sh -i -d
-    
+
     WSL provides a native Linux environment and often has better compatibility
     with ARM toolchains and build tools.
 
@@ -104,17 +104,17 @@ function Test-Dependency {
         [string]$Name,
         [string]$VersionArg = "--version"
     )
-    
+
     Write-Info "Checking for $Name..."
-    
+
     $result = Get-Command $Command -ErrorAction SilentlyContinue
     if (-not $result) {
         Write-Error-Custom "$Name not found. Please install $Name."
         return $false
     }
-    
+
     Write-Info "$Name found: $($result.Path)"
-    
+
     if ($VersionArg) {
         try {
             $versionOutput = & $Command $VersionArg 2>&1 | Select-Object -First 1
@@ -123,17 +123,17 @@ function Test-Dependency {
             # Version check failed, but tool exists
         }
     }
-    
+
     return $true
 }
 
 function Install-Dependencies {
     Write-Info "Installing build dependencies using Chocolatey..."
     Write-Host ""
-    
+
     # Check if running as administrator
     $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-    
+
     if (-not $isAdmin) {
         Write-Error-Custom "Administrator privileges required to install dependencies"
         Write-Host ""
@@ -149,17 +149,17 @@ function Install-Dependencies {
         Write-Host ""
         exit 1
     }
-    
+
     # Check if Chocolatey is installed
     $chocoInstalled = $null -ne (Get-Command choco -ErrorAction SilentlyContinue)
-    
+
     if (-not $chocoInstalled) {
         Write-Info "Chocolatey not found. Installing Chocolatey..."
         Write-Host ""
-        
+
         Set-ExecutionPolicy Bypass -Scope Process -Force
         [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-        
+
         try {
             Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
             Write-Info "Chocolatey installed successfully"
@@ -170,47 +170,47 @@ function Install-Dependencies {
             Write-Host "Then run this script again with -InstallDeps"
             exit 1
         }
-        
+
         # Refresh environment variables
         $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
     }
-    
+
     Write-Info "Installing dependencies via Chocolatey..."
     Write-Host ""
-    
+
     # Install ARM toolchain
     Write-Info "Installing ARM GCC toolchain..."
     choco install gcc-arm-embedded -y
-    
+
     # Install CMake
     Write-Info "Installing CMake..."
     choco install cmake -y
-    
+
     # Install Python
     Write-Info "Installing Python..."
     choco install python -y
-    
+
     # Install Git
     Write-Info "Installing Git..."
     choco install git -y
-    
+
     # Install Make and build tools
     Write-Info "Installing Make and build tools..."
     choco install make -y
-    
+
     # Install MinGW for better Windows build compatibility
     Write-Info "Installing MinGW..."
     choco install mingw -y
-    
+
     # Install Ninja as an alternative build system
     Write-Info "Installing Ninja build system..."
     choco install ninja -y
-    
+
     Write-Host ""
     Write-Info "Dependencies installed successfully!"
     Write-Info "You may need to restart your terminal or computer for PATH changes to take effect."
     Write-Host ""
-    
+
     # Refresh environment variables
     $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
 }
@@ -218,10 +218,10 @@ function Install-Dependencies {
 function Download-MayhemFirmware {
     Write-Info "Downloading Mayhem firmware..."
     Write-Host ""
-    
+
     # Check if git is installed
     $gitInstalled = $null -ne (Get-Command git -ErrorAction SilentlyContinue)
-    
+
     if (-not $gitInstalled) {
         Write-Error-Custom "Git is not installed. Please install git first."
         Write-Host ""
@@ -230,23 +230,23 @@ function Download-MayhemFirmware {
         Write-Host ""
         exit 1
     }
-    
+
     # Set default path if not specified
     if (-not $MayhemPath) {
         $script:MayhemPath = $DefaultMayhemClonePath
         Write-Info "Using default firmware location: $MayhemPath"
     }
-    
+
     # Check if directory already exists
     if (Test-Path $MayhemPath) {
         Write-Warning-Custom "Directory already exists: $MayhemPath"
-        
+
         # Check if it's a git repo
         $gitDir = Join-Path $MayhemPath ".git"
         if (Test-Path $gitDir) {
             Write-Info "Updating existing Mayhem firmware..."
             Push-Location $MayhemPath
-            
+
             try {
                 git pull
                 git submodule update --init --recursive
@@ -257,7 +257,7 @@ function Download-MayhemFirmware {
             } finally {
                 Pop-Location
             }
-            
+
             return
         } else {
             Write-Error-Custom "Directory exists but is not a git repository"
@@ -265,23 +265,23 @@ function Download-MayhemFirmware {
             exit 1
         }
     }
-    
+
     # Clone the firmware
     Write-Info "Cloning Mayhem firmware from GitHub..."
     Write-Info "This may take several minutes..."
     Write-Host ""
-    
+
     try {
         git clone --depth 1 https://github.com/portapack-mayhem/mayhem-firmware.git $MayhemPath
     } catch {
         Write-Error-Custom "Failed to clone firmware: $_"
         exit 1
     }
-    
+
     # Initialize submodules
     Write-Info "Initializing submodules..."
     Push-Location $MayhemPath
-    
+
     try {
         git submodule update --init --recursive
     } catch {
@@ -290,7 +290,7 @@ function Download-MayhemFirmware {
     } finally {
         Pop-Location
     }
-    
+
     Write-Host ""
     Write-Info "Mayhem firmware downloaded successfully to: $MayhemPath"
     Write-Host ""
@@ -299,21 +299,21 @@ function Download-MayhemFirmware {
 function Test-AllDependencies {
     Write-Info "Checking build requirements..."
     Write-Host ""
-    
+
     $missingDeps = @()
-    
+
     # Check for ARM toolchain
     if (-not (Test-Dependency "arm-none-eabi-gcc" "ARM GCC Toolchain")) {
         $missingDeps += "arm-none-eabi-gcc"
         Write-Host ""
     }
-    
+
     # Check for CMake
     if (-not (Test-Dependency "cmake" "CMake")) {
         $missingDeps += "cmake"
         Write-Host ""
     }
-    
+
     # Check for Python
     $pythonFound = $false
     if (Test-Dependency "python" "Python" "--version") {
@@ -321,18 +321,18 @@ function Test-AllDependencies {
     } elseif (Test-Dependency "python3" "Python3" "--version") {
         $pythonFound = $true
     }
-    
+
     if (-not $pythonFound) {
         $missingDeps += "python"
         Write-Host ""
     }
-    
+
     # Check for make
     if (-not (Test-Dependency "make" "GNU Make")) {
         $missingDeps += "make"
         Write-Host ""
     }
-    
+
     if ($missingDeps.Count -gt 0) {
         Write-Error-Custom "Missing dependencies: $($missingDeps -join ', ')"
         Write-Host ""
@@ -340,7 +340,7 @@ function Test-AllDependencies {
         Write-Host ""
         exit 1
     }
-    
+
     Write-Host ""
     Write-Info "All requirements satisfied!"
     Write-Host ""
@@ -360,46 +360,46 @@ function Test-MayhemPath {
             return
         }
     }
-    
+
     if (-not (Test-Path $MayhemPath)) {
         Write-Error-Custom "Mayhem firmware directory not found: $MayhemPath"
         Write-Info "Use -DownloadFirmware to download it automatically"
         exit 1
     }
-    
+
     $cmakePath = Join-Path $MayhemPath "CMakeLists.txt"
     if (-not (Test-Path $cmakePath)) {
         Write-Error-Custom "Invalid Mayhem firmware directory (CMakeLists.txt not found)"
         exit 1
     }
-    
+
     Write-Info "Mayhem firmware found at: $MayhemPath"
     Write-Host ""
 }
 
 function Download-Libopencm3 {
     Write-Info "Downloading libopencm3 from HackRF repository..."
-    
+
     $libopencm3Path = Join-Path $MayhemPath "hackrf\firmware\libopencm3"
     $hackrfRepo = "https://github.com/portapack-mayhem/hackrf.git"
     $hackrfCommit = "cf6815aaf9c4bb11c3ad3de97721c67ddf4fcb38"
-    
+
     # Check if git is installed
     if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
         Write-Error-Custom "Git is not installed. Please install git first."
         exit 1
     }
-    
+
     # Create hackrf/firmware directory if it doesn't exist
     $hackrfFirmwarePath = Join-Path $MayhemPath "hackrf\firmware"
     New-Item -ItemType Directory -Force -Path $hackrfFirmwarePath | Out-Null
-    
+
     # Clone the specific commit from HackRF repository into a temporary directory
     $tempDir = Join-Path $env:TEMP "hackrf-$(Get-Random)"
     New-Item -ItemType Directory -Force -Path $tempDir | Out-Null
-    
+
     Write-Info "Cloning HackRF repository (this may take a moment)..."
-    
+
     try {
         git clone $hackrfRepo "$tempDir\hackrf" --depth 1 --branch master 2>&1 | Out-Null
         if ($LASTEXITCODE -ne 0) {
@@ -416,9 +416,9 @@ function Download-Libopencm3 {
         Remove-Item -Recurse -Force $tempDir -ErrorAction SilentlyContinue
         exit 1
     }
-    
+
     Push-Location "$tempDir\hackrf"
-    
+
     # Try to checkout the specific commit
     Write-Info "Checking out commit: $hackrfCommit"
     try {
@@ -430,7 +430,7 @@ function Download-Libopencm3 {
     catch {
         Write-Warning-Custom "Could not checkout specific commit, using latest version"
     }
-    
+
     # Initialize libopencm3 submodule in the cloned repo
     Write-Info "Initializing libopencm3 submodule..."
     Push-Location "firmware"
@@ -447,23 +447,23 @@ function Download-Libopencm3 {
         Remove-Item -Recurse -Force $tempDir -ErrorAction SilentlyContinue
         exit 1
     }
-    
+
     # Copy libopencm3 to the target location
     Write-Info "Copying libopencm3 to $libopencm3Path"
     Copy-Item -Recurse -Force "libopencm3" $libopencm3Path
-    
+
     Pop-Location
     Pop-Location
-    
+
     # Clean up temporary directory
     Remove-Item -Recurse -Force $tempDir -ErrorAction SilentlyContinue
-    
+
     Write-Info "✓ libopencm3 downloaded successfully"
 }
 
 function Test-Submodules {
     Write-Info "Verifying git submodules are initialized..."
-    
+
     # Check for critical submodules that must exist for successful build
     # Note: nvic.h is generated during build, so we check for source files instead
     $criticalPaths = @(
@@ -471,9 +471,9 @@ function Test-Submodules {
         "hackrf\firmware\libopencm3\include\libopencm3\lpc43xx",
         "hackrf\firmware\libopencm3\include\libopencm3\lpc43xx\m0\irq.yaml"
     )
-    
+
     $missingSubmodules = $false
-    
+
     foreach ($path in $criticalPaths) {
         $fullPath = Join-Path $MayhemPath $path
         if (-not (Test-Path $fullPath)) {
@@ -481,7 +481,7 @@ function Test-Submodules {
             $missingSubmodules = $true
         }
     }
-    
+
     # If libopencm3 is missing, try different approaches to get it
     if ($missingSubmodules) {
         Write-Host ""
@@ -489,18 +489,18 @@ function Test-Submodules {
         Write-Warning-Custom "This will cause compilation errors like:"
         Write-Warning-Custom "  fatal error: libopencm3/lpc43xx/m0/nvic.h: No such file or directory"
         Write-Host ""
-        
+
         # If this is a git repository, try submodule init first
         $gitPath = Join-Path $MayhemPath ".git"
         if (Test-Path $gitPath) {
             Write-Info "Attempting to initialize git submodules..."
-            
+
             Push-Location $MayhemPath
             try {
                 git submodule update --init --recursive 2>&1 | Out-Null
                 if ($LASTEXITCODE -eq 0) {
                     Write-Info "Submodules initialized successfully via git"
-                    
+
                     # Verify again
                     $missingSubmodules = $false
                     foreach ($path in $criticalPaths) {
@@ -522,12 +522,12 @@ function Test-Submodules {
         else {
             Write-Info "Mayhem firmware is not a git repository"
         }
-        
+
         # If still missing, download from HackRF repository
         if ($missingSubmodules) {
             Write-Info "Downloading libopencm3 from HackRF repository..."
             Download-Libopencm3
-            
+
             # Final verification
             foreach ($path in $criticalPaths) {
                 $fullPath = Join-Path $MayhemPath $path
@@ -538,57 +538,107 @@ function Test-Submodules {
             }
         }
     }
-    
+
     Write-Info "✓ All required submodules are properly initialized"
     Write-Host ""
 }
 
+function Build-Libopencm3 {
+    Write-Info "Building libopencm3 library..."
+
+    $libopencm3Path = Join-Path $MayhemPath "hackrf\firmware\libopencm3"
+
+    if (-not (Test-Path $libopencm3Path)) {
+        Write-Error-Custom "libopencm3 directory not found: $libopencm3Path"
+        Write-Error-Custom "Please run Test-Submodules first"
+        exit 1
+    }
+
+    Push-Location $libopencm3Path
+
+    try {
+        # Check if already built
+        $libFile = Join-Path $libopencm3Path "lib\libopencm3_lpc43xx.a"
+        $nvicHeader = Join-Path $libopencm3Path "include\libopencm3\lpc43xx\m0\nvic.h"
+
+        if ((Test-Path $libFile) -and (Test-Path $nvicHeader)) {
+            Write-Info "libopencm3 already built, skipping..."
+            Pop-Location
+            return
+        }
+
+        Write-Info "Building libopencm3 for LPC43xx (this may take a few minutes)..."
+
+        # Build libopencm3
+        make TARGETS=lpc43xx 2>&1 | Out-Null
+
+        if ($LASTEXITCODE -ne 0) {
+            Write-Error-Custom "libopencm3 build failed"
+            Pop-Location
+            exit 1
+        }
+
+        # Verify the generated header exists
+        if (-not (Test-Path $nvicHeader)) {
+            Write-Error-Custom "nvic.h was not generated during libopencm3 build"
+            Write-Error-Custom "This is unexpected - please check the build logs"
+            Pop-Location
+            exit 1
+        }
+
+        Write-Info "✓ libopencm3 built successfully"
+    }
+    finally {
+        Pop-Location
+    }
+}
+
 function Invoke-Integration {
     Write-Info "Integrating MDK-Predator with Mayhem firmware..."
-    
+
     $externalDir = Join-Path $MayhemPath "firmware\application\external\mdk_predator"
     $externalCmake = Join-Path $MayhemPath "firmware\application\external\external.cmake"
-    
+
     # Create external app directory
     if (-not (Test-Path $externalDir)) {
         New-Item -ItemType Directory -Path $externalDir -Force | Out-Null
     }
-    
+
     # Copy application files
     Write-Info "Copying application files..."
     $appDir = Join-Path $RootDir "app"
     if (Test-Path $appDir) {
         Copy-Item -Path "$appDir\*" -Destination $externalDir -Recurse -Force
     }
-    
+
     # Copy source files
     Write-Info "Copying source files..."
     $srcDir = Join-Path $RootDir "src"
     $includeDir = Join-Path $RootDir "include"
-    
+
     if (Test-Path $srcDir) {
         Copy-Item -Path $srcDir -Destination $externalDir -Recurse -Force
     }
     if (Test-Path $includeDir) {
         Copy-Item -Path $includeDir -Destination $externalDir -Recurse -Force
     }
-    
+
     # Copy configuration
     Write-Info "Copying configuration..."
     $configFile = Join-Path $RootDir "mdk_predator.conf"
     if (Test-Path $configFile) {
         Copy-Item -Path $configFile -Destination $externalDir -Force
     }
-    
+
     # Register in external.cmake if not already registered
     Write-Info "Registering MDK-Predator in external.cmake..."
     if (Test-Path $externalCmake) {
         $cmakeContent = Get-Content $externalCmake -Raw
-        
+
         if ($cmakeContent -notmatch "external/mdk_predator/main\.cpp") {
             # Backup the original file
             Copy-Item $externalCmake "$externalCmake.backup" -Force
-            
+
             # Register MDK-Predator sources
             $mdkSources = @"
 
@@ -603,43 +653,43 @@ function Invoke-Integration {
 	external/mdk_predator/src/wireless/subghz_analyzer.c
 	external/mdk_predator/src/crypto/crypto_analyzer.c
 "@
-            
+
             # Add sources after set(EXTCPPSRC
             $cmakeContent = $cmakeContent -replace '(set\(EXTCPPSRC)', "`$1$mdkSources"
-            
+
             # Add to app list after set(EXTAPPLIST
             $cmakeContent = $cmakeContent -replace '(set\(EXTAPPLIST)', "`$1`n`tmdk_predator"
-            
+
             # Write back to file
             Set-Content -Path $externalCmake -Value $cmakeContent
-            
+
             Write-Info "MDK-Predator registered in external.cmake"
         } else {
             Write-Info "MDK-Predator already registered in external.cmake"
         }
     }
-    
+
     Write-Info "Integration complete"
     Write-Host ""
 }
 
 function Test-FileLinks {
     Write-Info "Verifying all files are properly linked in Mayhem firmware..."
-    
+
     $externalDir = Join-Path $MayhemPath "firmware\application\external\mdk_predator"
     $externalCmake = Join-Path $MayhemPath "firmware\application\external\external.cmake"
     $verificationFailed = $false
-    
+
     # Define all required files
     $requiredCppFiles = @(
         "main.cpp",
         "mdk_predator_app.cpp"
     )
-    
+
     $requiredHppFiles = @(
         "mdk_predator_app.hpp"
     )
-    
+
     $requiredCFiles = @(
         "src\mdk_predator.c",
         "src\automotive\key_fob_analyzer.c",
@@ -649,7 +699,7 @@ function Test-FileLinks {
         "src\wireless\subghz_analyzer.c",
         "src\crypto\crypto_analyzer.c"
     )
-    
+
     $requiredHFiles = @(
         "include\mdk_predator.h",
         "include\input_validation.h",
@@ -660,12 +710,12 @@ function Test-FileLinks {
         "include\wireless\subghz_analyzer.h",
         "include\crypto\crypto_analyzer.h"
     )
-    
+
     $requiredOtherFiles = @(
         "manifest.json",
         "mdk_predator.conf"
     )
-    
+
     # Check CPP files
     Write-Info "Checking C++ source files..."
     foreach ($file in $requiredCppFiles) {
@@ -677,7 +727,7 @@ function Test-FileLinks {
             Write-Info "  ✓ $file"
         }
     }
-    
+
     # Check HPP files
     Write-Info "Checking C++ header files..."
     foreach ($file in $requiredHppFiles) {
@@ -689,7 +739,7 @@ function Test-FileLinks {
             Write-Info "  ✓ $file"
         }
     }
-    
+
     # Check C files
     Write-Info "Checking C source files..."
     foreach ($file in $requiredCFiles) {
@@ -701,7 +751,7 @@ function Test-FileLinks {
             Write-Info "  ✓ $file"
         }
     }
-    
+
     # Check H files
     Write-Info "Checking C header files..."
     foreach ($file in $requiredHFiles) {
@@ -713,7 +763,7 @@ function Test-FileLinks {
             Write-Info "  ✓ $file"
         }
     }
-    
+
     # Check other required files
     Write-Info "Checking configuration files..."
     foreach ($file in $requiredOtherFiles) {
@@ -725,14 +775,14 @@ function Test-FileLinks {
             Write-Info "  ✓ $file"
         }
     }
-    
+
     # Verify external.cmake registration
     Write-Info "Verifying external.cmake registration..."
     $cmakeVerificationFailed = $false
-    
+
     if (Test-Path $externalCmake) {
         $cmakeContent = Get-Content $externalCmake -Raw
-        
+
         # Check if all CPP source files are registered
         foreach ($file in $requiredCppFiles) {
             $unixPath = $file -replace '\\', '/'
@@ -742,7 +792,7 @@ function Test-FileLinks {
                 $verificationFailed = $true
             }
         }
-        
+
         # Check if all C source files are registered
         foreach ($file in $requiredCFiles) {
             $unixPath = $file -replace '\\', '/'
@@ -752,14 +802,14 @@ function Test-FileLinks {
                 $verificationFailed = $true
             }
         }
-        
+
         # Check if mdk_predator is registered in EXTAPPLIST
         if ($cmakeContent -notmatch 'set\s*\(\s*EXTAPPLIST[^\)]*mdk_predator[^\)]*\)') {
             Write-Error-Custom "mdk_predator not found in EXTAPPLIST in external.cmake"
             $cmakeVerificationFailed = $true
             $verificationFailed = $true
         }
-        
+
         if (-not $cmakeVerificationFailed) {
             Write-Info "  ✓ All files registered in external.cmake"
         }
@@ -767,7 +817,7 @@ function Test-FileLinks {
         Write-Error-Custom "external.cmake not found!"
         $verificationFailed = $true
     }
-    
+
     # Final verification result
     if ($verificationFailed) {
         Write-Host ""
@@ -777,7 +827,7 @@ function Test-FileLinks {
         Write-Host ""
         exit 1
     }
-    
+
     Write-Host ""
     Write-Info "✓ All files verified successfully!"
     Write-Info "✓ All files are properly linked in Mayhem firmware"
@@ -787,55 +837,55 @@ function Test-FileLinks {
 
 function Invoke-Clean {
     Write-Info "Cleaning build artifacts..."
-    
+
     $buildDir = Join-Path $MayhemPath "build"
     if (Test-Path $buildDir) {
         Remove-Item -Recurse -Force $buildDir -ErrorAction SilentlyContinue
     }
-    
+
     $externalDir = Join-Path $MayhemPath "firmware\application\external\mdk_predator"
     if (Test-Path $externalDir) {
         Remove-Item -Recurse -Force $externalDir -ErrorAction SilentlyContinue
     }
-    
+
     Write-Info "Clean complete"
     Write-Host ""
 }
 
 function Invoke-Build {
     Write-Info "Building PortaPack firmware with MDK-Predator..."
-    
+
     $buildDir = Join-Path $MayhemPath "build"
-    
+
     # Create build directory
     if (-not (Test-Path $buildDir)) {
         New-Item -ItemType Directory -Path $buildDir -Force | Out-Null
     }
-    
+
     # Change to build directory
     Push-Location $buildDir
-    
+
     try {
         # Configure with CMake
         Write-Info "Running CMake configuration..."
-        
+
         # Try different generators for better Windows compatibility
         $generators = @("MinGW Makefiles", "Unix Makefiles", "Ninja")
         $cmakeSuccess = $false
         $lastError = ""
-        
+
         foreach ($generator in $generators) {
             Write-Info "Trying CMake generator: $generator"
-            
+
             # Clean CMakeCache if previous attempt failed
             $cacheFile = Join-Path $buildDir "CMakeCache.txt"
             if (Test-Path $cacheFile) {
                 Remove-Item $cacheFile -Force -ErrorAction SilentlyContinue
             }
-            
+
             # Try to configure with this generator
             $output = & cmake .. -G $generator 2>&1
-            
+
             if ($LASTEXITCODE -eq 0) {
                 Write-Info "CMake configuration successful with $generator"
                 $cmakeSuccess = $true
@@ -845,7 +895,7 @@ function Invoke-Build {
                 Write-Warning-Custom "Generator $generator failed, trying next..."
             }
         }
-        
+
         if (-not $cmakeSuccess) {
             Write-Error-Custom "CMake configuration failed with all generators"
             Write-Host ""
@@ -862,22 +912,22 @@ function Invoke-Build {
             Write-Host ""
             exit 1
         }
-        
+
         Write-Host ""
-        
+
         # Build application (which includes external apps)
         Write-Info "Building application and external apps..."
-        
+
         # Try using cmake --build first (more portable on Windows)
         Write-Info "Attempting to build with CMake..."
         & cmake --build . --target application
-        
+
         if ($LASTEXITCODE -ne 0) {
             Write-Warning-Custom "CMake build failed, trying make..."
-            
+
             # Fallback to make if cmake --build fails
             & make application
-            
+
             if ($LASTEXITCODE -ne 0) {
                 Write-Error-Custom "Build failed with both cmake and make"
                 Write-Host ""
@@ -890,11 +940,11 @@ function Invoke-Build {
                 exit 1
             }
         }
-        
+
         Write-Host ""
         Write-Info "Build complete"
         Write-Host ""
-        
+
     } finally {
         Pop-Location
     }
@@ -902,14 +952,14 @@ function Invoke-Build {
 
 function Copy-Output {
     Write-Info "Copying built application..."
-    
+
     # Try multiple possible locations for the .ppma file
     $possibleLocations = @(
         (Join-Path $MayhemPath "firmware\application\external\mdk_predator.ppma"),
         (Join-Path $MayhemPath "build\firmware\application\external\mdk_predator.ppma"),
         (Join-Path $MayhemPath "firmware\application\mdk_predator.ppma")
     )
-    
+
     $appFile = $null
     foreach ($location in $possibleLocations) {
         if (Test-Path $location) {
@@ -918,7 +968,7 @@ function Copy-Output {
             break
         }
     }
-    
+
     if (-not $appFile) {
         Write-Error-Custom "Built application not found in expected locations:"
         foreach ($location in $possibleLocations) {
@@ -927,7 +977,7 @@ function Copy-Output {
         Write-Host ""
         Write-Warning-Custom "Check build logs for errors"
         Write-Host ""
-        
+
         # Try to find any .ppma files
         Write-Info "Searching for .ppma files in build directory..."
         $foundFiles = Get-ChildItem -Path (Join-Path $MayhemPath "build") -Filter "*.ppma" -Recurse -ErrorAction SilentlyContinue
@@ -939,21 +989,21 @@ function Copy-Output {
         }
         exit 1
     }
-    
+
     # Create output directory
     if (-not (Test-Path $OutputDir)) {
         New-Item -ItemType Directory -Path $OutputDir -Force | Out-Null
     }
-    
+
     # Copy application
     Copy-Item -Path $appFile -Destination $OutputDir -Force
-    
+
     # Copy configuration
     $configFile = Join-Path $RootDir "mdk_predator.conf"
     if (Test-Path $configFile) {
         Copy-Item -Path $configFile -Destination $OutputDir -Force
     }
-    
+
     # Create README
     $readmeContent = @"
 MDK-Predator PortaPack Application
@@ -974,10 +1024,10 @@ Installation:
 
 See DEPLOYMENT.md for detailed instructions.
 "@
-    
+
     $readmePath = Join-Path $OutputDir "README.txt"
     Set-Content -Path $readmePath -Value $readmeContent -Force
-    
+
     Write-Host ""
     Write-Info "Application copied to: $OutputDir"
     Write-Info "  - mdk_predator.ppma"
@@ -1002,40 +1052,43 @@ function Main {
         Show-Usage
         exit 0
     }
-    
+
     # Install dependencies if requested
     if ($InstallDeps) {
         Install-Dependencies
     }
-    
+
     # Download firmware if requested
     if ($DownloadFirmware) {
         Download-MayhemFirmware
     }
-    
+
     # Show build info
     Show-BuildInfo
-    
+
     # Verify Mayhem path
     Test-MayhemPath
-    
+
     # Verify submodules are initialized
     Test-Submodules
-    
+
+    # Build libopencm3 first (generates nvic.h and other headers)
+    Build-Libopencm3
+
     # Check dependencies
     Test-AllDependencies
-    
+
     # Clean if requested
     if ($Clean) {
         Invoke-Clean
     }
-    
+
     # Build process
     Invoke-Integration
     Test-FileLinks
     Invoke-Build
     Copy-Output
-    
+
     # Success message
     Write-Host ""
     Write-Host "========================================" -ForegroundColor Green

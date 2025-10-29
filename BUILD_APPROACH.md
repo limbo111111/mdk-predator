@@ -181,7 +181,7 @@ MDK-Predator includes all necessary files for external app integration:
 ✅ **Headers** (`include/`)
 - All necessary header files for compilation
 
-✅ **Configuration** 
+✅ **Configuration**
 - `mdk_predator.conf` - Runtime configuration
 
 ### CMake Registration
@@ -281,33 +281,45 @@ cd /mnt/c/path/to/mdk-predator
 **Error Example:**
 ```
 In file included from /workspace/mayhem-firmware/hackrf/firmware/common/usb.c:32:
-/workspace/mayhem-firmware/hackrf/firmware/libopencm3/include/libopencm3/dispatch/nvic.h:30:11: 
+/workspace/mayhem-firmware/hackrf/firmware/libopencm3/include/libopencm3/dispatch/nvic.h:30:11:
 fatal error: libopencm3/lpc43xx/m0/nvic.h: No such file or directory
    30 | # include <libopencm3/lpc43xx/m0/nvic.h>
       |           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 compilation terminated.
 ```
 
-**Root Cause:** Git submodules in mayhem-firmware are not initialized
+**Root Cause:** The `nvic.h` header file is generated during the libopencm3 build process, not part of the source code. The application build was attempting to compile before libopencm3 was built.
 
-**Solution:** The build scripts now automatically detect and fix this issue. If you encounter this error:
+**Solution:** This issue is now automatically fixed by the build scripts. They will:
+1. Verify git submodules are initialized
+2. Build libopencm3 with `make TARGETS=lpc43xx` to generate `nvic.h` and other headers
+3. Verify that `nvic.h` was successfully generated
+4. Then build the application
 
-1. **Automatic fix (recommended):** Just run the build script again - it will detect missing submodules and initialize them
-   ```bash
-   # Linux/macOS
-   ./scripts/build_portapack_app.sh -m /path/to/mayhem-firmware
-   
-   # Windows
-   .\scripts\build_portapack_app.ps1 -MayhemPath "C:\path\to\mayhem-firmware"
-   ```
+Simply run your build command and the scripts will handle it:
+```bash
+# Linux/macOS
+./scripts/build_portapack_app.sh -m /path/to/mayhem-firmware
 
-2. **Manual fix (if automatic fails):**
-   ```bash
-   cd /path/to/mayhem-firmware
-   git submodule update --init --recursive
-   ```
+# Windows
+.\scripts\build_portapack_app.ps1 -MayhemPath "C:\path\to\mayhem-firmware"
 
-**Prevention:** This issue has been fixed in all build scripts. The scripts now verify submodules before building.
+# Docker
+./docker-build.sh
+```
+
+**Manual fix (if automatic build fails):**
+```bash
+cd /path/to/mayhem-firmware/hackrf/firmware/libopencm3
+make TARGETS=lpc43xx
+# Verify nvic.h was generated
+ls include/libopencm3/lpc43xx/m0/nvic.h
+```
+
+**Prevention:**
+- All build scripts now include a `build_libopencm3()` function
+- A test suite (`tests/build/test_libopencm3_build.sh`) verifies the fix
+- The build process enforces the correct order: submodules → libopencm3 → application
 
 ### Build fails with "arm-none-eabi-gcc not found"
 **Solution:** Install ARM toolchain
