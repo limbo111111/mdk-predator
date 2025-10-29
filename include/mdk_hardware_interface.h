@@ -4,6 +4,34 @@
 #define MDK_HARDWARE_INTERFACE_H
 
 #include <stdint.h>
+#include <stdbool.h>
+#include <stdlib.h>
+
+// Constants
+#define MDK_MAX_PARALLEL_STREAMS 8
+
+// Device Information Structure
+typedef struct {
+    uint32_t api_version;
+    uint32_t module_version;
+    char module_name[64];
+    uint32_t features;
+} mdk_device_info_t;
+
+// Acceleration Configuration Structure
+typedef struct {
+    uint32_t parallel_streams;
+} mdk_accel_config_t;
+
+// Bruteforce Task Structure
+typedef struct {
+    uint32_t start_code;
+    uint32_t end_code;
+    uint32_t (*hash_function)(uint32_t);
+    void (*progress_callback)(uint32_t, uint32_t);
+    uint32_t *result_code;
+    bool *found;
+} mdk_bruteforce_task_t;
 
 // I2C ESP32-S3 API Definitions
 #define I2C_MASTER_SDA_PIN 21
@@ -32,5 +60,13 @@ void bruteforce_task(StreamData *stream);
 // Function Prototypes for Hardware Acceleration
 void enable_hardware_acceleration();
 void disable_hardware_acceleration();
+
+// MDK Hardware API Functions
+bool mdk_hardware_detect(mdk_device_info_t *info);
+bool mdk_hardware_init(mdk_accel_config_t *config);
+bool mdk_accel_bruteforce(mdk_bruteforce_task_t *task);
+bool mdk_is_acceleration_enabled(void);
+uint32_t mdk_get_performance_multiplier(void);
+void mdk_hardware_cleanup(void);
 
 #endif // MDK_HARDWARE_INTERFACE_H
