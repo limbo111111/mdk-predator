@@ -19,8 +19,9 @@ typedef struct {
 } mdk_device_info_t;
 
 // Acceleration Configuration Structure
+// Note: parallel_streams must be > 0 to avoid division by zero
 typedef struct {
-    uint32_t parallel_streams;
+    uint32_t parallel_streams;  // Must be >= 1, will be capped at MDK_MAX_PARALLEL_STREAMS
 } mdk_accel_config_t;
 
 // Bruteforce Task Structure
@@ -63,7 +64,7 @@ void disable_hardware_acceleration();
 
 // MDK Hardware API Functions
 bool mdk_hardware_detect(mdk_device_info_t *info);
-bool mdk_hardware_init(mdk_accel_config_t *config);
+bool mdk_accel_init(mdk_accel_config_t *config);
 bool mdk_accel_bruteforce(mdk_bruteforce_task_t *task);
 bool mdk_is_acceleration_enabled(void);
 uint32_t mdk_get_performance_multiplier(void);

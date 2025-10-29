@@ -22,8 +22,13 @@ bool mdk_hardware_detect(mdk_device_info_t *info) {
     return true;
 }
 
-bool mdk_hardware_init(mdk_accel_config_t *config) {
+bool mdk_accel_init(mdk_accel_config_t *config) {
     if (!config || !g_mdk_available) return false;
+    
+    // Validate parallel_streams to prevent division by zero
+    if (config->parallel_streams == 0) {
+        return false;
+    }
     
     memcpy(&g_accel_config, config, sizeof(mdk_accel_config_t));
     
@@ -76,7 +81,7 @@ uint32_t mdk_get_performance_multiplier(void) {
     return g_accel_config.parallel_streams;
 }
 
-void mdk_hardware_cleanup(void) {
+void mdk_accel_cleanup(void) {
     g_mdk_initialized = false;
     memset(&g_accel_config, 0, sizeof(mdk_accel_config_t));
 }
