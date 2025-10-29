@@ -5,6 +5,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 // I2C ESP32-S3 API Definitions
 #define I2C_MASTER_SDA_PIN 21
