@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include "mdk_predator.h"
+#include "mdk_hardware_interface.h"
 #include "automotive/key_fob_analyzer.h"
 #include "automotive/rolling_code_tester.h"
 #include "wireless/wifi_analyzer.h"
@@ -28,8 +29,13 @@ bool mdk_predator_init(mdk_predator_config_t *config) {
         return false;
     }
 
-    // Initialize HackRF/Mayhem-MDK hardware with config
-    if (!mdk_hardware_init()) {
+    // Initialize HackRF/Mayhem-MDK hardware
+    // Note: mdk_hardware_init takes a config parameter but we can pass NULL for default
+    // or create an mdk_accel_config_t from our config if needed
+    mdk_accel_config_t hw_config = {0};
+    hw_config.parallel_streams = 4;  // Default to 4 parallel streams
+    
+    if (!mdk_hardware_init(&hw_config)) {
         return false;
     }
 
@@ -50,17 +56,6 @@ bool mdk_predator_init(mdk_predator_config_t *config) {
     }
 
     g_initialized = true;
-
-    return true;
-}
-
-/**
- * Initialize hardware interface
- */
-bool mdk_hardware_init(void) {
-    // Initialize HackRF One hardware
-    // Configure for Mayhem-MDK module
-    // Set up GPIO, SPI, I2C interfaces
 
     return true;
 }
@@ -146,14 +141,6 @@ void mdk_predator_cleanup(void) {
 
         g_initialized = false;
     }
-}
-
-/**
- * Cleanup hardware interface
- */
-void mdk_hardware_cleanup(void) {
-    // Release HackRF hardware
-    // Reset GPIO, SPI, I2C
 }
 
 /**

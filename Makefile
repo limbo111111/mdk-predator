@@ -1,10 +1,23 @@
 # MDK-Predator Makefile
 # Build system for Mayhem-MDK Predator Security Suite
 
-# Compiler and flags
-CC = arm-none-eabi-gcc
-AR = arm-none-eabi-ar
-CFLAGS = -Wall -Wextra -O2 -std=c11 -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16
+# Detect build target - ARM embedded or native
+# Set TARGET=arm for ARM cross-compilation, or leave unset for native build
+TARGET ?= native
+
+# Compiler and flags based on target
+ifeq ($(TARGET),arm)
+    # ARM Cortex-M4 embedded target
+    CC = arm-none-eabi-gcc
+    AR = arm-none-eabi-ar
+    CFLAGS = -Wall -Wextra -O2 -std=c11 -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16
+else
+    # Native x86/x64 target (default)
+    CC = gcc
+    AR = ar
+    CFLAGS = -Wall -Wextra -O2 -std=c11
+endif
+
 INCLUDES = -Iinclude
 LDFLAGS = -lm
 
@@ -18,26 +31,59 @@ LIB_DIR = $(BUILD_DIR)/lib
 AUTOMOTIVE_SRC = $(wildcard $(SRC_DIR)/automotive/*.c)
 WIRELESS_SRC = $(wildcard $(SRC_DIR)/wireless/*.c)
 CRYPTO_SRC = $(wildcard $(SRC_DIR)/crypto/*.c)
+HARDWARE_SRC = $(SRC_DIR)/mdk_hardware_interface.c
 MAIN_SRC = $(SRC_DIR)/mdk_predator.c
 
-ALL_SRC = $(AUTOMOTIVE_SRC) $(WIRELESS_SRC) $(CRYPTO_SRC) $(MAIN_SRC)
+ALL_SRC = $(AUTOMOTIVE_SRC) $(WIRELESS_SRC) $(CRYPTO_SRC) $(HARDWARE_SRC) $(MAIN_SRC)
 
 # Object files
 AUTOMOTIVE_OBJ = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(AUTOMOTIVE_SRC))
 WIRELESS_OBJ = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(WIRELESS_SRC))
 CRYPTO_OBJ = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(CRYPTO_SRC))
+HARDWARE_OBJ = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(HARDWARE_SRC))
 MAIN_OBJ = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(MAIN_SRC))
 
-ALL_OBJ = $(AUTOMOTIVE_OBJ) $(WIRELESS_OBJ) $(CRYPTO_OBJ) $(MAIN_OBJ)
+ALL_OBJ = $(AUTOMOTIVE_OBJ) $(WIRELESS_OBJ) $(CRYPTO_OBJ) $(HARDWARE_OBJ) $(MAIN_OBJ)
 
 # Output library
 LIB_NAME = libmdk_predator.a
 LIB_PATH = $(LIB_DIR)/$(LIB_NAME)
 
 # Targets
-.PHONY: all clean directories test test-build test-run test-automotive test-wireless test-crypto test-integration test-clean test-directories info automotive wireless crypto
+.PHONY: all clean directories test test-build test-run test-automotive test-wireless test-crypto test-integration test-clean test-directories info automotive wireless crypto hardware help
 
+# Default target
 all: directories $(LIB_PATH)
+
+help:
+	@echo "MDK-Predator Build System"
+	@echo "========================="
+	@echo ""
+	@echo "Usage: make [TARGET] [TARGET=platform]"
+	@echo ""
+	@echo "Build Targets:"
+	@echo "  all              - Build complete library (default)"
+	@echo "  automotive       - Build automotive module only"
+	@echo "  wireless         - Build wireless module only"
+	@echo "  crypto           - Build crypto module only"
+	@echo "  hardware         - Build hardware interface module only"
+	@echo "  test             - Build and run all tests"
+	@echo "  test-build       - Build tests only"
+	@echo "  test-run         - Run tests only"
+	@echo "  clean            - Clean build artifacts"
+	@echo "  info             - Display build configuration"
+	@echo "  help             - Show this help message"
+	@echo ""
+	@echo "Platform Options:"
+	@echo "  TARGET=native    - Build for native x86/x64 (default, uses gcc)"
+	@echo "  TARGET=arm       - Build for ARM Cortex-M4 (uses arm-none-eabi-gcc)"
+	@echo ""
+	@echo "Examples:"
+	@echo "  make                    # Build for native platform"
+	@echo "  make TARGET=arm         # Build for ARM embedded"
+	@echo "  make test               # Build and run tests"
+	@echo "  make clean all          # Clean build"
+	@echo ""
 
 directories:
 	@mkdir -p $(OBJ_DIR)/automotive
@@ -67,11 +113,16 @@ wireless: $(WIRELESS_OBJ)
 crypto: $(CRYPTO_OBJ)
 	@echo "Crypto module built"
 
+hardware: $(HARDWARE_OBJ)
+	@echo "Hardware interface module built"
+
 # Print configuration
 info:
 	@echo "MDK-Predator Build Configuration"
 	@echo "================================="
+	@echo "Target Platform: $(TARGET)"
 	@echo "CC: $(CC)"
+	@echo "AR: $(AR)"
 	@echo "CFLAGS: $(CFLAGS)"
 	@echo "Source files: $(words $(ALL_SRC))"
 	@echo "Object files: $(words $(ALL_OBJ))"
