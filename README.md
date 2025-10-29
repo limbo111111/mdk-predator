@@ -105,78 +105,50 @@ chmod +x docker-build.sh  # First time only
 
 ---
 
-### Quick Start - Automated Build with Dependencies
+### Simple Native Build
 
-**Alternative method - installs dependencies locally**
+**New simplified build scripts (recommended for native builds)**
 
 **Linux/macOS:**
 ```bash
-# Install dependencies and download firmware automatically
-./scripts/build_portapack_app.sh --install-deps --download-firmware
+# Download firmware and build
+./build.sh -d
 
-# Or use short flags
-./scripts/build_portapack_app.sh -i -d
+# Build with existing firmware
+./build.sh -m /path/to/mayhem-firmware
 ```
 
-**Windows (PowerShell as Administrator):**
+**Windows (PowerShell):**
 ```powershell
-# Install dependencies and download firmware automatically
-.\scripts\build_portapack_app.ps1 -InstallDeps -DownloadFirmware
+# Download firmware and build
+.\build.ps1 -Download
+
+# Build with existing firmware
+.\build.ps1 -MayhemPath C:\path\to\mayhem-firmware
 ```
 
-**Windows (CMD as Administrator):**
-```cmd
-scripts\build_portapack_app.bat --install-deps --download-firmware
-```
-
-**Windows Simple Build (Alternative):**
-```powershell
-# Simpler script with better error messages
-.\scripts\simple_build_windows.ps1 -MayhemPath .\mayhem-firmware
-```
-
-**Windows (WSL Debian/Ubuntu):**
-```bash
-# In WSL terminal
-./scripts/build_portapack_app_wsl.sh --install-deps --download-firmware
-```
+**Output:** `build/output/mdk_predator.ppma`
 
 This will:
-1. Install ARM toolchain, CMake, Python, and other dependencies
-2. Download the Mayhem firmware from GitHub
-3. Build the MDK-Predator application (.ppma file)
-4. Place output in `build/portapack/`
+1. Download the Mayhem firmware from GitHub (if needed)
+2. Copy MDK-Predator files to the firmware
+3. Register the app in external.cmake
+4. Build the MDK-Predator application (.ppma file)
 
-**Note:** For Windows users, Docker build is recommended. If using native build, WSL provides better compatibility than native Windows. See [BUILD_APPROACH.md](BUILD_APPROACH.md) for details.
-
-**Windows Build Issues?** See [scripts/WINDOWS_BUILD_FIXES.md](scripts/WINDOWS_BUILD_FIXES.md) for solutions to common CMake/nmake errors.
+**See:** [BUILD.md](BUILD.md) for complete build documentation.
 
 ### Library (for development)
 
 **Linux/macOS:**
 ```bash
-# Install dependencies first (if needed)
-./scripts/build.sh --install-deps
-
 # Build library
 make
-# Or use the build script
-./scripts/build.sh
 ```
 
-**Windows (PowerShell):**
+**Windows:**
 ```powershell
-# Install dependencies first (if needed)
-.\scripts\build.ps1 -InstallDeps
-
-# Build library
-.\scripts\build.ps1
-```
-
-**Windows (CMD):**
-```cmd
-scripts\build.bat --install-deps
-scripts\build.bat
+# Use Docker build or WSL
+.\docker-build.ps1
 ```
 
 The compiled library will be available at `build/lib/libmdk_predator.a`.
@@ -187,17 +159,12 @@ The compiled library will be available at `build/lib/libmdk_predator.a`.
 
 **Linux/macOS:**
 ```bash
-./scripts/build_portapack_app.sh -m /path/to/mayhem-firmware
+./build.sh -m /path/to/mayhem-firmware
 ```
 
 **Windows (PowerShell):**
 ```powershell
-.\scripts\build_portapack_app.ps1 -MayhemPath "C:\path\to\mayhem-firmware"
-```
-
-**Windows (CMD):**
-```cmd
-scripts\build_portapack_app.bat -m "C:\path\to\mayhem-firmware"
+.\build.ps1 -MayhemPath "C:\path\to\mayhem-firmware"
 ```
 
 **If you need to download Mayhem firmware:**
@@ -205,64 +172,45 @@ scripts\build_portapack_app.bat -m "C:\path\to\mayhem-firmware"
 **Linux/macOS:**
 ```bash
 # Download firmware and build
-./scripts/build_portapack_app.sh --download-firmware
-
-# Or specify where to download it
-./scripts/build_portapack_app.sh -d -m /custom/path
+./build.sh -d
 ```
 
 **Windows:**
 ```powershell
 # Download firmware and build
-.\scripts\build_portapack_app.ps1 -DownloadFirmware
+.\build.ps1 -Download
 ```
 
-**Windows (WSL):**
-```bash
-# Download firmware and build
-./scripts/build_portapack_app_wsl.sh --download-firmware
-```
-
-See [BUILD_APPROACH.md](BUILD_APPROACH.md) for details on:
+See [BUILD.md](BUILD.md) for complete build documentation including:
 - External app build vs. full firmware build
 - Why you only need to build the .ppma file
-- Platform-specific build recommendations
+- Manual build instructions
+- MDK module integration details
 
-See [DEPLOYMENT.md](docs/DEPLOYMENT.md) for complete instructions on:
-- Building the PortaPack application (.ppma)
+See [DEPLOYMENT.md](docs/DEPLOYMENT.md) for deployment instructions:
 - Installing to SD card
-- Integrating with Mayhem firmware
 - Deploying to Mayhem-MDK module
 
-**Windows users**: See [BUILDING_WINDOWS.md](docs/BUILDING_WINDOWS.md) for detailed Windows build instructions.
+### Build Options
 
-### Build Script Options
-
-**Library Build Options:**
-- `-i, --install-deps` / `-InstallDeps`: Install build dependencies automatically
-- `-c, --clean` / `-Clean`: Clean build artifacts before building
-- `-t, --test` / `-Test`: Run tests after building
-- `-T, --target` / `-Target`: Build specific module (automotive, wireless, crypto)
-
-**PortaPack Build Options:**
-- `-i, --install-deps` / `-InstallDeps`: Install build dependencies automatically
-- `-d, --download-firmware` / `-DownloadFirmware`: Download Mayhem firmware from GitHub
-- `-m, --mayhem` / `-MayhemPath`: Specify path to Mayhem firmware
-- `-c, --clean` / `-Clean`: Clean before building
-- `-o, --output` / `-OutputDir`: Custom output directory
+**Simplified Build Script Options:**
+- `-m PATH` / `-MayhemPath PATH`: Specify path to Mayhem firmware
+- `-d` / `-Download`: Download Mayhem firmware from GitHub
+- `-c` / `-Clean`: Clean before building
+- `-h` / `-Help`: Show help message
 
 ### Clean Build
 
 **Linux/macOS:**
 ```bash
 make clean
-# Or
-./scripts/build.sh --clean
+# Or for PortaPack app
+./build.sh -c -d
 ```
 
 **Windows:**
 ```powershell
-.\scripts\build.ps1 -Clean
+.\build.ps1 -Clean -Download
 ```
 
 ## Testing
