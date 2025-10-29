@@ -192,7 +192,7 @@ New simplified scripts at project root:
 
 **Total created:** ~355 lines + documentation
 
-**Reduction:** ~90% reduction in build script complexity
+**Reduction:** Reduced from 3,900 lines to 355 lines (91% reduction in build script code)
 
 **Why the new scripts are simpler:**
 
@@ -249,7 +249,7 @@ The new scripts are modeled directly on:
 
 **Example external app from mayhem-firmware:**
 ```bash
-# Example: acars_rx external app
+# Example: acars_rx external app structure
 ls firmware/application/external/acars_rx/
 # Output:
 # acars_app.cpp
@@ -259,14 +259,14 @@ ls firmware/application/external/acars_rx/
 
 Our structure is identical:
 ```bash
-# MDK-Predator when integrated
+# MDK-Predator when integrated into mayhem-firmware
 ls firmware/application/external/mdk_predator/
 # Output:
 # main.cpp
 # mdk_predator_app.cpp
 # mdk_predator_app.hpp
-# src/
-# include/
+# src/       (core implementation)
+# include/   (header files)
 ```
 
 **Build script usage:**
