@@ -74,12 +74,10 @@ typedef struct {
 
 /* Function prototypes */
 bool mdk_predator_init(mdk_predator_config_t *config);
-bool mdk_hardware_init(void);
 bool mdk_get_status(mdk_status_t *status);
 bool mdk_set_active_module(security_module_t module);
 bool mdk_run_diagnostic(diagnostic_result_t *result);
 void mdk_predator_cleanup(void);
-void mdk_hardware_cleanup(void);
 const char* mdk_get_version(void);
 
 #endif /* MDK_PREDATOR_H */

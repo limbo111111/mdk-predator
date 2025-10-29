@@ -5,6 +5,7 @@
 
 #include "mdk_hardware_interface.h"
 #include <string.h>
+#include <stdbool.h>
 
 static mdk_accel_config_t g_accel_config;
 static bool g_mdk_initialized = false;
@@ -23,7 +24,15 @@ bool mdk_hardware_detect(mdk_device_info_t *info) {
 }
 
 bool mdk_hardware_init(mdk_accel_config_t *config) {
-    if (!config || !g_mdk_available) return false;
+    if (!config) return false;
+    
+    // Auto-detect hardware if not already detected
+    if (!g_mdk_available) {
+        mdk_device_info_t info;
+        if (!mdk_hardware_detect(&info)) {
+            return false;
+        }
+    }
     
     memcpy(&g_accel_config, config, sizeof(mdk_accel_config_t));
     
@@ -41,15 +50,16 @@ bool mdk_accel_bruteforce(mdk_bruteforce_task_t *task) {
     uint32_t range = task->end_code - task->start_code;
     uint32_t chunk_size = range / g_accel_config.parallel_streams;
     
-    for (uint32_t stream = 0; stream < g_accel_config.parallel_streams; stream++) {
+    for (uint32_t stream = 0; stream < (uint32_t)g_accel_config.parallel_streams; stream++) {
         uint32_t stream_start = task->start_code + (stream * chunk_size);
-        uint32_t stream_end = (stream == g_accel_config.parallel_streams - 1) 
+        uint32_t stream_end = (stream == (uint32_t)(g_accel_config.parallel_streams - 1)) 
                                ? task->end_code 
                                : stream_start + chunk_size;
         
         for (uint32_t code = stream_start; code < stream_end; code++) {
             if (task->hash_function) {
-                uint32_t result = task->hash_function(code);
+                // Call hash function (result intentionally unused in this implementation)
+                (void)task->hash_function(code);
                 
                 if (task->progress_callback) {
                     task->progress_callback(code - task->start_code, range);
