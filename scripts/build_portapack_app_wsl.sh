@@ -305,57 +305,130 @@ check_mayhem_path() {
     echo ""
 }
 
+download_libopencm3() {
+    print_info "Downloading libopencm3 from HackRF repository..."
+    
+    local libopencm3_path="$MAYHEM_PATH/hackrf/firmware/libopencm3"
+    local hackrf_repo="https://github.com/portapack-mayhem/hackrf.git"
+    local hackrf_commit="cf6815aaf9c4bb11c3ad3de97721c67ddf4fcb38"
+    
+    # Check if git is installed
+    if ! command -v git &> /dev/null; then
+        print_error "Git is not installed. Please install git first."
+        exit 1
+    fi
+    
+    # Create hackrf/firmware directory if it doesn't exist
+    mkdir -p "$MAYHEM_PATH/hackrf/firmware"
+    
+    # Clone the specific commit from HackRF repository into a temporary directory
+    local temp_dir=$(mktemp -d)
+    print_info "Cloning HackRF repository (this may take a moment)..."
+    
+    if ! git clone "$hackrf_repo" "$temp_dir/hackrf" --depth 1 --branch master 2>&1; then
+        print_warning "Failed to clone with --depth, trying full clone..."
+        rm -rf "$temp_dir/hackrf"
+        if ! git clone "$hackrf_repo" "$temp_dir/hackrf"; then
+            print_error "Failed to clone HackRF repository"
+            rm -rf "$temp_dir"
+            exit 1
+        fi
+    fi
+    
+    cd "$temp_dir/hackrf"
+    
+    # Try to checkout the specific commit
+    print_info "Checking out commit: $hackrf_commit"
+    if ! git checkout "$hackrf_commit" 2>&1; then
+        print_warning "Could not checkout specific commit, using latest version"
+    fi
+    
+    # Initialize libopencm3 submodule in the cloned repo
+    print_info "Initializing libopencm3 submodule..."
+    cd firmware
+    if ! git submodule update --init libopencm3; then
+        print_error "Failed to initialize libopencm3 submodule"
+        cd - > /dev/null
+        rm -rf "$temp_dir"
+        exit 1
+    fi
+    
+    # Copy libopencm3 to the target location
+    print_info "Copying libopencm3 to $libopencm3_path"
+    cp -r libopencm3 "$libopencm3_path"
+    
+    cd - > /dev/null
+    
+    # Clean up temporary directory
+    rm -rf "$temp_dir"
+    
+    print_info "✓ libopencm3 downloaded successfully"
+}
+
 verify_submodules() {
     print_info "Verifying git submodules are initialized..."
     
-    # Check if the directory is a git repository
-    if [ ! -d "$MAYHEM_PATH/.git" ]; then
-        print_warning "Mayhem firmware is not a git repository, skipping submodule check"
-        return 0
-    fi
-    
     # Check for critical submodules that must exist for successful build
+    # Note: nvic.h is generated during build, so we check for source files instead
     local critical_paths=(
         "hackrf/firmware/libopencm3"
-        "hackrf/firmware/libopencm3/include/libopencm3/lpc43xx/m0/nvic.h"
+        "hackrf/firmware/libopencm3/include/libopencm3/lpc43xx"
+        "hackrf/firmware/libopencm3/include/libopencm3/lpc43xx/m0/irq.yaml"
     )
     
     local missing_submodules=0
     
     for path in "${critical_paths[@]}"; do
         if [ ! -e "$MAYHEM_PATH/$path" ]; then
-            print_error "Missing critical submodule or file: $path"
+            print_info "Missing: $path"
             missing_submodules=1
         fi
     done
     
+    # If libopencm3 is missing, try different approaches to get it
     if [ $missing_submodules -eq 1 ]; then
         echo ""
-        print_error "Git submodules are not properly initialized!"
-        print_error "This will cause compilation errors like:"
-        print_error "  fatal error: libopencm3/lpc43xx/m0/nvic.h: No such file or directory"
+        print_warning "libopencm3 is not present!"
+        print_warning "This will cause compilation errors like:"
+        print_warning "  fatal error: libopencm3/lpc43xx/m0/nvic.h: No such file or directory"
         echo ""
-        print_info "Attempting to initialize submodules now..."
-        cd "$MAYHEM_PATH"
-        if ! git submodule update --init --recursive; then
-            echo ""
-            print_error "Failed to initialize submodules automatically"
-            print_error "Please run manually:"
-            print_error "  cd $MAYHEM_PATH"
-            print_error "  git submodule update --init --recursive"
-            echo ""
-            exit 1
-        fi
-        cd - > /dev/null
-        print_info "Submodules initialized successfully"
         
-        # Verify again
-        for path in "${critical_paths[@]}"; do
-            if [ ! -e "$MAYHEM_PATH/$path" ]; then
-                print_error "Still missing: $path after submodule init"
-                exit 1
+        # If this is a git repository, try submodule init first
+        if [ -d "$MAYHEM_PATH/.git" ]; then
+            print_info "Attempting to initialize git submodules..."
+            cd "$MAYHEM_PATH"
+            if git submodule update --init --recursive 2>&1; then
+                cd - > /dev/null
+                print_info "Submodules initialized successfully via git"
+                
+                # Verify again
+                missing_submodules=0
+                for path in "${critical_paths[@]}"; do
+                    if [ ! -e "$MAYHEM_PATH/$path" ]; then
+                        missing_submodules=1
+                    fi
+                done
+            else
+                cd - > /dev/null
+                print_warning "Git submodule initialization failed"
             fi
-        done
+        else
+            print_info "Mayhem firmware is not a git repository"
+        fi
+        
+        # If still missing, download from HackRF repository
+        if [ $missing_submodules -eq 1 ]; then
+            print_info "Downloading libopencm3 from HackRF repository..."
+            download_libopencm3
+            
+            # Final verification
+            for path in "${critical_paths[@]}"; do
+                if [ ! -e "$MAYHEM_PATH/$path" ]; then
+                    print_error "Still missing: $path after download"
+                    exit 1
+                fi
+            done
+        fi
     fi
     
     print_info "✓ All required submodules are properly initialized"

@@ -377,20 +377,99 @@ function Test-MayhemPath {
     Write-Host ""
 }
 
+function Download-Libopencm3 {
+    Write-Info "Downloading libopencm3 from HackRF repository..."
+    
+    $libopencm3Path = Join-Path $MayhemPath "hackrf\firmware\libopencm3"
+    $hackrfRepo = "https://github.com/portapack-mayhem/hackrf.git"
+    $hackrfCommit = "cf6815aaf9c4bb11c3ad3de97721c67ddf4fcb38"
+    
+    # Check if git is installed
+    if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
+        Write-Error-Custom "Git is not installed. Please install git first."
+        exit 1
+    }
+    
+    # Create hackrf/firmware directory if it doesn't exist
+    $hackrfFirmwarePath = Join-Path $MayhemPath "hackrf\firmware"
+    New-Item -ItemType Directory -Force -Path $hackrfFirmwarePath | Out-Null
+    
+    # Clone the specific commit from HackRF repository into a temporary directory
+    $tempDir = Join-Path $env:TEMP "hackrf-$(Get-Random)"
+    New-Item -ItemType Directory -Force -Path $tempDir | Out-Null
+    
+    Write-Info "Cloning HackRF repository (this may take a moment)..."
+    
+    try {
+        git clone $hackrfRepo "$tempDir\hackrf" --depth 1 --branch master 2>&1 | Out-Null
+        if ($LASTEXITCODE -ne 0) {
+            Write-Warning-Custom "Failed to clone with --depth, trying full clone..."
+            Remove-Item -Recurse -Force "$tempDir\hackrf" -ErrorAction SilentlyContinue
+            git clone $hackrfRepo "$tempDir\hackrf" 2>&1 | Out-Null
+            if ($LASTEXITCODE -ne 0) {
+                throw "Failed to clone HackRF repository"
+            }
+        }
+    }
+    catch {
+        Write-Error-Custom "Failed to clone HackRF repository: $_"
+        Remove-Item -Recurse -Force $tempDir -ErrorAction SilentlyContinue
+        exit 1
+    }
+    
+    Push-Location "$tempDir\hackrf"
+    
+    # Try to checkout the specific commit
+    Write-Info "Checking out commit: $hackrfCommit"
+    try {
+        git checkout $hackrfCommit 2>&1 | Out-Null
+        if ($LASTEXITCODE -ne 0) {
+            Write-Warning-Custom "Could not checkout specific commit, using latest version"
+        }
+    }
+    catch {
+        Write-Warning-Custom "Could not checkout specific commit, using latest version"
+    }
+    
+    # Initialize libopencm3 submodule in the cloned repo
+    Write-Info "Initializing libopencm3 submodule..."
+    Push-Location "firmware"
+    try {
+        git submodule update --init libopencm3 2>&1 | Out-Null
+        if ($LASTEXITCODE -ne 0) {
+            throw "Failed to initialize libopencm3 submodule"
+        }
+    }
+    catch {
+        Write-Error-Custom "Failed to initialize libopencm3 submodule: $_"
+        Pop-Location
+        Pop-Location
+        Remove-Item -Recurse -Force $tempDir -ErrorAction SilentlyContinue
+        exit 1
+    }
+    
+    # Copy libopencm3 to the target location
+    Write-Info "Copying libopencm3 to $libopencm3Path"
+    Copy-Item -Recurse -Force "libopencm3" $libopencm3Path
+    
+    Pop-Location
+    Pop-Location
+    
+    # Clean up temporary directory
+    Remove-Item -Recurse -Force $tempDir -ErrorAction SilentlyContinue
+    
+    Write-Info "✓ libopencm3 downloaded successfully"
+}
+
 function Test-Submodules {
     Write-Info "Verifying git submodules are initialized..."
     
-    # Check if the directory is a git repository
-    $gitPath = Join-Path $MayhemPath ".git"
-    if (-not (Test-Path $gitPath)) {
-        Write-Warning-Custom "Mayhem firmware is not a git repository, skipping submodule check"
-        return
-    }
-    
     # Check for critical submodules that must exist for successful build
+    # Note: nvic.h is generated during build, so we check for source files instead
     $criticalPaths = @(
         "hackrf\firmware\libopencm3",
-        "hackrf\firmware\libopencm3\include\libopencm3\lpc43xx\m0\nvic.h"
+        "hackrf\firmware\libopencm3\include\libopencm3\lpc43xx",
+        "hackrf\firmware\libopencm3\include\libopencm3\lpc43xx\m0\irq.yaml"
     )
     
     $missingSubmodules = $false
@@ -398,45 +477,64 @@ function Test-Submodules {
     foreach ($path in $criticalPaths) {
         $fullPath = Join-Path $MayhemPath $path
         if (-not (Test-Path $fullPath)) {
-            Write-Error-Custom "Missing critical submodule or file: $path"
+            Write-Info "Missing: $path"
             $missingSubmodules = $true
         }
     }
     
+    # If libopencm3 is missing, try different approaches to get it
     if ($missingSubmodules) {
         Write-Host ""
-        Write-Error-Custom "Git submodules are not properly initialized!"
-        Write-Error-Custom "This will cause compilation errors like:"
-        Write-Error-Custom "  fatal error: libopencm3/lpc43xx/m0/nvic.h: No such file or directory"
+        Write-Warning-Custom "libopencm3 is not present!"
+        Write-Warning-Custom "This will cause compilation errors like:"
+        Write-Warning-Custom "  fatal error: libopencm3/lpc43xx/m0/nvic.h: No such file or directory"
         Write-Host ""
-        Write-Info "Attempting to initialize submodules now..."
         
-        Push-Location $MayhemPath
-        try {
-            git submodule update --init --recursive
-            if ($LASTEXITCODE -ne 0) {
-                throw "git submodule failed"
+        # If this is a git repository, try submodule init first
+        $gitPath = Join-Path $MayhemPath ".git"
+        if (Test-Path $gitPath) {
+            Write-Info "Attempting to initialize git submodules..."
+            
+            Push-Location $MayhemPath
+            try {
+                git submodule update --init --recursive 2>&1 | Out-Null
+                if ($LASTEXITCODE -eq 0) {
+                    Write-Info "Submodules initialized successfully via git"
+                    
+                    # Verify again
+                    $missingSubmodules = $false
+                    foreach ($path in $criticalPaths) {
+                        $fullPath = Join-Path $MayhemPath $path
+                        if (-not (Test-Path $fullPath)) {
+                            $missingSubmodules = $true
+                        }
+                    }
+                }
+                else {
+                    Write-Warning-Custom "Git submodule initialization failed"
+                }
             }
-            Write-Info "Submodules initialized successfully"
-        }
-        catch {
-            Write-Host ""
-            Write-Error-Custom "Failed to initialize submodules automatically"
-            Write-Error-Custom "Please run manually:"
-            Write-Error-Custom "  cd $MayhemPath"
-            Write-Error-Custom "  git submodule update --init --recursive"
-            Write-Host ""
+            catch {
+                Write-Warning-Custom "Git submodule initialization failed: $_"
+            }
             Pop-Location
-            exit 1
         }
-        Pop-Location
+        else {
+            Write-Info "Mayhem firmware is not a git repository"
+        }
         
-        # Verify again
-        foreach ($path in $criticalPaths) {
-            $fullPath = Join-Path $MayhemPath $path
-            if (-not (Test-Path $fullPath)) {
-                Write-Error-Custom "Still missing: $path after submodule init"
-                exit 1
+        # If still missing, download from HackRF repository
+        if ($missingSubmodules) {
+            Write-Info "Downloading libopencm3 from HackRF repository..."
+            Download-Libopencm3
+            
+            # Final verification
+            foreach ($path in $criticalPaths) {
+                $fullPath = Join-Path $MayhemPath $path
+                if (-not (Test-Path $fullPath)) {
+                    Write-Error-Custom "Still missing: $path after download"
+                    exit 1
+                }
             }
         }
     }
