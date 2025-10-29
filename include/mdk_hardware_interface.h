@@ -67,6 +67,6 @@ bool mdk_hardware_init(mdk_accel_config_t *config);
 bool mdk_accel_bruteforce(mdk_bruteforce_task_t *task);
 bool mdk_is_acceleration_enabled(void);
 uint32_t mdk_get_performance_multiplier(void);
-void mdk_hardware_cleanup(void);
+void mdk_accel_cleanup(void);
 
 #endif // MDK_HARDWARE_INTERFACE_H
