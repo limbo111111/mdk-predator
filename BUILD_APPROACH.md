@@ -288,7 +288,7 @@ fatal error: libopencm3/lpc43xx/m0/nvic.h: No such file or directory
 compilation terminated.
 ```
 
-**Root Cause:** The `nvic.h` header file is generated during the libopencm3 build process. The build scripts now automatically build libopencm3 before building the application.
+**Root Cause:** The `nvic.h` header file is generated during the libopencm3 build process, not part of the source code. The application build was attempting to compile before libopencm3 was built.
 
 **Solution:** This issue is now automatically fixed by the build scripts. They will:
 1. Verify git submodules are initialized
