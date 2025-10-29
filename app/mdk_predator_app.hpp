@@ -1,10 +1,14 @@
-// Existing content of the file
+/*
+ * MDK-Predator PortaPack Mayhem Application Header
+ */
 
-private:
-    bool use_hardware_accel;
-    uint32_t parallel_streams;
-    mdk_device_info_t mdk_info;
+#ifndef __MDK_PREDATOR_APP_H__
+#define __MDK_PREDATOR_APP_H__
 
-    // New method declarations
-    void detect_mdk(); // Declaration for MDK detection
-    void report_status(); // Declaration for status reporting
+#include "mdk_hardware_interface.h"
+
+// Hardware acceleration configuration
+// These would typically be part of a class definition in the .cpp file
+// Placeholder for future class member variables
+
+#endif // __MDK_PREDATOR_APP_H__

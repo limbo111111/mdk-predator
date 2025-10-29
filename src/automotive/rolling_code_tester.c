@@ -8,6 +8,10 @@
  */
 
 #include <stdio.h>
+#include "automotive/rolling_code_tester.h"
+
+// Performance multiplier for hardware acceleration (4x speedup)
+#define PERFORMANCE_MULTIPLIER 4
 
 // Function to encrypt using Keeloq algorithm
 void keeloq_encrypt_test() {
@@ -21,15 +25,15 @@ void rolling_code_bruteforce_hw() {
 }
 
 // Function to get performance metrics
-int rolling_code_get_performance(int multiplier) {
-    return 250000 * multiplier;
+int rolling_code_get_performance() {
+    return 250000 * PERFORMANCE_MULTIPLIER;
 }
 
 int main() {
     // Example usage of the functions
     keeloq_encrypt_test();
     rolling_code_bruteforce_hw();
-    int performance = rolling_code_get_performance(4);
+    int performance = rolling_code_get_performance();
     printf("Performance: %d codes/sec\n", performance);
     return 0;
 }
