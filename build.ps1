@@ -68,7 +68,7 @@ if ($Download) {
         git clone --depth 1 https://github.com/portapack-mayhem/mayhem-firmware.git $MayhemPath
         Write-Info "Initializing submodules..."
         Push-Location $MayhemPath
-        git submodule update --init --depth 1 hackrf/firmware/libopencm3
+        git submodule update --init --recursive --depth 1 hackrf
         Pop-Location
     } else {
         Write-Info "Mayhem firmware already exists at $MayhemPath"

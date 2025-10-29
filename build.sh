@@ -76,7 +76,7 @@ if [ $DOWNLOAD_FIRMWARE -eq 1 ]; then
         git clone --depth 1 https://github.com/portapack-mayhem/mayhem-firmware.git "$MAYHEM_DIR"
         print_info "Initializing submodules..."
         cd "$MAYHEM_DIR"
-        git submodule update --init --depth 1 hackrf/firmware/libopencm3
+        git submodule update --init --recursive --depth 1 hackrf
     else
         print_info "Mayhem firmware already exists at $MAYHEM_DIR"
     fi
