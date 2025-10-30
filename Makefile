@@ -18,17 +18,19 @@ LIB_DIR = $(BUILD_DIR)/lib
 AUTOMOTIVE_SRC = $(wildcard $(SRC_DIR)/automotive/*.c)
 WIRELESS_SRC = $(wildcard $(SRC_DIR)/wireless/*.c)
 CRYPTO_SRC = $(wildcard $(SRC_DIR)/crypto/*.c)
+HARDWARE_SRC = $(SRC_DIR)/mdk_hardware_interface.c
 MAIN_SRC = $(SRC_DIR)/mdk_predator.c
 
-ALL_SRC = $(AUTOMOTIVE_SRC) $(WIRELESS_SRC) $(CRYPTO_SRC) $(MAIN_SRC)
+ALL_SRC = $(AUTOMOTIVE_SRC) $(WIRELESS_SRC) $(CRYPTO_SRC) $(HARDWARE_SRC) $(MAIN_SRC)
 
 # Object files
 AUTOMOTIVE_OBJ = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(AUTOMOTIVE_SRC))
 WIRELESS_OBJ = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(WIRELESS_SRC))
 CRYPTO_OBJ = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(CRYPTO_SRC))
+HARDWARE_OBJ = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(HARDWARE_SRC))
 MAIN_OBJ = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(MAIN_SRC))
 
-ALL_OBJ = $(AUTOMOTIVE_OBJ) $(WIRELESS_OBJ) $(CRYPTO_OBJ) $(MAIN_OBJ)
+ALL_OBJ = $(AUTOMOTIVE_OBJ) $(WIRELESS_OBJ) $(CRYPTO_OBJ) $(HARDWARE_OBJ) $(MAIN_OBJ)
 
 # Output library
 LIB_NAME = libmdk_predator.a
@@ -89,20 +91,22 @@ TEST_BIN_DIR = $(TEST_BUILD_DIR)/bin
 TEST_AUTOMOTIVE_SRC = $(wildcard $(TEST_DIR)/automotive/*.c)
 TEST_WIRELESS_SRC = $(wildcard $(TEST_DIR)/wireless/*.c)
 TEST_CRYPTO_SRC = $(wildcard $(TEST_DIR)/crypto/*.c)
+TEST_HARDWARE_SRC = $(wildcard $(TEST_DIR)/hardware/*.c)
 TEST_INTEGRATION_SRC = $(wildcard $(TEST_DIR)/integration/*.c)
 
-ALL_TEST_SRC = $(TEST_AUTOMOTIVE_SRC) $(TEST_WIRELESS_SRC) $(TEST_CRYPTO_SRC) $(TEST_INTEGRATION_SRC)
+ALL_TEST_SRC = $(TEST_AUTOMOTIVE_SRC) $(TEST_WIRELESS_SRC) $(TEST_CRYPTO_SRC) $(TEST_HARDWARE_SRC) $(TEST_INTEGRATION_SRC)
 
 # Test binaries
 TEST_AUTOMOTIVE_BIN = $(patsubst $(TEST_DIR)/automotive/%.c,$(TEST_BIN_DIR)/automotive/%,$(TEST_AUTOMOTIVE_SRC))
 TEST_WIRELESS_BIN = $(patsubst $(TEST_DIR)/wireless/%.c,$(TEST_BIN_DIR)/wireless/%,$(TEST_WIRELESS_SRC))
 TEST_CRYPTO_BIN = $(patsubst $(TEST_DIR)/crypto/%.c,$(TEST_BIN_DIR)/crypto/%,$(TEST_CRYPTO_SRC))
+TEST_HARDWARE_BIN = $(patsubst $(TEST_DIR)/hardware/%.c,$(TEST_BIN_DIR)/hardware/%,$(TEST_HARDWARE_SRC))
 TEST_INTEGRATION_BIN = $(patsubst $(TEST_DIR)/integration/%.c,$(TEST_BIN_DIR)/integration/%,$(TEST_INTEGRATION_SRC))
 
-ALL_TEST_BIN = $(TEST_AUTOMOTIVE_BIN) $(TEST_WIRELESS_BIN) $(TEST_CRYPTO_BIN) $(TEST_INTEGRATION_BIN)
+ALL_TEST_BIN = $(TEST_AUTOMOTIVE_BIN) $(TEST_WIRELESS_BIN) $(TEST_CRYPTO_BIN) $(TEST_HARDWARE_BIN) $(TEST_INTEGRATION_BIN)
 
 # Test targets
-.PHONY: test test-build test-run test-automotive test-wireless test-crypto test-integration test-clean
+.PHONY: test test-build test-run test-automotive test-wireless test-crypto test-hardware test-integration test-clean
 
 test: test-build test-run
 
@@ -112,7 +116,9 @@ test-directories:
 	@mkdir -p $(TEST_BIN_DIR)/automotive
 	@mkdir -p $(TEST_BIN_DIR)/wireless
 	@mkdir -p $(TEST_BIN_DIR)/crypto
+	@mkdir -p $(TEST_BIN_DIR)/hardware
 	@mkdir -p $(TEST_BIN_DIR)/integration
+
 
 # Compile test binaries - automotive
 $(TEST_BIN_DIR)/automotive/%: $(TEST_DIR)/automotive/%.c $(AUTOMOTIVE_SRC) test-directories
@@ -128,6 +134,11 @@ $(TEST_BIN_DIR)/wireless/%: $(TEST_DIR)/wireless/%.c $(WIRELESS_SRC) test-direct
 $(TEST_BIN_DIR)/crypto/%: $(TEST_DIR)/crypto/%.c $(CRYPTO_SRC) test-directories
 	@echo "Building test: $@"
 	$(TEST_CC) $(TEST_CFLAGS) $(TEST_INCLUDES) $< $(CRYPTO_SRC) -lm -o $@
+
+# Compile test binaries - hardware
+$(TEST_BIN_DIR)/hardware/%: $(TEST_DIR)/hardware/%.c $(HARDWARE_SRC) test-directories
+	@echo "Building test: $@"
+	$(TEST_CC) $(TEST_CFLAGS) $(TEST_INCLUDES) $< $(HARDWARE_SRC) -o $@
 
 # Compile test binaries - integration
 $(TEST_BIN_DIR)/integration/test_input_validation: $(TEST_DIR)/integration/test_input_validation.c test-directories
@@ -192,6 +203,16 @@ test-crypto:
 	@echo "Building and running crypto tests..."
 	@$(MAKE) test-build
 	@for test in $(TEST_CRYPTO_BIN); do \
+		if [ -f "$$test" ]; then \
+			echo "Running: $$test"; \
+			$$test; \
+		fi; \
+	done
+
+test-hardware:
+	@echo "Building and running hardware tests..."
+	@$(MAKE) test-build
+	@for test in $(TEST_HARDWARE_BIN); do \
 		if [ -f "$$test" ]; then \
 			echo "Running: $$test"; \
 			$$test; \
