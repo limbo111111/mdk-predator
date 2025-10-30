@@ -8,6 +8,7 @@
  */
 
 #include <stdio.h>
+#include "automotive/rolling_code_tester.h"
 
 // Function to encrypt using Keeloq algorithm
 void keeloq_encrypt_test() {
