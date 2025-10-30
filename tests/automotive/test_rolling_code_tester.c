@@ -245,7 +245,8 @@ void test_hardware_acceleration_config() {
 }
 
 /**
- * Test: Hardware acceleration - default parallel streams
+ * Test: Hardware acceleration - default parallel streams assignment
+ * When parallel_streams is set to 0, init should set it to default (8)
  */
 void test_software_only_mode() {
     rolling_code_config_t config;

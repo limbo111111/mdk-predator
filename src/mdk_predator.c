@@ -294,46 +294,40 @@ bool mdk_accel_execute(mdk_accel_stream_t *stream) {
     }
     
     uint32_t threads_created = 0;
-    worker_thread_data_t **thread_data_ptrs = calloc(stream->queue_tail, sizeof(worker_thread_data_t*));
-    if (!thread_data_ptrs) {
-        return false;
-    }
     
     // Create worker threads
     for (uint32_t i = 0; i < stream->queue_tail && i < stream->stream_count; i++) {
         worker_thread_data_t *data = malloc(sizeof(worker_thread_data_t));
         if (!data) {
-            // Cleanup and fail
+            // Cleanup: wait for already-created threads to finish
+            // (they will free their own data)
             for (uint32_t j = 0; j < threads_created; j++) {
                 pthread_join(stream->threads[j], NULL);
             }
-            free(thread_data_ptrs);
             return false;
         }
         
-        thread_data_ptrs[i] = data;
         data->stream = stream;
         data->thread_id = i;
         
         if (pthread_create(&stream->threads[i], NULL, accel_worker_thread, data) != 0) {
-            // Thread creation failed - cleanup and fail
+            // Thread creation failed - free data and cleanup
             free(data);
+            // Wait for already-created threads to finish
+            // (they will free their own data)
             for (uint32_t j = 0; j < threads_created; j++) {
                 pthread_join(stream->threads[j], NULL);
             }
-            free(thread_data_ptrs);
             return false;
         }
         
         threads_created++;
     }
     
-    // Wait for all threads to complete
+    // Wait for all threads to complete (they will free their own data)
     for (uint32_t i = 0; i < threads_created; i++) {
         pthread_join(stream->threads[i], NULL);
     }
-    
-    free(thread_data_ptrs);
     
     // Reset queue
     stream->queue_head = 0;
