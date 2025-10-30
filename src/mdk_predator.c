@@ -44,6 +44,14 @@ bool mdk_predator_init(mdk_predator_config_t *config) {
     // hackrf_set_vga_gain(g_config.hardware.hackrf_vga_gain);
     // hackrf_set_txvga_gain(g_config.hardware.hackrf_txvga_gain);
 
+    // Apply hardware acceleration configuration
+    // Note: In production, this would configure DMA and parallel processing
+    // if (g_config.hardware.use_dma) {
+    //     mdk_enable_dma_transfer();
+    // }
+    // mdk_set_parallel_streams(g_config.hardware.parallel_streams);
+    // mdk_set_bruteforce_rate_limit(g_config.hardware.max_codes_per_second);
+
     // Apply security configuration
     if (!g_config.security.allow_transmit) {
         // Disable transmit functions

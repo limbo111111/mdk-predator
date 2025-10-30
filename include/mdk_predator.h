@@ -32,6 +32,10 @@ typedef struct {
     uint32_t hackrf_lna_gain;
     uint32_t hackrf_vga_gain;
     uint32_t hackrf_txvga_gain;
+    /* Hardware acceleration settings */
+    uint32_t parallel_streams;
+    bool use_dma;
+    uint32_t max_codes_per_second;
 } mdk_hardware_config_t;
 
 /* Security configuration */
