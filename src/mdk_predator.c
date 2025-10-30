@@ -34,16 +34,16 @@ bool mdk_detect_i2c_module(void) {
     // 2. Scan for I2C device at MDK module address
     // 3. Read device identifier
     // 4. Verify device model matches I2CDECMDL_PPMOD
-    // 
+    //
     // For now, we simulate detection based on system capabilities
     // This would be replaced with actual I2C detection code in production
-    
+
     // Simulated I2C detection logic
     // In real hardware, would check:
     // - I2C bus availability
     // - Device presence at expected address
     // - Device model string verification
-    
+
     return false; // Default to not detected for software-only fallback
 }
 
@@ -221,7 +221,7 @@ const char* mdk_get_hardware_mode(void) {
     if (!g_initialized) {
         return "Not initialized";
     }
-    
+
     if (g_hardware_acceleration_enabled) {
         return "Hardware accelerated";
     } else {

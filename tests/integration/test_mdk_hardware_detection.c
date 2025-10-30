@@ -192,7 +192,7 @@ void test_diagnostic_includes_mdk_status() {
  */
 void test_hardware_mode_string() {
     mdk_predator_config_t config;
-    
+
     config.default_module = MODULE_CRYPTO;
     config.enable_logging = false;
     config.buffer_size = 1024;
@@ -212,7 +212,7 @@ void test_hardware_mode_string() {
     TEST_ASSERT(strcmp(mode_before, "Not initialized") == 0, "Mode should be 'Not initialized' before init");
 
     mdk_predator_init(&config);
-    
+
     const char *mode_after = mdk_get_hardware_mode();
     // In test environment, will be software mode since MDK not detected
     TEST_ASSERT(strcmp(mode_after, "Software only") == 0, "Mode should be 'Software only' without MDK");
@@ -225,7 +225,7 @@ void test_hardware_mode_string() {
  */
 void test_i2c_detection_function() {
     bool result = mdk_detect_i2c_module();
-    
+
     // In test environment, should return false (no real hardware)
     TEST_ASSERT(result == false, "I2C detection should return false in test environment");
 }
