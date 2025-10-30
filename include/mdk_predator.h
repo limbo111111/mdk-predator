@@ -32,6 +32,9 @@ typedef struct {
     uint32_t hackrf_lna_gain;
     uint32_t hackrf_vga_gain;
     uint32_t hackrf_txvga_gain;
+    bool mdk_auto_detect;
+    bool mdk_hardware_acceleration;
+    uint32_t mdk_parallel_streams;
 } mdk_hardware_config_t;
 
 /* Security configuration */
@@ -58,6 +61,9 @@ typedef struct {
     bool is_initialized;
     bool hardware_ready;
     security_module_t active_module;
+    bool mdk_module_detected;
+    bool hardware_acceleration_enabled;
+    uint32_t parallel_streams_count;
 } mdk_status_t;
 
 /* Diagnostic result */
@@ -70,6 +76,7 @@ typedef struct {
     bool bluetooth_ok;
     bool subghz_ok;
     bool crypto_ok;
+    bool mdk_module_present;
 } diagnostic_result_t;
 
 /* Function prototypes */
@@ -81,5 +88,7 @@ bool mdk_run_diagnostic(diagnostic_result_t *result);
 void mdk_predator_cleanup(void);
 void mdk_hardware_cleanup(void);
 const char* mdk_get_version(void);
+bool mdk_detect_i2c_module(void);
+const char* mdk_get_hardware_mode(void);
 
 #endif /* MDK_PREDATOR_H */
