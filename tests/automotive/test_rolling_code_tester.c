@@ -245,7 +245,7 @@ void test_hardware_acceleration_config() {
 }
 
 /**
- * Test: Hardware acceleration - software-only mode
+ * Test: Hardware acceleration - default parallel streams
  */
 void test_software_only_mode() {
     rolling_code_config_t config;
@@ -253,8 +253,8 @@ void test_software_only_mode() {
     
     bool result = rolling_code_tester_init(&config);
     
-    TEST_ASSERT(result == true, "Init should succeed in software-only mode");
-    TEST_ASSERT(config.parallel_streams == 8, "Default parallel streams should be set");
+    TEST_ASSERT(result == true, "Init should succeed with parallel streams = 0");
+    TEST_ASSERT(config.parallel_streams == 8, "Default parallel streams should be set to 8");
     
     rolling_code_tester_cleanup(&config);
 }

@@ -12,6 +12,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
+#include <pthread.h>
 #include "automotive/rolling_code_tester.h"
 #include "mdk_predator.h"
 
@@ -130,8 +131,9 @@ typedef struct {
     uint64_t key_start;
     uint64_t key_end;
     uint64_t *key_found;
-    bool *found;
-    uint64_t *keys_tested;
+    volatile bool *found;
+    pthread_mutex_t *result_lock;
+    uint64_t keys_tested_local;  // Thread-local counter
 } bruteforce_worker_data_t;
 
 /**
@@ -150,14 +152,26 @@ static void bruteforce_worker_callback(void *input, void *output, void *user_dat
     uint64_t start = data->key_start;
     uint64_t end = data->key_end;
     
-    for (uint64_t key = start; key <= end && !(*data->found); key++) {
+    data->keys_tested_local = 0;
+    
+    for (uint64_t key = start; key <= end; key++) {
+        // Check if another thread already found the key
+        if (*data->found) {
+            break;
+        }
+        
         keeloq_result_t result;
         if (test_keeloq_code(encrypted, key, &result)) {
-            (*data->keys_tested)++;
+            data->keys_tested_local++;
             
             if (result.decrypted == target) {
-                *data->key_found = key;
-                *data->found = true;
+                // Atomically update result with mutex protection
+                pthread_mutex_lock(data->result_lock);
+                if (!*data->found) {  // Double-check after acquiring lock
+                    *data->key_found = key;
+                    *data->found = true;
+                }
+                pthread_mutex_unlock(data->result_lock);
                 break;
             }
         }
@@ -220,8 +234,9 @@ bool bruteforce_keeloq_key(rolling_code_config_t *config,
         
         bruteforce_worker_data_t *worker_data = calloc(config->parallel_streams, sizeof(bruteforce_worker_data_t));
         uint64_t found_key = 0;
-        bool found = false;
-        uint64_t total_tested = 0;
+        volatile bool found = false;
+        pthread_mutex_t result_lock;
+        pthread_mutex_init(&result_lock, NULL);
         
         if (!worker_data) {
             mdk_accel_destroy_stream(stream);
@@ -238,7 +253,8 @@ bool bruteforce_keeloq_key(rolling_code_config_t *config,
                                       (key_start + ((i + 1) * keys_per_worker) - 1);
             worker_data[i].key_found = &found_key;
             worker_data[i].found = &found;
-            worker_data[i].keys_tested = &total_tested;
+            worker_data[i].result_lock = &result_lock;
+            worker_data[i].keys_tested_local = 0;
             
             mdk_accel_enqueue(stream, &worker_data[i], NULL, bruteforce_worker_callback, config);
         }
@@ -246,12 +262,18 @@ bool bruteforce_keeloq_key(rolling_code_config_t *config,
         // Execute parallel bruteforce
         mdk_accel_execute(stream);
         
-        // Collect results
+        // Collect results from all workers
+        uint64_t total_tested = 0;
+        for (uint32_t i = 0; i < config->parallel_streams; i++) {
+            total_tested += worker_data[i].keys_tested_local;
+        }
+        
         result->key_found = found_key;
         result->key_valid = found;
         result->keys_tested = total_tested;
         
         // Cleanup
+        pthread_mutex_destroy(&result_lock);
         free(worker_data);
         mdk_accel_destroy_stream(stream);
     }
