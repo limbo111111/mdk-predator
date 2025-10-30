@@ -31,6 +31,7 @@ typedef struct {
     rolling_code_algorithm_t algorithm;
     test_mode_t mode;  // Changed from test_mode to mode for app compatibility
     uint8_t manufacturer_key[8];
+    uint32_t parallel_streams;  // Number of parallel hardware streams (0 = software-only)
 } rolling_code_config_t;
 
 /* KeeLoq test result */
@@ -40,6 +41,25 @@ typedef struct {
     uint16_t counter;
     bool is_valid;
 } keeloq_result_t;
+
+/* Bruteforce result */
+typedef struct {
+    uint64_t key_found;
+    bool key_valid;
+    uint64_t keys_tested;
+    uint64_t elapsed_ms;
+    double keys_per_second;
+    uint32_t stream_count;
+} bruteforce_result_t;
+
+/* Performance benchmark result */
+typedef struct {
+    uint64_t operations_completed;
+    uint64_t elapsed_ms;
+    double ops_per_second;
+    uint32_t parallel_streams_used;
+    double speedup_factor;  // Compared to software-only baseline
+} performance_benchmark_t;
 
 /* Sequence analysis result */
 typedef struct {
@@ -64,5 +84,18 @@ bool test_replay_vulnerability(rolling_code_config_t *config,
                                 signal_data_t *signal,
                                 replay_test_result_t *result);
 void rolling_code_tester_cleanup(rolling_code_config_t *config);
+
+/* Hardware-accelerated bruteforce operations */
+bool bruteforce_keeloq_key(rolling_code_config_t *config,
+                           uint32_t encrypted,
+                           uint32_t decrypted_target,
+                           uint64_t key_start,
+                           uint64_t key_end,
+                           bruteforce_result_t *result);
+
+/* Performance benchmarking */
+bool benchmark_performance(rolling_code_config_t *config,
+                          uint32_t test_iterations,
+                          performance_benchmark_t *result);
 
 #endif /* ROLLING_CODE_TESTER_H */

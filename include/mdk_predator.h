@@ -32,6 +32,7 @@ typedef struct {
     uint32_t hackrf_lna_gain;
     uint32_t hackrf_vga_gain;
     uint32_t hackrf_txvga_gain;
+    uint32_t parallel_streams;  // Number of parallel processing streams for hardware acceleration
 } mdk_hardware_config_t;
 
 /* Security configuration */
@@ -72,6 +73,12 @@ typedef struct {
     bool crypto_ok;
 } diagnostic_result_t;
 
+/* Hardware acceleration stream handle */
+typedef struct mdk_accel_stream_t mdk_accel_stream_t;
+
+/* Hardware acceleration callback for processing data in parallel */
+typedef void (*mdk_accel_callback_t)(void *input, void *output, void *user_data);
+
 /* Function prototypes */
 bool mdk_predator_init(mdk_predator_config_t *config);
 bool mdk_hardware_init(void);
@@ -81,5 +88,11 @@ bool mdk_run_diagnostic(diagnostic_result_t *result);
 void mdk_predator_cleanup(void);
 void mdk_hardware_cleanup(void);
 const char* mdk_get_version(void);
+
+/* Hardware acceleration interface */
+mdk_accel_stream_t* mdk_accel_create_stream(uint32_t stream_count, uint32_t input_size, uint32_t output_size);
+bool mdk_accel_enqueue(mdk_accel_stream_t *stream, void *input, void *output, mdk_accel_callback_t callback, void *user_data);
+bool mdk_accel_execute(mdk_accel_stream_t *stream);
+void mdk_accel_destroy_stream(mdk_accel_stream_t *stream);
 
 #endif /* MDK_PREDATOR_H */

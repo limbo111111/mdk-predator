@@ -230,6 +230,149 @@ void test_rolling_code_cleanup_null() {
 }
 
 /**
+ * Test: Hardware acceleration - parallel streams configuration
+ */
+void test_hardware_acceleration_config() {
+    rolling_code_config_t config;
+    config.parallel_streams = 8;
+    
+    bool result = rolling_code_tester_init(&config);
+    
+    TEST_ASSERT(result == true, "Init should succeed with parallel streams configured");
+    TEST_ASSERT(config.parallel_streams == 8, "Parallel streams should be preserved");
+    
+    rolling_code_tester_cleanup(&config);
+}
+
+/**
+ * Test: Hardware acceleration - software-only mode
+ */
+void test_software_only_mode() {
+    rolling_code_config_t config;
+    config.parallel_streams = 0;
+    
+    bool result = rolling_code_tester_init(&config);
+    
+    TEST_ASSERT(result == true, "Init should succeed in software-only mode");
+    TEST_ASSERT(config.parallel_streams == 8, "Default parallel streams should be set");
+    
+    rolling_code_tester_cleanup(&config);
+}
+
+/**
+ * Test: Bruteforce KeeLoq key with valid parameters
+ */
+void test_bruteforce_keeloq_valid() {
+    rolling_code_config_t config;
+    rolling_code_tester_init(&config);
+    config.parallel_streams = 4;  // Use 4 streams for testing
+    
+    bruteforce_result_t result;
+    uint32_t encrypted = 0x12345678;
+    uint32_t decrypted_target = 0x87654321;
+    uint64_t key_start = 0x1000;
+    uint64_t key_end = 0x1100;
+    
+    bool test_result = bruteforce_keeloq_key(&config, encrypted, decrypted_target,
+                                             key_start, key_end, &result);
+    
+    TEST_ASSERT(test_result == true, "Bruteforce should succeed with valid parameters");
+    TEST_ASSERT(result.stream_count == 4, "Should use 4 parallel streams");
+    TEST_ASSERT(result.keys_tested > 0, "Should test at least one key");
+    
+    rolling_code_tester_cleanup(&config);
+}
+
+/**
+ * Test: Bruteforce with null config
+ */
+void test_bruteforce_null_config() {
+    bruteforce_result_t result;
+    
+    bool test_result = bruteforce_keeloq_key(NULL, 0x12345678, 0x87654321,
+                                             0x1000, 0x1100, &result);
+    
+    TEST_ASSERT(test_result == false, "Bruteforce should fail with NULL config");
+}
+
+/**
+ * Test: Bruteforce with null result
+ */
+void test_bruteforce_null_result() {
+    rolling_code_config_t config;
+    rolling_code_tester_init(&config);
+    
+    bool test_result = bruteforce_keeloq_key(&config, 0x12345678, 0x87654321,
+                                             0x1000, 0x1100, NULL);
+    
+    TEST_ASSERT(test_result == false, "Bruteforce should fail with NULL result");
+    
+    rolling_code_tester_cleanup(&config);
+}
+
+/**
+ * Test: Benchmark performance with valid parameters
+ */
+void test_benchmark_performance_valid() {
+    rolling_code_config_t config;
+    rolling_code_tester_init(&config);
+    config.parallel_streams = 4;
+    
+    performance_benchmark_t result;
+    
+    bool test_result = benchmark_performance(&config, 100, &result);
+    
+    TEST_ASSERT(test_result == true, "Benchmark should succeed with valid parameters");
+    TEST_ASSERT(result.operations_completed == 100, "Should complete 100 operations");
+    TEST_ASSERT(result.parallel_streams_used == 4, "Should report 4 parallel streams");
+    TEST_ASSERT(result.ops_per_second >= 0.0, "Should report non-negative ops/sec");
+    TEST_ASSERT(result.speedup_factor >= 1.0, "Speedup factor should be >= 1.0");
+    
+    rolling_code_tester_cleanup(&config);
+}
+
+/**
+ * Test: Benchmark performance with null config
+ */
+void test_benchmark_null_config() {
+    performance_benchmark_t result;
+    
+    bool test_result = benchmark_performance(NULL, 100, &result);
+    
+    TEST_ASSERT(test_result == false, "Benchmark should fail with NULL config");
+}
+
+/**
+ * Test: Benchmark performance with null result
+ */
+void test_benchmark_null_result() {
+    rolling_code_config_t config;
+    rolling_code_tester_init(&config);
+    
+    bool test_result = benchmark_performance(&config, 100, NULL);
+    
+    TEST_ASSERT(test_result == false, "Benchmark should fail with NULL result");
+    
+    rolling_code_tester_cleanup(&config);
+}
+
+/**
+ * Test: Benchmark performance with zero iterations
+ */
+void test_benchmark_zero_iterations() {
+    rolling_code_config_t config;
+    rolling_code_tester_init(&config);
+    
+    performance_benchmark_t result;
+    
+    bool test_result = benchmark_performance(&config, 0, &result);
+    
+    TEST_ASSERT(test_result == false, "Benchmark should fail with zero iterations");
+    
+    rolling_code_tester_cleanup(&config);
+}
+
+/**
  * Main test runner
  */
 int main(void) {
@@ -252,6 +395,17 @@ int main(void) {
     RUN_TEST(test_replay_vulnerability_null_result);
     RUN_TEST(test_rolling_code_cleanup_valid);
     RUN_TEST(test_rolling_code_cleanup_null);
+    
+    // Hardware acceleration tests
+    RUN_TEST(test_hardware_acceleration_config);
+    RUN_TEST(test_software_only_mode);
+    RUN_TEST(test_bruteforce_keeloq_valid);
+    RUN_TEST(test_bruteforce_null_config);
+    RUN_TEST(test_bruteforce_null_result);
+    RUN_TEST(test_benchmark_performance_valid);
+    RUN_TEST(test_benchmark_null_config);
+    RUN_TEST(test_benchmark_null_result);
+    RUN_TEST(test_benchmark_zero_iterations);
 
     printf("\n========================================\n");
     printf("Test Results:\n");

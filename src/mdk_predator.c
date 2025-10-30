@@ -5,9 +5,15 @@
  * on the Mayhem-MDK platform
  */
 
+#define _DEFAULT_SOURCE
+
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <pthread.h>
+#include <unistd.h>
 #include "mdk_predator.h"
 #include "automotive/key_fob_analyzer.h"
 #include "automotive/rolling_code_tester.h"
@@ -15,6 +21,27 @@
 #include "wireless/bluetooth_analyzer.h"
 #include "wireless/subghz_analyzer.h"
 #include "crypto/crypto_analyzer.h"
+
+/* Hardware acceleration stream structure */
+struct mdk_accel_stream_t {
+    uint32_t stream_count;
+    uint32_t input_size;
+    uint32_t output_size;
+    pthread_t *threads;
+    void **inputs;
+    void **outputs;
+    mdk_accel_callback_t *callbacks;
+    void **user_data;
+    uint32_t queue_head;
+    uint32_t queue_tail;
+    pthread_mutex_t lock;
+};
+
+/* Worker thread data */
+typedef struct {
+    mdk_accel_stream_t *stream;
+    uint32_t thread_id;
+} worker_thread_data_t;
 
 /* Global configuration */
 static mdk_predator_config_t g_config;
@@ -35,6 +62,11 @@ bool mdk_predator_init(mdk_predator_config_t *config) {
 
     // Copy configuration
     g_config = *config;
+
+    // Set default parallel streams if not specified
+    if (g_config.hardware.parallel_streams == 0) {
+        g_config.hardware.parallel_streams = 8;  // Default to 8 streams
+    }
 
     // Apply hardware configuration
     // Note: In production, this would call HackRF API functions
@@ -161,4 +193,145 @@ void mdk_hardware_cleanup(void) {
  */
 const char* mdk_get_version(void) {
     return "MDK-Predator v1.0.0";
+}
+
+/**
+ * Worker thread function for hardware acceleration
+ */
+static void* accel_worker_thread(void *arg) {
+    worker_thread_data_t *data = (worker_thread_data_t *)arg;
+    mdk_accel_stream_t *stream = data->stream;
+    uint32_t thread_id = data->thread_id;
+    
+    // Execute assigned work item
+    if (thread_id < stream->queue_tail && stream->callbacks[thread_id] != NULL) {
+        void *input = stream->inputs[thread_id];
+        void *output = stream->outputs[thread_id];
+        mdk_accel_callback_t callback = stream->callbacks[thread_id];
+        void *user_data = stream->user_data[thread_id];
+        
+        // Execute callback
+        if (callback) {
+            callback(input, output, user_data);
+        }
+    }
+    
+    free(data);
+    return NULL;
+}
+
+/**
+ * Create hardware acceleration stream
+ */
+mdk_accel_stream_t* mdk_accel_create_stream(uint32_t stream_count, uint32_t input_size, uint32_t output_size) {
+    if (stream_count == 0 || stream_count > 64) {
+        return NULL;
+    }
+    
+    mdk_accel_stream_t *stream = calloc(1, sizeof(mdk_accel_stream_t));
+    if (!stream) {
+        return NULL;
+    }
+    
+    stream->stream_count = stream_count;
+    stream->input_size = input_size;
+    stream->output_size = output_size;
+    stream->queue_head = 0;
+    stream->queue_tail = 0;
+    
+    // Allocate arrays
+    stream->threads = calloc(stream_count, sizeof(pthread_t));
+    stream->inputs = calloc(stream_count, sizeof(void*));
+    stream->outputs = calloc(stream_count, sizeof(void*));
+    stream->callbacks = calloc(stream_count, sizeof(mdk_accel_callback_t));
+    stream->user_data = calloc(stream_count, sizeof(void*));
+    
+    if (!stream->threads || !stream->inputs || !stream->outputs || 
+        !stream->callbacks || !stream->user_data) {
+        mdk_accel_destroy_stream(stream);
+        return NULL;
+    }
+    
+    pthread_mutex_init(&stream->lock, NULL);
+    
+    return stream;
+}
+
+/**
+ * Enqueue work item to hardware acceleration stream
+ */
+bool mdk_accel_enqueue(mdk_accel_stream_t *stream, void *input, void *output, 
+                       mdk_accel_callback_t callback, void *user_data) {
+    if (!stream || !callback) {
+        return false;
+    }
+    
+    pthread_mutex_lock(&stream->lock);
+    
+    if (stream->queue_tail >= stream->stream_count) {
+        pthread_mutex_unlock(&stream->lock);
+        return false;
+    }
+    
+    uint32_t idx = stream->queue_tail;
+    stream->inputs[idx] = input;
+    stream->outputs[idx] = output;
+    stream->callbacks[idx] = callback;
+    stream->user_data[idx] = user_data;
+    stream->queue_tail++;
+    
+    pthread_mutex_unlock(&stream->lock);
+    
+    return true;
+}
+
+/**
+ * Execute all enqueued work on hardware acceleration stream
+ */
+bool mdk_accel_execute(mdk_accel_stream_t *stream) {
+    if (!stream || stream->queue_tail == 0) {
+        return false;
+    }
+    
+    // Create worker threads
+    for (uint32_t i = 0; i < stream->queue_tail && i < stream->stream_count; i++) {
+        worker_thread_data_t *data = malloc(sizeof(worker_thread_data_t));
+        if (!data) {
+            continue;
+        }
+        
+        data->stream = stream;
+        data->thread_id = i;
+        
+        pthread_create(&stream->threads[i], NULL, accel_worker_thread, data);
+    }
+    
+    // Wait for all threads to complete
+    for (uint32_t i = 0; i < stream->queue_tail && i < stream->stream_count; i++) {
+        pthread_join(stream->threads[i], NULL);
+    }
+    
+    // Reset queue
+    stream->queue_head = 0;
+    stream->queue_tail = 0;
+    
+    return true;
+}
+
+/**
+ * Destroy hardware acceleration stream
+ */
+void mdk_accel_destroy_stream(mdk_accel_stream_t *stream) {
+    if (!stream) {
+        return;
+    }
+    
+    pthread_mutex_destroy(&stream->lock);
+    
+    free(stream->threads);
+    free(stream->inputs);
+    free(stream->outputs);
+    free(stream->callbacks);
+    free(stream->user_data);
+    free(stream);
 }

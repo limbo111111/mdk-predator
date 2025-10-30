@@ -115,9 +115,9 @@ test-directories:
 	@mkdir -p $(TEST_BIN_DIR)/integration
 
 # Compile test binaries - automotive
-$(TEST_BIN_DIR)/automotive/%: $(TEST_DIR)/automotive/%.c $(AUTOMOTIVE_SRC) test-directories
+$(TEST_BIN_DIR)/automotive/%: $(TEST_DIR)/automotive/%.c $(AUTOMOTIVE_SRC) $(MAIN_SRC) test-directories
 	@echo "Building test: $@"
-	$(TEST_CC) $(TEST_CFLAGS) $(TEST_INCLUDES) $< $(AUTOMOTIVE_SRC) -o $@
+	$(TEST_CC) $(TEST_CFLAGS) $(TEST_INCLUDES) $< $(AUTOMOTIVE_SRC) $(MAIN_SRC) -pthread -o $@
 
 # Compile test binaries - wireless
 $(TEST_BIN_DIR)/wireless/%: $(TEST_DIR)/wireless/%.c $(WIRELESS_SRC) test-directories
