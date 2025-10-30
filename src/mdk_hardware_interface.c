@@ -6,9 +6,6 @@
 #include "mdk_hardware_interface.h"
 #include <string.h>
 
-typedef struct {
-    uint32_t parallel_streams;
-} mdk_accel_config_t;
 static mdk_accel_config_t g_accel_config;
 static bool g_mdk_initialized = false;
 static bool g_mdk_available = false;
@@ -63,8 +60,11 @@ bool mdk_accel_bruteforce(mdk_bruteforce_task_t *task) {
                     task->progress_callback(code - task->start_code, range);
                 }
                 
-                if (task->result_code && *task->found == false) {
-                    *task->result_code = code;
+                // Compare hash result against target value
+                if (result == task->target_value && *task->found == false) {
+                    if (task->result_code) {
+                        *task->result_code = code;
+                    }
                     *task->found = true;
                     return true;
                 }
