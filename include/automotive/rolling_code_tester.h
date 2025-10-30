@@ -6,7 +6,7 @@ void rolling_code_bruteforce_hw() {
 }
 
 // Function to get performance metrics of the rolling code
-int rolling_code_get_performance() {
+int rolling_code_get_performance(int multiplier) {
     // Implementation to measure and return performance
     return 1; // Placeholder return value
 }
