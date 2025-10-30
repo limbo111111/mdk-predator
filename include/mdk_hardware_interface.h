@@ -43,25 +43,6 @@ void i2c_master_init();
 void i2c_master_write(uint8_t device_addr, uint8_t *data, size_t size);
 void i2c_master_read(uint8_t device_addr, uint8_t *data, size_t size);
 
-// Parallel Processing Structures
-typedef struct {
-    uint8_t stream_id;
-    uint32_t data_buffer[1024]; // Example buffer size
-} StreamData;
-
-StreamData streams[4]; // Four streams for parallel processing
-
-// DMA Configuration
-void dma_init();
-void start_dma_transfer(StreamData *stream);
-
-// Bruteforce Task Definitions
-void bruteforce_task(StreamData *stream);
-
-// Function Prototypes for Hardware Acceleration
-void enable_hardware_acceleration();
-void disable_hardware_acceleration();
-
 // MDK Hardware API Functions
 bool mdk_hardware_detect(mdk_device_info_t *info);
 bool mdk_accel_init(mdk_accel_config_t *config);
