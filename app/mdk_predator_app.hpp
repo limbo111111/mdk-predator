@@ -39,6 +39,11 @@ private:
         { { 2 * 8, 2 * 16 }, "Mayhem-MDK Module", Color::light_grey() }
     };
 
+    Text text_hardware_status {
+        { 2 * 8, 3 * 16, 26 * 8, 16 },
+        ""
+    };
+
     Button button_automotive {
         { 2 * 8, 4 * 16, 26 * 8, 2 * 16 },
         "Automotive Security"
