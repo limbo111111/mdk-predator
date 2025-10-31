@@ -46,6 +46,7 @@ typedef struct {
 typedef struct {
     bool initialized;
     mdk_gpio_config_t config;
+    bool current_level;  // Track current output level for simulation
 } mdk_gpio_state_t;
 
 /** UART port state */
@@ -699,6 +700,8 @@ bool mdk_parallel_streams_init(const mdk_parallel_stream_config_t *config) {
     
     g_hw_state.parallel_streams.config = *config;
     g_hw_state.parallel_streams.initialized = true;
+    // The acceleration factor below is a theoretical maximum (ideal linear scaling).
+    // In practice, parallel processing rarely achieves perfect scaling due to overhead.
     g_hw_state.parallel_streams.acceleration_factor = (float)config->num_streams;
     
     return true;
@@ -819,6 +822,7 @@ bool mdk_gpio_init(const mdk_gpio_config_t *config) {
     // Configure GPIO hardware
     pin->config = *config;
     pin->initialized = true;
+    pin->current_level = false;  // Initialize to low
     
     return true;
 }
@@ -855,7 +859,8 @@ bool mdk_gpio_set_level(mdk_gpio_pin_t pin, bool level) {
     }
     
     // In production: set GPIO output level via registers
-    (void)level;
+    // For simulation: track the level
+    p->current_level = level;
     
     return true;
 }
@@ -876,7 +881,8 @@ bool mdk_gpio_get_level(mdk_gpio_pin_t pin, bool *level) {
     }
     
     // In production: read GPIO input level from registers
-    *level = false;
+    // For simulation: return the tracked level
+    *level = p->current_level;
     
     return true;
 }
