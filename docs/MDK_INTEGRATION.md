@@ -253,6 +253,7 @@ bool test_rolling_code(const void *key, size_t key_len, void *user_data) {
     
     // KeeLoq decryption logic here
     // NOTE: keeloq_decrypt must be implemented by the user or imported from a suitable library
+    // NOTE: keeloq_decrypt must be implemented by the user or imported from a suitable library
     uint32_t decrypted = keeloq_decrypt(encrypted, test_key);
     
     return is_valid_code(decrypted);
