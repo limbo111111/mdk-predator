@@ -113,18 +113,17 @@ bool mdk_hardware_init(void) {
         .max_dma_buffer_size = 2 * 1024 * 1024,  // 2MB
         .parallel_stream_count = 4
     };
-    
+
     if (!mdk_hardware_interface_init(&hw_config)) {
         return false;
     }
-    
+
     // Initialize I2C for I2CDECMDL_PPMOD device model
     if (!mdk_i2c_init_i2cdecmdl()) {
         // Non-fatal: I2C device may not be present
         printf("[INFO] I2CDECMDL_PPMOD device not detected or failed to initialize. Continuing without I2C device as it is optional.\n");
-        printf("[INFO] I2CDECMDL_PPMOD device not detected or failed to initialize. Continuing without I2C device as it is optional.\n");
     }
-    
+
     // Configure DMA for signal capture
     mdk_dma_config_t dma_config = {
         .channel = MDK_DMA_CHANNEL_0,

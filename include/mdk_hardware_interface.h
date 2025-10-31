@@ -55,7 +55,7 @@ bool mdk_i2c_device_open(mdk_i2c_device_t *device, mdk_i2c_bus_t bus, uint8_t de
 bool mdk_i2c_device_close(mdk_i2c_device_t *device);
 bool mdk_i2c_write(const mdk_i2c_device_t *device, const uint8_t *data, size_t length);
 bool mdk_i2c_read(const mdk_i2c_device_t *device, uint8_t *data, size_t length);
-bool mdk_i2c_write_read(const mdk_i2c_device_t *device, 
+bool mdk_i2c_write_read(const mdk_i2c_device_t *device,
                         const uint8_t *write_data, size_t write_len,
                         uint8_t *read_data, size_t read_len);
 bool mdk_i2c_write_reg(const mdk_i2c_device_t *device, uint8_t reg_addr, uint8_t value);
@@ -126,7 +126,7 @@ bool mdk_dma_abort(mdk_dma_channel_t channel);
 bool mdk_dma_get_status(mdk_dma_channel_t channel, bool *active, size_t *bytes_transferred);
 
 /* Signal Capture with DMA */
-bool mdk_dma_capture_signal(mdk_dma_channel_t channel, void *buffer, size_t buffer_size, 
+bool mdk_dma_capture_signal(mdk_dma_channel_t channel, void *buffer, size_t buffer_size,
                             uint32_t sample_rate, uint32_t duration_ms);
 bool mdk_dma_get_capture_status(mdk_dma_channel_t channel, size_t *samples_captured);
 
@@ -201,7 +201,7 @@ float mdk_parallel_streams_get_acceleration(void);
 /* Bruteforce Acceleration with Parallel Streams */
 typedef bool (*mdk_bruteforce_test_fn_t)(const void *key, size_t key_len, void *user_data);
 
-bool mdk_parallel_bruteforce(const void *key_space, size_t key_len, 
+bool mdk_parallel_bruteforce(const void *key_space, size_t key_len,
                              size_t num_keys, mdk_bruteforce_test_fn_t test_fn,
                              void *user_data, void *result_key);
 
