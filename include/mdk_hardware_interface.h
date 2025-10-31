@@ -28,6 +28,7 @@ typedef struct {
 typedef struct {
     uint32_t start_code;
     uint32_t end_code;
+    uint32_t target_value;
     uint32_t (*hash_function)(uint32_t);
     void (*progress_callback)(uint32_t, uint32_t);
     uint32_t *result_code;
