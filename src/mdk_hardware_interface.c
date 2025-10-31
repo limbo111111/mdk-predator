@@ -41,7 +41,7 @@ bool mdk_accel_init(mdk_accel_config_t *config) {
 }
 
 bool mdk_accel_bruteforce(mdk_bruteforce_task_t *task) {
-    if (!task || !g_mdk_initialized) return false;
+    if (!task || !g_mdk_initialized || !task->found) return false;
     
     uint32_t range = task->end_code - task->start_code;
     uint32_t chunk_size = range / g_accel_config.parallel_streams;
