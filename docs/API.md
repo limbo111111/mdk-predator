@@ -57,7 +57,7 @@ Initialize DMA channel for high-speed data transfers.
 
 #### `mdk_dma_capture_signal()`
 ```c
-bool mdk_dma_capture_signal(mdk_dma_channel_t channel, void *buffer, size_t buffer_size, 
+bool mdk_dma_capture_signal(mdk_dma_channel_t channel, void *buffer, size_t buffer_size,
                             uint32_t sample_rate, uint32_t duration_ms);
 ```
 Capture RF signal using DMA for zero CPU overhead.
@@ -72,7 +72,7 @@ Initialize parallel stream processing for 4x+ performance acceleration.
 
 #### `mdk_parallel_bruteforce()`
 ```c
-bool mdk_parallel_bruteforce(const void *key_space, size_t key_len, 
+bool mdk_parallel_bruteforce(const void *key_space, size_t key_len,
                              size_t num_keys, mdk_bruteforce_test_fn_t test_fn,
                              void *user_data, void *result_key);
 ```

@@ -93,7 +93,7 @@ If you prefer full control:
    ```
 
 3. Register in `firmware/application/external/external.cmake`:
-   
+
    Add to `EXTCPPSRC`:
    ```cmake
    #mdk_predator
@@ -107,7 +107,7 @@ If you prefer full control:
    external/mdk_predator/src/wireless/subghz_analyzer.c
    external/mdk_predator/src/crypto/crypto_analyzer.c
    ```
-   
+
    Add to `EXTAPPLIST`:
    ```cmake
    mdk_predator
@@ -153,11 +153,11 @@ The integration means:
 
 **A:** This is correctly configured as an **external app** (not standalone). External apps are the recommended approach because:
 
-✅ No firmware flashing required - just copy .ppma to SD card  
-✅ Safe - no risk of bricking your device  
-✅ Easy updates - just replace the .ppma file  
-✅ Works with official Mayhem firmware releases  
-✅ Your firmware settings remain intact  
+✅ No firmware flashing required - just copy .ppma to SD card
+✅ Safe - no risk of bricking your device
+✅ Easy updates - just replace the .ppma file
+✅ Works with official Mayhem firmware releases
+✅ Your firmware settings remain intact
 
 Standalone firmware integration would require flashing and is not recommended for end users.
 

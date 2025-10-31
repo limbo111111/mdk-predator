@@ -181,7 +181,7 @@ else
         print_info "Starting build..."
         $DOCKER_COMPOSE run --rm mdk-predator-build
     fi
-    
+
     echo ""
     print_info "Build completed!"
     echo ""

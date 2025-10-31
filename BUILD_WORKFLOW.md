@@ -45,7 +45,7 @@ cd ..
 # Have to debug PATH issues, reinstall packages, etc.
 ```
 
-**Total Time: 30-60 minutes** *(for experienced users, based on typical setup time)*  
+**Total Time: 30-60 minutes** *(for experienced users, based on typical setup time)*
 **Success Rate: ~60%** *(estimated from user feedback and issue reports)*
 
 ---
@@ -99,7 +99,7 @@ Set-ExecutionPolicy RemoteSigned
 # Restart computer again
 ```
 
-**Total Time: 1-3 hours** *(for experienced users, including troubleshooting)*  
+**Total Time: 1-3 hours** *(for experienced users, including troubleshooting)*
 **Success Rate: ~40%** *(estimated from user feedback; many Windows users reported giving up)*
 
 ---
@@ -185,7 +185,7 @@ Build Successful!
 Application built: build/portapack/mdk_predator.ppma
 ```
 
-**Total Time: 5-15 minutes** *(mostly download/compile time, based on testing)*  
+**Total Time: 5-15 minutes** *(mostly download/compile time, based on testing)*
 **Success Rate: ~95%** *(estimated; works on most fresh Linux systems)*
 
 ---
@@ -236,7 +236,7 @@ Build Successful!
 Application built: build\portapack\mdk_predator.ppma
 ```
 
-**Total Time: 10-20 minutes** *(mostly download/compile time, based on testing)*  
+**Total Time: 10-20 minutes** *(mostly download/compile time, based on testing)*
 **Success Rate: ~90%** *(estimated; requires admin rights)*
 
 ---

@@ -52,9 +52,9 @@ If you prefer to integrate manually:
    ```
 
 3. **Register MDK-Predator in external.cmake:**
-   
+
    Edit `/path/to/mayhem-firmware/firmware/application/external/external.cmake`:
-   
+
    Add to `EXTCPPSRC`:
    ```cmake
    #mdk_predator
@@ -68,7 +68,7 @@ If you prefer to integrate manually:
    external/mdk_predator/src/wireless/subghz_analyzer.c
    external/mdk_predator/src/crypto/crypto_analyzer.c
    ```
-   
+
    Add to `EXTAPPLIST`:
    ```cmake
    mdk_predator
