@@ -26,6 +26,7 @@ MDKPredatorView::MDKPredatorView(NavigationView& nav)
     : nav_(nav) {
     add_children({
         &labels,
+        &text_hardware_status,
         &button_automotive,
         &button_wifi,
         &button_bluetooth,
@@ -36,28 +37,62 @@ MDKPredatorView::MDKPredatorView(NavigationView& nav)
         &console
     });
 
-    // Initialize MDK-Predator core
-    mdk_config_t config;
+    // Initialize MDK-Predator core with configuration
+    mdk_predator_config_t config;
     config.default_module = MDK_MODULE_AUTOMOTIVE;
+    config.enable_logging = true;
+    config.buffer_size = 1048576;
     config.hardware.hackrf_sample_rate = 2000000;
     config.hardware.hackrf_bandwidth = 1750000;
     config.hardware.hackrf_lna_gain = 8;
     config.hardware.hackrf_vga_gain = 20;
     config.hardware.hackrf_txvga_gain = 0;
+    // MDK module configuration from mdk_predator.conf
+    config.hardware.mdk_auto_detect = true;
+    config.hardware.mdk_hardware_acceleration = true;
+    config.hardware.mdk_parallel_streams = 4;
     config.security.allow_transmit = false;
     config.security.require_confirmation = true;
     config.security.log_all_activity = true;
 
     if (mdk_predator_init(&config)) {
+        // Get hardware status
+        mdk_status_t status;
+        if (mdk_get_status(&status)) {
+            // Display hardware detection status
+            if (status.mdk_module_detected) {
+                if (status.hardware_acceleration_enabled) {
+                    char hw_info[64];
+                    snprintf(hw_info, sizeof(hw_info), "MDK: Detected | Accel: ON (%lu streams)",
+                             (unsigned long)status.parallel_streams_count);
+                    text_hardware_status.set(hw_info);
+                    log_message("MDK Module: Detected");
+                    log_message("Hardware Acceleration: Enabled");
+                    char streams_msg[64];
+                    snprintf(streams_msg, sizeof(streams_msg), "Parallel Streams: %lu",
+                             (unsigned long)status.parallel_streams_count);
+                    log_message(streams_msg);
+                } else {
+                    text_hardware_status.set("MDK: Detected | Accel: OFF");
+                    log_message("MDK Module: Detected");
+                    log_message("Hardware Acceleration: Disabled");
+                }
+            } else {
+                text_hardware_status.set("MDK: Not found | Software mode");
+                log_message("MDK Module: Not detected");
+                log_message("Operating in software-only mode");
+            }
+        }
+        
         text_status.set("Status: Ready");
         log_message("MDK-Predator v1.0.0");
-        log_message("Hardware: HackRF + MDK Module");
         log_message("Security: TX Disabled");
         log_message("All modules initialized");
         log_message("");
         log_message("Select a security module:");
     } else {
         text_status.set("Status: Init failed");
+        text_hardware_status.set("MDK: Initialization error");
         log_message("ERROR: Failed to initialize MDK-Predator");
         log_message("Check hardware connections");
     }
