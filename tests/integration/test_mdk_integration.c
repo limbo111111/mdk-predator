@@ -47,7 +47,7 @@ void test_mdk_init_valid() {
     config.hardware.hackrf_lna_gain = 8;
     config.hardware.hackrf_vga_gain = 20;
     config.hardware.hackrf_txvga_gain = 0;
-    config.hardware.parallel_streams = 4;
+    config.hardware.parallel_streams = TEST_PARALLEL_STREAMS;
     config.hardware.use_dma = TEST_USE_DMA;
     config.hardware.max_codes_per_second = TEST_MAX_CODES_PER_SECOND;
     config.security.allow_transmit = false;
@@ -86,7 +86,7 @@ void test_mdk_get_status_after_init() {
     config.hardware.hackrf_lna_gain = 8;
     config.hardware.hackrf_vga_gain = 20;
     config.hardware.hackrf_txvga_gain = 0;
-    config.hardware.parallel_streams = 4;
+    config.hardware.parallel_streams = TEST_PARALLEL_STREAMS;
     config.hardware.use_dma = TEST_USE_DMA;
     config.hardware.max_codes_per_second = TEST_MAX_CODES_PER_SECOND;
     config.security.allow_transmit = false;
@@ -130,7 +130,7 @@ void test_mdk_get_status_null() {
     config.hardware.hackrf_lna_gain = 8;
     config.hardware.hackrf_vga_gain = 20;
     config.hardware.hackrf_txvga_gain = 0;
-    config.hardware.parallel_streams = 4;
+    config.hardware.parallel_streams = TEST_PARALLEL_STREAMS;
     config.hardware.use_dma = TEST_USE_DMA;
     config.hardware.max_codes_per_second = TEST_MAX_CODES_PER_SECOND;
     config.security.allow_transmit = false;
@@ -158,7 +158,7 @@ void test_mdk_set_active_module_valid() {
     config.hardware.hackrf_lna_gain = 8;
     config.hardware.hackrf_vga_gain = 20;
     config.hardware.hackrf_txvga_gain = 0;
-    config.hardware.parallel_streams = 4;
+    config.hardware.parallel_streams = TEST_PARALLEL_STREAMS;
     config.hardware.use_dma = TEST_USE_DMA;
     config.hardware.max_codes_per_second = TEST_MAX_CODES_PER_SECOND;
     config.security.allow_transmit = false;
@@ -205,7 +205,7 @@ void test_mdk_run_diagnostic_valid() {
     config.hardware.hackrf_lna_gain = 8;
     config.hardware.hackrf_vga_gain = 20;
     config.hardware.hackrf_txvga_gain = 0;
-    config.hardware.parallel_streams = 4;
+    config.hardware.parallel_streams = TEST_PARALLEL_STREAMS;
     config.hardware.use_dma = TEST_USE_DMA;
     config.hardware.max_codes_per_second = TEST_MAX_CODES_PER_SECOND;
     config.security.allow_transmit = false;
@@ -253,7 +253,7 @@ void test_mdk_run_diagnostic_null() {
     config.hardware.hackrf_lna_gain = 8;
     config.hardware.hackrf_vga_gain = 20;
     config.hardware.hackrf_txvga_gain = 0;
-    config.hardware.parallel_streams = 4;
+    config.hardware.parallel_streams = TEST_PARALLEL_STREAMS;
     config.hardware.use_dma = TEST_USE_DMA;
     config.hardware.max_codes_per_second = TEST_MAX_CODES_PER_SECOND;
     config.security.allow_transmit = false;
@@ -292,7 +292,7 @@ void test_mdk_cleanup_multiple() {
     config.hardware.hackrf_lna_gain = 8;
     config.hardware.hackrf_vga_gain = 20;
     config.hardware.hackrf_txvga_gain = 0;
-    config.hardware.parallel_streams = 4;
+    config.hardware.parallel_streams = TEST_PARALLEL_STREAMS;
     config.hardware.use_dma = TEST_USE_DMA;
     config.hardware.max_codes_per_second = TEST_MAX_CODES_PER_SECOND;
     config.security.allow_transmit = false;
