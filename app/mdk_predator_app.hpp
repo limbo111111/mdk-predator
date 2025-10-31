@@ -82,9 +82,9 @@ private:
     void log_message(const std::string& message);
 
     // Hardware acceleration support
-    bool use_hardware_accel;
-    uint32_t parallel_streams;
-    mdk_device_info_t mdk_info;
+    bool use_hardware_accel = false;
+    uint32_t parallel_streams = 0;
+    mdk_device_info_t mdk_info = {};
 
     // Hardware integration methods
     void detect_mdk(); // Declaration for MDK detection
