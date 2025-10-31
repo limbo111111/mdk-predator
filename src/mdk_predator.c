@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include "mdk_predator.h"
+#include "mdk_hardware_interface.h"
 #include "automotive/key_fob_analyzer.h"
 #include "automotive/rolling_code_tester.h"
 #include "wireless/wifi_analyzer.h"
@@ -55,7 +56,7 @@ bool mdk_predator_init(mdk_predator_config_t *config) {
         return false;
     }
 
-    // Initialize HackRF/Mayhem-MDK hardware with config
+    // Initialize MDK hardware interface
     if (!mdk_hardware_init()) {
         return false;
     }
@@ -102,9 +103,39 @@ bool mdk_predator_init(mdk_predator_config_t *config) {
  * Initialize hardware interface
  */
 bool mdk_hardware_init(void) {
-    // Initialize HackRF One hardware
-    // Configure for Mayhem-MDK module
-    // Set up GPIO, SPI, I2C interfaces
+    // Initialize MDK hardware interface with comprehensive capabilities
+    mdk_hardware_interface_config_t hw_config = {
+        .enable_i2c = true,
+        .enable_dma = true,
+        .enable_parallel_streams = true,
+        .enable_gpio = true,
+        .enable_uart = true,
+        .max_dma_buffer_size = 2 * 1024 * 1024,  // 2MB
+        .parallel_stream_count = 4
+    };
+    
+    if (!mdk_hardware_interface_init(&hw_config)) {
+        return false;
+    }
+    
+    // Initialize I2C for I2CDECMDL_PPMOD device model
+    if (!mdk_i2c_init_i2cdecmdl()) {
+        // Non-fatal: I2C device may not be present
+        printf("[INFO] I2CDECMDL_PPMOD device not detected or failed to initialize. Continuing without I2C device as it is optional.\n");
+        printf("[INFO] I2CDECMDL_PPMOD device not detected or failed to initialize. Continuing without I2C device as it is optional.\n");
+    }
+    
+    // Configure DMA for signal capture
+    mdk_dma_config_t dma_config = {
+        .channel = MDK_DMA_CHANNEL_0,
+        .direction = MDK_DMA_PERIPH_TO_MEM,
+        .priority = MDK_DMA_PRIORITY_VERY_HIGH,
+        .circular_mode = true,
+        .interrupt_enable = true,
+        .callback = NULL,
+        .user_data = NULL
+    };
+    mdk_dma_init(&dma_config);
 
     return true;
 }
@@ -179,7 +210,6 @@ bool mdk_run_diagnostic(diagnostic_result_t *result) {
     result->bluetooth_ok = true;
     result->subghz_ok = true;
     result->crypto_ok = true;
-    result->mdk_module_present = g_mdk_module_detected;
 
     return true;
 }
@@ -203,8 +233,8 @@ void mdk_predator_cleanup(void) {
  * Cleanup hardware interface
  */
 void mdk_hardware_cleanup(void) {
-    // Release HackRF hardware
-    // Reset GPIO, SPI, I2C
+    // Cleanup MDK hardware interface
+    mdk_hardware_interface_cleanup();
 }
 
 /**

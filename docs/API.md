@@ -23,6 +23,77 @@ Cleanup and release all resources.
 
 ---
 
+## Hardware Interface API
+
+See [MDK_INTEGRATION.md](MDK_INTEGRATION.md) for detailed integration guide.
+
+### I2C Communication
+
+#### `mdk_i2c_init()`
+```c
+bool mdk_i2c_init(const mdk_i2c_config_t *config);
+```
+Initialize I2C bus (ESP32-S3 compatible).
+
+#### `mdk_i2c_device_open()`
+```c
+bool mdk_i2c_device_open(mdk_i2c_device_t *device, mdk_i2c_bus_t bus, uint8_t device_addr);
+```
+Open I2C device for communication.
+
+#### `mdk_i2c_init_i2cdecmdl()`
+```c
+bool mdk_i2c_init_i2cdecmdl(void);
+```
+Initialize I2CDECMDL_PPMOD device model integration.
+
+### DMA Transfers
+
+#### `mdk_dma_init()`
+```c
+bool mdk_dma_init(const mdk_dma_config_t *config);
+```
+Initialize DMA channel for high-speed data transfers.
+
+#### `mdk_dma_capture_signal()`
+```c
+bool mdk_dma_capture_signal(mdk_dma_channel_t channel, void *buffer, size_t buffer_size, 
+                            uint32_t sample_rate, uint32_t duration_ms);
+```
+Capture RF signal using DMA for zero CPU overhead.
+
+### Parallel Streams
+
+#### `mdk_parallel_streams_init()`
+```c
+bool mdk_parallel_streams_init(const mdk_parallel_stream_config_t *config);
+```
+Initialize parallel stream processing for 4x+ performance acceleration.
+
+#### `mdk_parallel_bruteforce()`
+```c
+bool mdk_parallel_bruteforce(const void *key_space, size_t key_len, 
+                             size_t num_keys, mdk_bruteforce_test_fn_t test_fn,
+                             void *user_data, void *result_key);
+```
+Hardware-accelerated parallel bruteforce for crypto and automotive modules.
+
+### GPIO/UART
+
+#### `mdk_gpio_init()`
+```c
+bool mdk_gpio_init(const mdk_gpio_config_t *config);
+```
+Configure GPIO pin with interrupt support.
+
+#### `mdk_uart_init()`
+```c
+bool mdk_uart_init(const mdk_uart_config_t *config);
+```
+Initialize UART with optional DMA support.
+
+---
+
 ## Automotive Security Module
 
 ### Key Fob Analyzer
