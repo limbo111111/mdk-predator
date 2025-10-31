@@ -38,7 +38,7 @@ MDKPredatorView::MDKPredatorView(NavigationView& nav)
     });
 
     // Initialize MDK-Predator core with configuration
-    mdk_config_t config;
+    mdk_predator_config_t config;
     config.default_module = MDK_MODULE_AUTOMOTIVE;
     config.enable_logging = true;
     config.buffer_size = 1048576;

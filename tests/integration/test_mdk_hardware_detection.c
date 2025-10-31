@@ -34,8 +34,8 @@ static int tests_failed = 0;
  * Test: Initialize with MDK auto-detection enabled
  */
 void test_mdk_init_with_auto_detect() {
-    mdk_predator_config_t config;
-    config.default_module = MODULE_AUTOMOTIVE;
+    mdk_predator_config_t config = {0};
+    config.default_module = MDK_MODULE_AUTOMOTIVE;
     config.enable_logging = true;
     config.buffer_size = 1048576;
     config.hardware.hackrf_sample_rate = 2000000;
@@ -61,8 +61,8 @@ void test_mdk_init_with_auto_detect() {
  * Test: Initialize with MDK auto-detection disabled
  */
 void test_mdk_init_without_auto_detect() {
-    mdk_predator_config_t config;
-    config.default_module = MODULE_AUTOMOTIVE;
+    mdk_predator_config_t config = {0};
+    config.default_module = MDK_MODULE_AUTOMOTIVE;
     config.enable_logging = false;
     config.buffer_size = 1024;
     config.hardware.hackrf_sample_rate = 2000000;
@@ -88,10 +88,10 @@ void test_mdk_init_without_auto_detect() {
  * Test: Get status includes MDK detection information
  */
 void test_mdk_status_includes_detection_info() {
-    mdk_predator_config_t config;
+    mdk_predator_config_t config = {0};
     mdk_status_t status;
 
-    config.default_module = MODULE_WIFI;
+    config.default_module = MDK_MODULE_WIFI;
     config.enable_logging = false;
     config.buffer_size = 2048;
     config.hardware.hackrf_sample_rate = 2000000;
@@ -125,10 +125,10 @@ void test_mdk_status_includes_detection_info() {
  * Test: Software-only fallback when MDK not detected
  */
 void test_software_fallback_mode() {
-    mdk_predator_config_t config;
+    mdk_predator_config_t config = {0};
     mdk_status_t status;
 
-    config.default_module = MODULE_BLUETOOTH;
+    config.default_module = MDK_MODULE_BLUETOOTH;
     config.enable_logging = false;
     config.buffer_size = 1024;
     config.hardware.hackrf_sample_rate = 2000000;
@@ -158,10 +158,10 @@ void test_software_fallback_mode() {
  * Test: Diagnostic includes MDK module status
  */
 void test_diagnostic_includes_mdk_status() {
-    mdk_predator_config_t config;
+    mdk_predator_config_t config = {0};
     diagnostic_result_t result;
 
-    config.default_module = MODULE_SUBGHZ;
+    config.default_module = MDK_MODULE_SUBGHZ;
     config.enable_logging = false;
     config.buffer_size = 1024;
     config.hardware.hackrf_sample_rate = 2000000;
@@ -191,9 +191,9 @@ void test_diagnostic_includes_mdk_status() {
  * Test: Hardware mode string reflects current mode
  */
 void test_hardware_mode_string() {
-    mdk_predator_config_t config;
+    mdk_predator_config_t config = {0};
 
-    config.default_module = MODULE_CRYPTO;
+    config.default_module = MDK_MODULE_CRYPTO;
     config.enable_logging = false;
     config.buffer_size = 1024;
     config.hardware.hackrf_sample_rate = 2000000;
@@ -234,10 +234,10 @@ void test_i2c_detection_function() {
  * Test: Cleanup resets MDK detection state
  */
 void test_cleanup_resets_mdk_state() {
-    mdk_predator_config_t config;
+    mdk_predator_config_t config = {0};
     mdk_status_t status;
 
-    config.default_module = MODULE_AUTOMOTIVE;
+    config.default_module = MDK_MODULE_AUTOMOTIVE;
     config.enable_logging = false;
     config.buffer_size = 1024;
     config.hardware.hackrf_sample_rate = 2000000;
@@ -268,10 +268,10 @@ void test_cleanup_resets_mdk_state() {
  * Test: Multiple parallel streams configuration
  */
 void test_parallel_streams_configuration() {
-    mdk_predator_config_t config;
+    mdk_predator_config_t config = {0};
     mdk_status_t status;
 
-    config.default_module = MODULE_AUTOMOTIVE;
+    config.default_module = MDK_MODULE_AUTOMOTIVE;
     config.enable_logging = false;
     config.buffer_size = 1024;
     config.hardware.hackrf_sample_rate = 2000000;
