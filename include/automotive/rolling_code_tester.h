@@ -10,6 +10,4 @@ void keeloq_encrypt_test(void);
 void rolling_code_bruteforce_hw(void);
 
 // Function to get performance metrics of the rolling code
-int rolling_code_get_performance(int multiplier);
 
-#endif /* ROLLING_CODE_TESTER_H */
