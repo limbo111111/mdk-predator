@@ -78,6 +78,7 @@ bool mdk_hardware_init(void) {
     if (!mdk_i2c_init_i2cdecmdl()) {
         // Non-fatal: I2C device may not be present
         printf("[INFO] I2CDECMDL_PPMOD device not detected or failed to initialize. Continuing without I2C device as it is optional.\n");
+        printf("[INFO] I2CDECMDL_PPMOD device not detected or failed to initialize. Continuing without I2C device as it is optional.\n");
     }
     
     // Configure DMA for signal capture
