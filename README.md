@@ -73,6 +73,23 @@ MDK-Predator
 
 ## Building
 
+### ☁️ GitHub Codespaces (Easiest - Build in Your Browser!)
+
+**Zero setup required! Build directly in your browser with GitHub Codespaces.**
+
+Click the **Code** button on GitHub → **Codespaces** → **Create codespace**. The development environment will automatically set up with all tools pre-installed.
+
+```bash
+# In Codespaces terminal
+./docker-build.sh
+# Or use native build
+./build.sh -d
+```
+
+**See:** [.devcontainer/README.md](.devcontainer/README.md) for detailed Codespaces documentation.
+
+---
+
 ### 🐳 Docker Build (Recommended - No Dependencies Required!)
 
 **Best option for Windows users and anyone who wants zero dependency hassle!**
@@ -248,6 +265,10 @@ See [docs/TESTING.md](docs/TESTING.md) and [tests/README.md](tests/README.md) fo
 - **Mayhem Firmware**: Compatible firmware installed
 
 ## Documentation
+
+### Development Environment
+- **[GitHub Codespaces Setup](.devcontainer/README.md)** - Build in your browser with zero setup!
+- **[DevContainer Guide](.devcontainer/README.md)** - VS Code Remote Containers setup
 
 ### Building
 - **[Docker Quick Start](DOCKER_QUICKSTART.md)** - Build with Docker in 5 minutes (recommended)!
