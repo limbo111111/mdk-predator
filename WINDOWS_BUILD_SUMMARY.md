@@ -30,7 +30,7 @@ CMake on Windows defaults to using Visual Studio's `nmake` build tool, which mos
 **Result**: Build now succeeds automatically on most Windows configurations without manual intervention.
 
 ### 2. New Simplified Build Script
-**Files**: 
+**Files**:
 - `scripts/simple_build_windows.ps1` (PowerShell)
 - `scripts/simple_build_windows.bat` (Batch wrapper)
 

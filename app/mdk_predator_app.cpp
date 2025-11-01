@@ -83,7 +83,7 @@ MDKPredatorView::MDKPredatorView(NavigationView& nav)
                 log_message("Operating in software-only mode");
             }
         }
-        
+
         text_status.set("Status: Ready");
         log_message("MDK-Predator v1.0.0");
         log_message("Security: TX Disabled");

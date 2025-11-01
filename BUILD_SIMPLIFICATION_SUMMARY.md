@@ -261,10 +261,10 @@ The only difference is:
 The build system has been simplified from ~3,900 lines of complex scripts to ~355 lines of simple, maintainable scripts that follow mayhem-firmware and hackrf repository best practices.
 
 The new scripts:
-✅ Are easier to understand and maintain  
-✅ Follow standard mayhem-firmware build process  
-✅ Produce identical results  
-✅ Work on all supported platforms  
-✅ Align with ecosystem best practices  
+✅ Are easier to understand and maintain
+✅ Follow standard mayhem-firmware build process
+✅ Produce identical results
+✅ Work on all supported platforms
+✅ Align with ecosystem best practices
 
 The Docker build method remains the recommended approach for end users who want zero dependency hassle.

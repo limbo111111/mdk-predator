@@ -49,7 +49,7 @@ The first build will:
 3. Clone mayhem-firmware (~500 MB)
 4. Build mdk-predator (~5-10 minutes)
 
-**Total time:** ~15-20 minutes  
+**Total time:** ~15-20 minutes
 **Total space:** ~2 GB
 
 Subsequent builds are much faster (~2-5 minutes) as everything is cached.
@@ -79,11 +79,11 @@ Subsequent builds are much faster (~2-5 minutes) as everything is cached.
 
 ## Why Docker?
 
-✅ No dependency installation  
-✅ Works perfectly on Windows  
-✅ Reproducible builds  
-✅ Clean system  
-✅ Easy updates  
+✅ No dependency installation
+✅ Works perfectly on Windows
+✅ Reproducible builds
+✅ Clean system
+✅ Easy updates
 
 ## More Information
 

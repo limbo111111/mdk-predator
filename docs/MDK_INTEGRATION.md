@@ -50,13 +50,13 @@ bool init_i2c_decoder(void) {
     if (!mdk_i2c_init_i2cdecmdl()) {
         return false;
     }
-    
+
     // Read device status
     uint8_t status;
     if (!mdk_i2c_i2cdecmdl_read_status(&status)) {
         return false;
     }
-    
+
     return true;
 }
 ```
@@ -129,7 +129,7 @@ if (!mdk_dma_init(&dma_config)) {
 
 // Capture 1M samples at 2 MS/s for 500ms
 uint8_t *buffer = malloc(1024 * 1024);
-if (!mdk_dma_capture_signal(MDK_DMA_CHANNEL_0, buffer, 
+if (!mdk_dma_capture_signal(MDK_DMA_CHANNEL_0, buffer,
                             1024 * 1024, 2000000, 500)) {
     free(buffer);
     return false;
@@ -179,7 +179,7 @@ void setup_parallel_bruteforce(void) {
     for (int i = 0; i < 4; i++) {
         buffers[i] = malloc(512 * 1024);
     }
-    
+
     // Configure parallel stream group
     mdk_parallel_stream_config_t config = {
         .num_streams = 4,
@@ -228,14 +228,14 @@ void setup_parallel_bruteforce(void) {
             }
         }
     };
-    
+
     if (!mdk_parallel_streams_init(&config)) {
         return;
     }
-    
+
     // Start all streams
     mdk_parallel_streams_start_all();
-    
+
     // Get acceleration factor
     float accel = mdk_parallel_streams_get_acceleration();
     printf("Acceleration: %.1fx\n", accel);  // Should be ~4.0x
@@ -250,12 +250,12 @@ bool test_rolling_code(const void *key, size_t key_len, void *user_data) {
     // Test if this key decrypts the rolling code
     uint64_t test_key = *(uint64_t *)key;
     uint32_t encrypted = *(uint32_t *)user_data;
-    
+
     // KeeLoq decryption logic here
     // NOTE: keeloq_decrypt must be implemented by the user or imported from a suitable library
     // NOTE: keeloq_decrypt must be implemented by the user or imported from a suitable library
     uint32_t decrypted = keeloq_decrypt(encrypted, test_key);
-    
+
     return is_valid_code(decrypted);
 }
 
@@ -267,20 +267,20 @@ bool automotive_parallel_bruteforce(uint32_t encrypted_code) {
     for (size_t i = 0; i < num_keys; i++) {
         keys[i] = i;
     }
-    
+
     // Run parallel bruteforce
     uint64_t result_key = 0;
-    bool found = mdk_parallel_bruteforce(keys, sizeof(uint64_t), 
+    bool found = mdk_parallel_bruteforce(keys, sizeof(uint64_t),
                                          num_keys, test_rolling_code,
                                          &encrypted_code, &result_key);
-    
+
     free(keys);
-    
+
     if (found) {
         printf("Key found: 0x%016llx\n", result_key);
         return true;
     }
-    
+
     return false;
 }
 ```
@@ -305,11 +305,11 @@ bool automotive_init_with_hardware(void) {
         .max_dma_buffer_size = 2 * 1024 * 1024,
         .parallel_stream_count = 4
     };
-    
+
     if (!mdk_hardware_interface_init(&hw_config)) {
         return false;
     }
-    
+
     // Setup DMA for signal capture
     mdk_dma_config_t dma_config = {
         .channel = MDK_DMA_CHANNEL_0,
@@ -321,7 +321,7 @@ bool automotive_init_with_hardware(void) {
         .user_data = NULL
     };
     mdk_dma_init(&dma_config);
-    
+
     // Initialize automotive modules
     keyfob_config_t keyfob_config = {
         .frequency = 433920000,
@@ -330,7 +330,7 @@ bool automotive_init_with_hardware(void) {
         .mode = KEYFOB_MODE_RECEIVE
     };
     keyfob_analyzer_init(&keyfob_config);
-    
+
     return true;
 }
 ```
@@ -345,7 +345,7 @@ bool automotive_init_with_hardware(void) {
 bool wireless_init_with_hardware(void) {
     // Initialize parallel streams for multi-channel WiFi scanning
     setup_parallel_wifi_scanning();
-    
+
     // Initialize Bluetooth with UART
     mdk_uart_config_t uart_config = {
         .port = MDK_UART_PORT_0,
@@ -359,7 +359,7 @@ bool wireless_init_with_hardware(void) {
         .dma_channel = MDK_DMA_CHANNEL_2
     };
     mdk_uart_init(&uart_config);
-    
+
     return true;
 }
 ```
@@ -374,9 +374,9 @@ bool crypto_init_with_hardware(void) {
     // Use parallel streams for accelerated crypto analysis
     mdk_parallel_stream_config_t config;
     // ... configure streams for parallel crypto operations
-    
+
     mdk_parallel_streams_init(&config);
-    
+
     return true;
 }
 ```
@@ -490,7 +490,7 @@ stream_buffer_size=524288
 mdk_hw_status_t status;
 if (mdk_hw_get_status(MDK_HW_SUBSYS_DMA, 0, &status)) {
     if (status.error_count > 0) {
-        printf("DMA errors: %u, Last: %s\n", 
+        printf("DMA errors: %u, Last: %s\n",
                status.error_count, status.last_error);
     }
 }
@@ -510,16 +510,16 @@ void cleanup_hardware(void) {
     // Stop parallel streams
     mdk_parallel_streams_stop_all();
     mdk_parallel_streams_deinit();
-    
+
     // Cleanup DMA channels
     for (int i = 0; i < 4; i++) {
         mdk_dma_deinit(i);
     }
-    
+
     // Cleanup I2C
     mdk_i2c_deinit(MDK_I2C_BUS_0);
     mdk_i2c_deinit(MDK_I2C_BUS_1);
-    
+
     // Final cleanup
     mdk_hardware_interface_cleanup();
 }

@@ -65,9 +65,9 @@ sed -n '236p;248p;263p' tests/build/test_libopencm3_build.sh | od -c
        nav.push<MDKPredatorView>();
    }
    }
-   
+
    extern "C" {
-   __attribute__((section(".external_app.app_mdk_predator.application_information"), used)) 
+   __attribute__((section(".external_app.app_mdk_predator.application_information"), used))
    application_information_t _application_information_mdk_predator = {
        // ...
    }
@@ -85,23 +85,23 @@ sed -n '236p;248p;263p' tests/build/test_libopencm3_build.sh | od -c
 
 3. **Files organized for external app deployment:**
    - app/ - External app wrapper
-   - src/ - Core implementation  
+   - src/ - Core implementation
    - include/ - Headers
 
 **Why external app is the correct choice:**
 
-✅ **Safety:** No firmware flashing = no risk of bricking device  
-✅ **Simplicity:** Just copy .ppma to SD card /APPS/ directory  
-✅ **Compatibility:** Works with any compatible Mayhem firmware version  
-✅ **Updates:** Easy to update - just replace the .ppma file  
-✅ **User-friendly:** No special tools or procedures required  
+✅ **Safety:** No firmware flashing = no risk of bricking device
+✅ **Simplicity:** Just copy .ppma to SD card /APPS/ directory
+✅ **Compatibility:** Works with any compatible Mayhem firmware version
+✅ **Updates:** Easy to update - just replace the .ppma file
+✅ **User-friendly:** No special tools or procedures required
 
 **Standalone firmware integration would:**
-❌ Require flashing firmware (risky)  
-❌ Replace entire firmware (loses user settings)  
-❌ Require special tools (DFU mode, flasher)  
-❌ Make updates complex  
-❌ Lock to specific firmware version  
+❌ Require flashing firmware (risky)
+❌ Replace entire firmware (loses user settings)
+❌ Require special tools (DFU mode, flasher)
+❌ Make updates complex
+❌ Lock to specific firmware version
 
 **Conclusion:** External app is the correct and recommended approach. No changes needed.
 
@@ -172,7 +172,7 @@ User's PortaPack Device
 
 Deleted entire `scripts/` directory containing:
 - build_portapack_app.sh (807 lines)
-- build_portapack_app.ps1 (1,111 lines)  
+- build_portapack_app.ps1 (1,111 lines)
 - build_portapack_app_wsl.sh (895 lines)
 - build.sh (302 lines)
 - build.ps1 (352 lines)
@@ -222,23 +222,23 @@ Our scripts simply automate these exact steps:
 
 **What was removed from old scripts:**
 
-❌ Complex OS detection logic  
-❌ Automatic dependency installation  
-❌ Multiple build paths and options  
-❌ Complex error handling and recovery  
-❌ Windows compatibility workarounds  
-❌ Custom file verification  
-❌ WSL-specific build scripts  
+❌ Complex OS detection logic
+❌ Automatic dependency installation
+❌ Multiple build paths and options
+❌ Complex error handling and recovery
+❌ Windows compatibility workarounds
+❌ Custom file verification
+❌ WSL-specific build scripts
 
 **What the new scripts do:**
 
-✅ Download firmware (if requested)  
-✅ Initialize submodules (git submodule update --init --recursive)  
-✅ Copy files to correct location  
-✅ Register in external.cmake  
-✅ Build libopencm3  
-✅ Run standard CMake build  
-✅ Extract output .ppma  
+✅ Download firmware (if requested)
+✅ Initialize submodules (git submodule update --init --recursive)
+✅ Copy files to correct location
+✅ Register in external.cmake
+✅ Build libopencm3
+✅ Run standard CMake build
+✅ Extract output .ppma
 
 **Comparison to mayhem-firmware/hackrf approach:**
 
@@ -285,7 +285,7 @@ ls firmware/application/external/mdk_predator/
 # Linux/macOS (no longer exists)
 ./scripts/build_portapack_app.sh --install-deps --download-firmware
 
-# Windows (no longer exists)  
+# Windows (no longer exists)
 .\scripts\build_portapack_app.ps1 -InstallDeps -DownloadFirmware
 ```
 

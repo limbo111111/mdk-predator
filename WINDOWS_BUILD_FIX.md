@@ -281,10 +281,10 @@ However, the code changes ensure these will work because:
    ```bash
    # WSL
    ./scripts/build_portapack_app_wsl.sh -i -d
-   
+
    # Windows PowerShell
    .\scripts\build_portapack_app.ps1 -InstallDeps -DownloadFirmware
-   
+
    # Linux/macOS
    ./scripts/build_portapack_app.sh -i -d
    ```

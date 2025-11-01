@@ -340,11 +340,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      
+
       - name: Install dependencies and build
         run: |
           ./scripts/build_portapack_app.sh --install-deps --download-firmware
-      
+
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:

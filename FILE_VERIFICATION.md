@@ -155,11 +155,11 @@ The `verify_file_links()` function in `build_portapack_app.sh` and `build_portap
 ```bash
 verify_file_links() {
     print_info "Verifying all files are properly linked in Mayhem firmware..."
-    
+
     # Check file existence
     # Check CMake registration
     # Report results
-    
+
     if [ $verification_failed -eq 1 ]; then
         exit 1
     fi
@@ -173,11 +173,11 @@ The `Test-FileLinks` function in `build_portapack_app.ps1`:
 ```powershell
 function Test-FileLinks {
     Write-Info "Verifying all files are properly linked in Mayhem firmware..."
-    
+
     # Check file existence
     # Check CMake registration
     # Report results
-    
+
     if ($verificationFailed) {
         exit 1
     }
@@ -212,27 +212,27 @@ All tests pass with 100% success rate.
 
 ### All Files Fail Verification
 
-**Cause**: Integration step may have failed  
+**Cause**: Integration step may have failed
 **Solution**: Check that files were copied from `app/`, `src/`, and `include/` directories
 
 ### Specific File Missing
 
-**Cause**: File may not exist in source or copy failed  
-**Solution**: 
+**Cause**: File may not exist in source or copy failed
+**Solution**:
 1. Verify file exists in source: `ls -la app/ src/ include/`
 2. Check disk space
 3. Check file permissions
 
 ### CMake Registration Failed
 
-**Cause**: `external.cmake` file may not be writable or corrupt  
+**Cause**: `external.cmake` file may not be writable or corrupt
 **Solution**:
 1. Check permissions on `mayhem-firmware/firmware/application/external/external.cmake`
 2. Restore from backup if available: `external.cmake.backup`
 
 ### Directory Structure Incomplete
 
-**Cause**: Subdirectories not copied  
+**Cause**: Subdirectories not copied
 **Solution**: Use `cp -r` flag to copy directories recursively
 
 ## Related Documentation

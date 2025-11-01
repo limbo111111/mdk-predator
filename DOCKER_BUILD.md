@@ -15,11 +15,11 @@ Setting up these dependencies can be challenging, especially on Windows. Docker 
 
 ## Benefits of Docker Build
 
-✅ **No dependency installation** - Everything is in the Docker container  
-✅ **Works on Windows** - No WSL or complex setup needed  
-✅ **Reproducible builds** - Same environment every time  
-✅ **No pollution** - Your system stays clean  
-✅ **Easy updates** - Just rebuild the Docker image  
+✅ **No dependency installation** - Everything is in the Docker container
+✅ **Works on Windows** - No WSL or complex setup needed
+✅ **Reproducible builds** - Same environment every time
+✅ **No pollution** - Your system stays clean
+✅ **Easy updates** - Just rebuild the Docker image
 
 ## Prerequisites
 

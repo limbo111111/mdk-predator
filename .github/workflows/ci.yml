@@ -10,19 +10,19 @@ jobs:
   test:
     name: Build and Test
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
-    
+
     - name: Install dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y gcc make
-    
+
     - name: Build and run tests
       run: make test
-    
+
     - name: Check for compiler warnings
       run: |
         make clean
@@ -32,7 +32,7 @@ jobs:
           exit 1
         fi
         echo "No compiler warnings found ✓"
-    
+
     - name: Test summary
       if: always()
       run: |
@@ -47,16 +47,16 @@ jobs:
   code-quality:
     name: Code Quality Checks
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
-    
+
     - name: Check for TODO/FIXME comments
       run: |
         echo "Checking for TODO/FIXME comments..."
         grep -rn "TODO\|FIXME" src/ include/ || echo "No TODO/FIXME found ✓"
-    
+
     - name: Check file permissions
       run: |
         echo "Checking file permissions..."
@@ -67,7 +67,7 @@ jobs:
           exit 1
         fi
         echo "File permissions OK ✓"
-    
+
     - name: Check for trailing whitespace
       run: |
         echo "Checking for trailing whitespace..."
@@ -76,7 +76,7 @@ jobs:
           exit 1
         fi
         echo "No trailing whitespace ✓"
-    
+
     - name: Line count statistics
       run: |
         echo "Code statistics:"
@@ -90,11 +90,11 @@ jobs:
   security:
     name: Security Checks
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
-    
+
     - name: Check for hardcoded secrets
       run: |
         echo "Checking for potential secrets..."
@@ -103,7 +103,7 @@ jobs:
           exit 1
         fi
         echo "No obvious secrets found ✓"
-    
+
     - name: Check security configurations
       run: |
         echo "Checking security configurations..."
@@ -112,7 +112,7 @@ jobs:
           exit 1
         fi
         echo "Security configuration OK ✓"
-    
+
     - name: Verify test coverage
       run: |
         echo "Verifying test coverage..."
@@ -129,11 +129,11 @@ jobs:
   documentation:
     name: Documentation Checks
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
-    
+
     - name: Check documentation exists
       run: |
         echo "Checking required documentation..."
@@ -153,7 +153,7 @@ jobs:
           fi
         done
         echo "All required documentation present ✓"
-    
+
     - name: Check README links
       run: |
         echo "Checking README links..."
@@ -166,7 +166,7 @@ jobs:
         done; then
           echo "README links OK ✓"
         fi
-    
+
     - name: Validate markdown
       run: |
         echo "Checking markdown files..."
