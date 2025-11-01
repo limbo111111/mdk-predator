@@ -86,7 +86,7 @@ Click the **Code** button on GitHub → **Codespaces** → **Create codespace**.
 ./build.sh -d
 ```
 
-**See:** [.devcontainer/README.md](.devcontainer/README.md) for detailed Codespaces documentation.
+**See:** [CODESPACES.md](CODESPACES.md) for complete GitHub Codespaces guide.
 
 ---
 
@@ -267,8 +267,8 @@ See [docs/TESTING.md](docs/TESTING.md) and [tests/README.md](tests/README.md) fo
 ## Documentation
 
 ### Development Environment
-- **[GitHub Codespaces Setup](.devcontainer/README.md)** - Build in your browser with zero setup!
-- **[DevContainer Guide](.devcontainer/README.md)** - VS Code Remote Containers setup
+- **[GitHub Codespaces Guide](CODESPACES.md)** - Build in your browser with zero setup!
+- **[DevContainer Setup](.devcontainer/README.md)** - VS Code Remote Containers and local development
 
 ### Building
 - **[Docker Quick Start](DOCKER_QUICKSTART.md)** - Build with Docker in 5 minutes (recommended)!
