@@ -298,13 +298,7 @@ Edit `mdk_predator.conf` to customize:
 - Hardware parameters
 - Security options
 
-**Important**: Transmit is now enabled by default (`allow_transmit=true`) for security research. **You must have proper authorization and ensure compliance with all local regulations before use.** Set to `false` if you want receive-only mode.
-
-**⚠️ CRITICAL**: Before using transmit functionality:
-- Obtain explicit written authorization for any testing
-- Verify compliance with FCC, CE, and local RF regulations
-- Understand and follow responsible disclosure practices
-- Never transmit on unauthorized frequencies or systems
+**Important**: Keep `allow_transmit=false` unless you have authorization for active testing.
 
 ## Legal and Safety
 
