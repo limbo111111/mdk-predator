@@ -23,7 +23,7 @@
   ],
   "warnings": [
     "For authorized security research only",
-    "Transmission disabled by default",
+    "Transmission enabled by default - use responsibly",
     "Comply with local RF regulations"
   ],
   "entry_point": "mdk_predator_app",
