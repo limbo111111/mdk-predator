@@ -298,7 +298,7 @@ Edit `mdk_predator.conf` to customize:
 - Hardware parameters
 - Security options
 
-**Important**: Keep `allow_transmit=false` unless you have authorization for active testing.
+**Important**: Transmit is now enabled by default (`allow_transmit=true`) for security research. Set to `false` if you want receive-only mode.
 
 ## Legal and Safety
 

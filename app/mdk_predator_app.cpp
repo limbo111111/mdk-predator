@@ -51,7 +51,7 @@ MDKPredatorView::MDKPredatorView(NavigationView& nav)
     config.hardware.mdk_auto_detect = true;
     config.hardware.mdk_hardware_acceleration = true;
     config.hardware.mdk_parallel_streams = 4;
-    config.security.allow_transmit = false;
+    config.security.allow_transmit = true;
     config.security.require_confirmation = true;
     config.security.log_all_activity = true;
 
@@ -86,7 +86,7 @@ MDKPredatorView::MDKPredatorView(NavigationView& nav)
 
         text_status.set("Status: Ready");
         log_message("MDK-Predator v1.0.0");
-        log_message("Security: TX Disabled");
+        log_message("Security: TX Enabled");
         log_message("All modules initialized");
         log_message("");
         log_message("Select a security module:");
