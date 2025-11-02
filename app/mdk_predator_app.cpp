@@ -14,6 +14,7 @@
 extern "C" {
     #include "mdk_predator.h"
     #include "automotive/key_fob_analyzer.h"
+    #include "automotive/rolling_code_tester.h"
     #include "wireless/wifi_analyzer.h"
     #include "wireless/bluetooth_analyzer.h"
     #include "wireless/subghz_analyzer.h"

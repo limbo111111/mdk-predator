@@ -22,16 +22,17 @@
 app_mdk_predator_name = mdk_predator
 app_mdk_predator_SOURCES = \
     mdk_predator_app.cpp \
-    ../src/mdk_predator.c \
-    ../src/automotive/key_fob_analyzer.c \
-    ../src/automotive/rolling_code_tester.c \
-    ../src/wireless/wifi_analyzer.c \
-    ../src/wireless/bluetooth_analyzer.c \
-    ../src/wireless/subghz_analyzer.c \
-    ../src/crypto/crypto_analyzer.c
+    src/mdk_predator.c \
+    src/mdk_hardware_interface.c \
+    src/automotive/key_fob_analyzer.c \
+    src/automotive/rolling_code_tester.c \
+    src/wireless/wifi_analyzer.c \
+    src/wireless/bluetooth_analyzer.c \
+    src/wireless/subghz_analyzer.c \
+    src/crypto/crypto_analyzer.c
 
 app_mdk_predator_INCLUDES = \
-    ../include
+    include
 
 app_mdk_predator_CFLAGS = \
     -std=c11 \
