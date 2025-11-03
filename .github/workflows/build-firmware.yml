@@ -16,42 +16,57 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+      with:
+        submodules: recursive
       
-    - name: Setup ESP-IDF
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        
+    - name: Install ESP-IDF dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y git wget flex bison gperf python3 python3-pip python3-venv cmake ninja-build ccache libffi-dev libssl-dev dfu-util libusb-1.0-0
+        sudo apt-get install -y git wget flex bison gperf python3-pip python3-venv cmake ninja-build ccache libffi-dev libssl-dev dfu-util libusb-1.0-0
+        
+    - name: Clone ESP-IDF
+      run: |
         mkdir -p ~/esp
         cd ~/esp
-        git clone -b v5.1 --recursive https://github.com/espressif/esp-idf.git
-        cd esp-idf
+        git clone -b v5.1.2 --depth 1 --recursive https://github.com/espressif/esp-idf.git
+        
+    - name: Install ESP-IDF
+      run: |
+        cd ~/esp/esp-idf
         ./install.sh esp32s3
         
-    - name: Prepare build directory
+    - name: Create build structure
       run: |
-        mkdir -p mdk-predator-esp32/main
-        cp .devcontainer/esp32_main.c mdk-predator-esp32/main/
-        cp .devcontainer/mdk_hardware_abstraction.c mdk-predator-esp32/main/
-        cp .devcontainer/mdk_i2c_protocol.h mdk-predator-esp32/main/
+        mkdir -p build-esp32/main
         
-    - name: Create CMakeLists.txt
-      run: |
-        cat > mdk-predator-esp32/CMakeLists.txt <<EOF
+        # Copy source files
+        cp .devcontainer/esp32_main.c build-esp32/main/
+        cp .devcontainer/mdk_hardware_abstraction.c build-esp32/main/
+        cp .devcontainer/mdk_i2c_protocol.h build-esp32/main/
+        
+        # Create root CMakeLists.txt
+        cat > build-esp32/CMakeLists.txt << 'EOFCMAKE'
         cmake_minimum_required(VERSION 3.16)
-        include(\$ENV{IDF_PATH}/tools/cmake/project.cmake)
+        include($ENV{IDF_PATH}/tools/cmake/project.cmake)
         project(mdk-predator)
-        EOF
+        EOFCMAKE
         
-        cat > mdk-predator-esp32/main/CMakeLists.txt <<EOF
-        idf_component_register(SRCS "esp32_main.c"
-                                     "mdk_hardware_abstraction.c"
-                               INCLUDE_DIRS "."
-                               REQUIRES driver nvs_flash mbedtls)
-        EOF
+        # Create component CMakeLists.txt
+        cat > build-esp32/main/CMakeLists.txt << 'EOFCMAKE'
+        idf_component_register(
+            SRCS "esp32_main.c" "mdk_hardware_abstraction.c"
+            INCLUDE_DIRS "."
+            REQUIRES driver nvs_flash mbedtls esp_timer freertos
+        )
+        EOFCMAKE
         
-    - name: Create sdkconfig.defaults
-      run: |
-        cat > mdk-predator-esp32/sdkconfig.defaults <<EOF
+        # Create sdkconfig.defaults
+        cat > build-esp32/sdkconfig.defaults << 'EOFCONFIG'
         CONFIG_IDF_TARGET="esp32s3"
         CONFIG_IDF_TARGET_ESP32S3=y
         CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ_240=y
@@ -64,57 +79,100 @@ jobs:
         CONFIG_MBEDTLS_HARDWARE_SHA=y
         CONFIG_COMPILER_OPTIMIZATION_PERF=y
         CONFIG_LOG_DEFAULT_LEVEL_INFO=y
-        EOF
+        EOFCONFIG
         
     - name: Build firmware
       run: |
         export IDF_PATH=~/esp/esp-idf
-        . ~/esp/esp-idf/export.sh
-        cd mdk-predator-esp32
+        source ~/esp/esp-idf/export.sh
+        cd build-esp32
         idf.py set-target esp32s3
         idf.py build
         
     - name: Prepare release artifacts
       run: |
-        mkdir -p release
-        cp mdk-predator-esp32/build/mdk-predator.bin release/
-        cp mdk-predator-esp32/build/bootloader/bootloader.bin release/
-        cp mdk-predator-esp32/build/partition_table/partition-table.bin release/
-        cp .devcontainer/flash_mdk.sh release/ || touch release/flash_mdk.sh
-        cp .devcontainer/FLASH_INSTRUCTIONS.md release/ || echo "# Flash Instructions" > release/FLASH_INSTRUCTIONS.md
-        chmod +x release/flash_mdk.sh
+        mkdir -p firmware-release
         
-    - name: Create release package
-      run: |
-        cd release
-        tar -czf ../mdk-predator-release-${{ github.sha }}.tar.gz *
-        cd ..
+        # Copy binaries
+        cp build-esp32/build/mdk-predator.bin firmware-release/
+        cp build-esp32/build/bootloader/bootloader.bin firmware-release/
+        cp build-esp32/build/partition_table/partition-table.bin firmware-release/
         
-    - name: Upload artifacts
+        # Copy flash script and instructions
+        if [ -f .devcontainer/flash_mdk.sh ]; then
+          cp .devcontainer/flash_mdk.sh firmware-release/
+          chmod +x firmware-release/flash_mdk.sh
+        fi
+        
+        if [ -f .devcontainer/FLASH_INSTRUCTIONS.md ]; then
+          cp .devcontainer/FLASH_INSTRUCTIONS.md firmware-release/
+        fi
+        
+        # List artifacts
+        ls -lh firmware-release/
+        
+    - name: Upload firmware artifacts
       uses: actions/upload-artifact@v4
       with:
         name: mdk-predator-firmware
-        path: |
-          release/mdk-predator.bin
-          release/bootloader.bin
-          release/partition-table.bin
-          release/flash_mdk.sh
-          release/FLASH_INSTRUCTIONS.md
-          
-    - name: Upload release package
+        path: firmware-release/*
+        retention-days: 90
+        
+    - name: Create release package
+      run: |
+        cd firmware-release
+        tar -czf ../mdk-predator-release-${{ github.sha }}.tar.gz *
+        cd ..
+        
+    - name: Upload release artifact
       uses: actions/upload-artifact@v4
       with:
         name: mdk-predator-release
-        path: mdk-predator-release-${{ github.sha }}.tar.gz
+        path: mdk-predator-release-*.tar.gz
+        retention-days: 90
         
-    - name: Create Release (on tag)
+    - name: Create GitHub Release
       if: startsWith(github.ref, 'refs/tags/v')
       uses: softprops/action-gh-release@v1
       with:
         files: |
-          mdk-predator-release-${{ github.sha }}.tar.gz
-          release/mdk-predator.bin
-          release/bootloader.bin
-          release/partition-table.bin
+          mdk-predator-release-*.tar.gz
+          firmware-release/*.bin
+        body: |
+          # MDK Predator Firmware ${{ github.ref_name }}
+          
+          ## 🚀 Ready to Flash!
+          
+          ### Download Files:
+          
+          - `mdk-predator.bin` - Main firmware
+          - `bootloader.bin` - ESP32-S3 bootloader
+          - `partition-table.bin` - Partition table
+          - `mdk-predator-release-*.tar.gz` - Complete package
+          
+          ### Quick Flash:
+          
+          ```bash
+          esptool.py --chip esp32s3 --port /dev/ttyUSB0 --baud 921600 \
+            write_flash --flash_mode dio --flash_freq 80m --flash_size 8MB \
+            0x0 bootloader.bin \
+            0x8000 partition-table.bin \
+            0x10000 mdk-predator.bin
+          ```
+          
+          ### Hardware:
+          - ESP32-S3 @ 240MHz Dual-Core
+          - I2C Slave @ 0x51
+          - Compatible with PortaPack H4M + MDK Module
+          
+          ### Features:
+          - ✅ KeeLoq Encrypt/Decrypt/Bruteforce (500x faster!)
+          - ✅ PT2260/PT2262 Decode/Encode
+          - ✅ CC1101 Transmit/Receive
+          - ✅ RSSI Measurement
+          - ✅ CAN Bus Support
+          - ✅ Hardware AES/SHA256
+        draft: false
+        prerelease: false
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
