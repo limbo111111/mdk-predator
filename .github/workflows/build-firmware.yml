@@ -33,7 +33,7 @@ jobs:
       run: |
         mkdir -p ~/esp
         cd ~/esp
-        git clone -b v5.1.2 --depth 1 --recursive https://github.com/espressif/esp-idf.git
+        git clone -b v5.3 --depth 1 --recursive https://github.com/espressif/esp-idf.git
         
     - name: Install ESP-IDF
       run: |
