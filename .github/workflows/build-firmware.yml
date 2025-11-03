@@ -1,0 +1,115 @@
+name: Build MDK Predator Firmware
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup ESP-IDF
+      uses: espressif/esp-idf-ci-action@v1
+      with:
+        esp_idf_version: v5.1
+        target: esp32s3
+        
+    - name: Prepare build directory
+      run: |
+        mkdir -p mdk-predator-esp32/main
+        cp .devcontainer/esp32_main.c mdk-predator-esp32/main/
+        cp .devcontainer/mdk_hardware_abstraction.c mdk-predator-esp32/main/
+        cp .devcontainer/mdk_i2c_protocol.h mdk-predator-esp32/main/
+        
+    - name: Create CMakeLists.txt
+      run: |
+        cat > mdk-predator-esp32/CMakeLists.txt <<EOF
+        cmake_minimum_required(VERSION 3.16)
+        include(\$ENV{IDF_PATH}/tools/cmake/project.cmake)
+        project(mdk-predator)
+        EOF
+        
+        cat > mdk-predator-esp32/main/CMakeLists.txt <<EOF
+        idf_component_register(SRCS "esp32_main.c"
+                                     "mdk_hardware_abstraction.c"
+                               INCLUDE_DIRS "."
+                               REQUIRES driver nvs_flash mbedtls)
+        EOF
+        
+    - name: Create sdkconfig.defaults
+      run: |
+        cat > mdk-predator-esp32/sdkconfig.defaults <<EOF
+        CONFIG_IDF_TARGET="esp32s3"
+        CONFIG_IDF_TARGET_ESP32S3=y
+        CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ_240=y
+        CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ=240
+        CONFIG_FREERTOS_UNICORE=n
+        CONFIG_SPIRAM=y
+        CONFIG_SPIRAM_MODE_OCT=y
+        CONFIG_SPIRAM_SPEED_80M=y
+        CONFIG_MBEDTLS_HARDWARE_AES=y
+        CONFIG_MBEDTLS_HARDWARE_SHA=y
+        CONFIG_COMPILER_OPTIMIZATION_PERF=y
+        CONFIG_LOG_DEFAULT_LEVEL_INFO=y
+        EOF
+        
+    - name: Build firmware
+      working-directory: mdk-predator-esp32
+      run: |
+        . $IDF_PATH/export.sh
+        idf.py set-target esp32s3
+        idf.py build
+        
+    - name: Prepare release artifacts
+      run: |
+        mkdir -p release
+        cp mdk-predator-esp32/build/mdk-predator.bin release/
+        cp mdk-predator-esp32/build/bootloader/bootloader.bin release/
+        cp mdk-predator-esp32/build/partition_table/partition-table.bin release/
+        cp .devcontainer/flash_mdk.sh release/ || touch release/flash_mdk.sh
+        cp .devcontainer/FLASH_INSTRUCTIONS.md release/ || echo "# Flash Instructions" > release/FLASH_INSTRUCTIONS.md
+        chmod +x release/flash_mdk.sh
+        
+    - name: Create release package
+      run: |
+        cd release
+        tar -czf ../mdk-predator-release-${{ github.sha }}.tar.gz *
+        cd ..
+        
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: mdk-predator-firmware
+        path: |
+          release/mdk-predator.bin
+          release/bootloader.bin
+          release/partition-table.bin
+          release/flash_mdk.sh
+          release/FLASH_INSTRUCTIONS.md
+          
+    - name: Upload release package
+      uses: actions/upload-artifact@v4
+      with:
+        name: mdk-predator-release
+        path: mdk-predator-release-${{ github.sha }}.tar.gz
+        
+    - name: Create Release (on tag)
+      if: startsWith(github.ref, 'refs/tags/v')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          mdk-predator-release-${{ github.sha }}.tar.gz
+          release/mdk-predator.bin
+          release/bootloader.bin
+          release/partition-table.bin
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
