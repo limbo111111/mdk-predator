@@ -23,6 +23,9 @@ typedef enum {
     MDK_I2C_BUS_1 = 1
 } mdk_i2c_bus_t;
 
+/** Number of I2C buses available */
+#define MDK_I2C_BUS_COUNT 2
+
 /** I2C speed modes */
 typedef enum {
     MDK_I2C_SPEED_STANDARD = 100000,   /* 100 kHz */
@@ -77,6 +80,9 @@ typedef enum {
     MDK_DMA_CHANNEL_2 = 2,
     MDK_DMA_CHANNEL_3 = 3
 } mdk_dma_channel_t;
+
+/** Number of DMA channels available */
+#define MDK_DMA_CHANNEL_COUNT 4
 
 /** DMA transfer direction */
 typedef enum {
@@ -212,6 +218,9 @@ bool mdk_parallel_bruteforce(const void *key_space, size_t key_len,
 /** GPIO pin number */
 typedef uint8_t mdk_gpio_pin_t;
 
+/** Number of GPIO pins available */
+#define MDK_GPIO_PIN_COUNT 64
+
 /** GPIO direction */
 typedef enum {
     MDK_GPIO_INPUT,
@@ -267,6 +276,9 @@ typedef enum {
     MDK_UART_PORT_1 = 1,
     MDK_UART_PORT_2 = 2
 } mdk_uart_port_t;
+
+/** Number of UART ports available */
+#define MDK_UART_PORT_COUNT 3
 
 /** UART baud rate */
 typedef enum {
