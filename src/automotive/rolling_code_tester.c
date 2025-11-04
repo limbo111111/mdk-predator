@@ -12,6 +12,7 @@
 
 /* KeeLoq algorithm constants */
 #define KEELOQ_NLF 0x3A5C742E
+#define KEELOQ_ROUNDS 528  /* KeeLoq uses 528 decryption rounds */
 
 /**
  * Initialize rolling code tester
@@ -36,10 +37,10 @@ bool test_keeloq_code(uint32_t encrypted, uint64_t key, keeloq_result_t *result)
         return false;
     }
 
-    // KeeLoq decryption algorithm
+    // KeeLoq decryption algorithm (528 rounds)
     uint32_t x = encrypted;
 
-    for (int i = 0; i < 528; i++) {
+    for (int i = 0; i < KEELOQ_ROUNDS; i++) {
         uint32_t r = (key >> (i & 63)) & 1;
         x = (x << 1) | ((x >> 31) ^ (x >> 26) ^ (x >> 20) ^ (x >> 9) ^ r);
     }

@@ -5,6 +5,19 @@ All notable changes to the MDK-Predator project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+- Added missing `math.h` include in `crypto_analyzer.c` for `log()` function used in entropy analysis
+
+### Changed
+- Replaced magic number 528 with `KEELOQ_ROUNDS` constant in rolling code tester for better code clarity
+- Optimized Shannon entropy calculation using multiplication instead of division (pre-calculate 1/log(2))
+
+### Added
+- Comprehensive code quality report (CODE_QUALITY_REPORT.md)
+- Detailed security analysis report (SECURITY_ANALYSIS.md)
+
 ## [1.0.0] - 2025-10-22
 
 ### Added
