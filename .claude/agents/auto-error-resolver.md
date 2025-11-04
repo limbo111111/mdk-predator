@@ -94,19 +94,15 @@ make clean && make
 # Continue until clean build
 ```
 
-# For backend repos:
-cd ./users && npx tsc --noEmit
-```
+## Build Configuration:
 
-## TypeScript Commands by Repo:
+The Makefile contains all necessary build commands. Common build targets:
+- `make` - Build the project
+- `make clean` - Clean build artifacts
+- `make test` - Run tests (if available)
+- `make info` - Display build configuration
+- `make V=1` - Verbose build output
 
-The hook automatically detects and saves the correct TSC command for each repo. Always check `~/.claude/tsc-cache/*/tsc-commands.txt` to see which command to use for verification.
-
-Common patterns:
-- **Frontend**: `npx tsc --project tsconfig.app.json --noEmit`
-- **Backend repos**: `npx tsc --noEmit`
-- **Project references**: `npx tsc --build --noEmit`
-
-Always use the correct command based on what's saved in the tsc-commands.txt file.
+Always verify fixes by running a clean build to ensure all dependencies are properly rebuilt.
 
 Report completion with a summary of what was fixed.
