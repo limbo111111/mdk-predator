@@ -68,11 +68,11 @@ typedef struct {
 static struct {
     bool initialized;
     mdk_hardware_interface_config_t config;
-    mdk_i2c_bus_state_t i2c_buses[2];
-    mdk_dma_channel_state_t dma_channels[4];
+    mdk_i2c_bus_state_t i2c_buses[MDK_I2C_BUS_COUNT];
+    mdk_dma_channel_state_t dma_channels[MDK_DMA_CHANNEL_COUNT];
     mdk_stream_state_t streams[MDK_STREAM_MAX];
-    mdk_gpio_state_t gpio_pins[64];
-    mdk_uart_state_t uart_ports[3];
+    mdk_gpio_state_t gpio_pins[MDK_GPIO_PIN_COUNT];
+    mdk_uart_state_t uart_ports[MDK_UART_PORT_COUNT];
     mdk_parallel_stream_state_t parallel_streams;
 } g_hw_state = {0};
 
@@ -97,7 +97,7 @@ bool mdk_i2c_init(const mdk_i2c_config_t *config) {
         return false;
     }
 
-    if (config->bus >= 2) {
+    if (config->bus >= MDK_I2C_BUS_COUNT) {
         return false;
     }
 
@@ -113,7 +113,7 @@ bool mdk_i2c_init(const mdk_i2c_config_t *config) {
 }
 
 bool mdk_i2c_deinit(mdk_i2c_bus_t bus) {
-    if (bus >= 2) {
+    if (bus >= MDK_I2C_BUS_COUNT) {
         return false;
     }
 
@@ -130,7 +130,7 @@ bool mdk_i2c_deinit(mdk_i2c_bus_t bus) {
 }
 
 bool mdk_i2c_device_probe(mdk_i2c_bus_t bus, uint8_t device_addr) {
-    if (bus >= 2) {
+    if (bus >= MDK_I2C_BUS_COUNT) {
         return false;
     }
 
@@ -150,7 +150,7 @@ bool mdk_i2c_device_open(mdk_i2c_device_t *device, mdk_i2c_bus_t bus, uint8_t de
         return false;
     }
 
-    if (bus >= 2) {
+    if (bus >= MDK_I2C_BUS_COUNT) {
         return false;
     }
 
@@ -295,7 +295,7 @@ bool mdk_dma_init(const mdk_dma_config_t *config) {
         return false;
     }
 
-    if (config->channel >= 4) {
+    if (config->channel >= MDK_DMA_CHANNEL_COUNT) {
         return false;
     }
 
@@ -311,7 +311,7 @@ bool mdk_dma_init(const mdk_dma_config_t *config) {
 }
 
 bool mdk_dma_deinit(mdk_dma_channel_t channel) {
-    if (channel >= 4) {
+    if (channel >= MDK_DMA_CHANNEL_COUNT) {
         return false;
     }
 
@@ -336,7 +336,7 @@ bool mdk_dma_transfer(mdk_dma_channel_t channel, const mdk_dma_transfer_t *trans
         return false;
     }
 
-    if (channel >= 4) {
+    if (channel >= MDK_DMA_CHANNEL_COUNT) {
         return false;
     }
 
@@ -370,7 +370,7 @@ bool mdk_dma_transfer_async(mdk_dma_channel_t channel, const mdk_dma_transfer_t 
         return false;
     }
 
-    if (channel >= 4) {
+    if (channel >= MDK_DMA_CHANNEL_COUNT) {
         return false;
     }
 
@@ -405,7 +405,7 @@ bool mdk_dma_transfer_async(mdk_dma_channel_t channel, const mdk_dma_transfer_t 
 }
 
 bool mdk_dma_wait_complete(mdk_dma_channel_t channel, uint32_t timeout_ms) {
-    if (channel >= 4) {
+    if (channel >= MDK_DMA_CHANNEL_COUNT) {
         return false;
     }
 
@@ -422,7 +422,7 @@ bool mdk_dma_wait_complete(mdk_dma_channel_t channel, uint32_t timeout_ms) {
 }
 
 bool mdk_dma_abort(mdk_dma_channel_t channel) {
-    if (channel >= 4) {
+    if (channel >= MDK_DMA_CHANNEL_COUNT) {
         return false;
     }
 
@@ -440,7 +440,7 @@ bool mdk_dma_abort(mdk_dma_channel_t channel) {
 }
 
 bool mdk_dma_get_status(mdk_dma_channel_t channel, bool *active, size_t *bytes_transferred) {
-    if (channel >= 4) {
+    if (channel >= MDK_DMA_CHANNEL_COUNT) {
         return false;
     }
 
@@ -467,7 +467,7 @@ bool mdk_dma_capture_signal(mdk_dma_channel_t channel, void *buffer, size_t buff
         return false;
     }
 
-    if (channel >= 4 || buffer_size == 0) {
+    if (channel >= MDK_DMA_CHANNEL_COUNT || buffer_size == 0) {
         return false;
     }
 
@@ -493,7 +493,7 @@ bool mdk_dma_capture_signal(mdk_dma_channel_t channel, void *buffer, size_t buff
 }
 
 bool mdk_dma_get_capture_status(mdk_dma_channel_t channel, size_t *samples_captured) {
-    if (channel >= 4) {
+    if (channel >= MDK_DMA_CHANNEL_COUNT) {
         return false;
     }
 
@@ -813,7 +813,7 @@ bool mdk_gpio_init(const mdk_gpio_config_t *config) {
         return false;
     }
 
-    if (config->pin >= 64) {
+    if (config->pin >= MDK_GPIO_PIN_COUNT) {
         return false;
     }
 
@@ -828,7 +828,7 @@ bool mdk_gpio_init(const mdk_gpio_config_t *config) {
 }
 
 bool mdk_gpio_deinit(mdk_gpio_pin_t pin) {
-    if (pin >= 64) {
+    if (pin >= MDK_GPIO_PIN_COUNT) {
         return false;
     }
 
@@ -844,7 +844,7 @@ bool mdk_gpio_deinit(mdk_gpio_pin_t pin) {
 }
 
 bool mdk_gpio_set_level(mdk_gpio_pin_t pin, bool level) {
-    if (pin >= 64) {
+    if (pin >= MDK_GPIO_PIN_COUNT) {
         return false;
     }
 
@@ -870,7 +870,7 @@ bool mdk_gpio_get_level(mdk_gpio_pin_t pin, bool *level) {
         return false;
     }
 
-    if (pin >= 64) {
+    if (pin >= MDK_GPIO_PIN_COUNT) {
         return false;
     }
 
@@ -888,7 +888,7 @@ bool mdk_gpio_get_level(mdk_gpio_pin_t pin, bool *level) {
 }
 
 bool mdk_gpio_toggle(mdk_gpio_pin_t pin) {
-    if (pin >= 64) {
+    if (pin >= MDK_GPIO_PIN_COUNT) {
         return false;
     }
 
@@ -908,7 +908,7 @@ bool mdk_gpio_toggle(mdk_gpio_pin_t pin) {
 }
 
 bool mdk_gpio_set_direction(mdk_gpio_pin_t pin, mdk_gpio_direction_t direction) {
-    if (pin >= 64) {
+    if (pin >= MDK_GPIO_PIN_COUNT) {
         return false;
     }
 
@@ -924,7 +924,7 @@ bool mdk_gpio_set_direction(mdk_gpio_pin_t pin, mdk_gpio_direction_t direction) 
 }
 
 bool mdk_gpio_set_pull(mdk_gpio_pin_t pin, mdk_gpio_pull_t pull) {
-    if (pin >= 64) {
+    if (pin >= MDK_GPIO_PIN_COUNT) {
         return false;
     }
 
@@ -940,7 +940,7 @@ bool mdk_gpio_set_pull(mdk_gpio_pin_t pin, mdk_gpio_pull_t pull) {
 }
 
 bool mdk_gpio_enable_interrupt(mdk_gpio_pin_t pin, mdk_gpio_int_mode_t mode) {
-    if (pin >= 64) {
+    if (pin >= MDK_GPIO_PIN_COUNT) {
         return false;
     }
 
@@ -970,7 +970,7 @@ bool mdk_uart_init(const mdk_uart_config_t *config) {
         return false;
     }
 
-    if (config->port >= 3) {
+    if (config->port >= MDK_UART_PORT_COUNT) {
         return false;
     }
 
@@ -999,7 +999,7 @@ bool mdk_uart_init(const mdk_uart_config_t *config) {
 }
 
 bool mdk_uart_deinit(mdk_uart_port_t port) {
-    if (port >= 3) {
+    if (port >= MDK_UART_PORT_COUNT) {
         return false;
     }
 
@@ -1019,7 +1019,7 @@ bool mdk_uart_write(mdk_uart_port_t port, const uint8_t *data, size_t length) {
         return false;
     }
 
-    if (port >= 3 || length == 0) {
+    if (port >= MDK_UART_PORT_COUNT || length == 0) {
         return false;
     }
 
@@ -1040,7 +1040,7 @@ bool mdk_uart_read(mdk_uart_port_t port, uint8_t *data, size_t length, size_t *b
         return false;
     }
 
-    if (port >= 3 || length == 0) {
+    if (port >= MDK_UART_PORT_COUNT || length == 0) {
         return false;
     }
 
@@ -1064,7 +1064,7 @@ bool mdk_uart_write_async(mdk_uart_port_t port, const uint8_t *data, size_t leng
         return false;
     }
 
-    if (port >= 3 || length == 0) {
+    if (port >= MDK_UART_PORT_COUNT || length == 0) {
         return false;
     }
 
@@ -1090,7 +1090,7 @@ bool mdk_uart_write_async(mdk_uart_port_t port, const uint8_t *data, size_t leng
 }
 
 bool mdk_uart_available(mdk_uart_port_t port, size_t *bytes_available) {
-    if (port >= 3) {
+    if (port >= MDK_UART_PORT_COUNT) {
         return false;
     }
 
@@ -1109,7 +1109,7 @@ bool mdk_uart_available(mdk_uart_port_t port, size_t *bytes_available) {
 }
 
 bool mdk_uart_flush(mdk_uart_port_t port) {
-    if (port >= 3) {
+    if (port >= MDK_UART_PORT_COUNT) {
         return false;
     }
 
@@ -1125,7 +1125,7 @@ bool mdk_uart_flush(mdk_uart_port_t port) {
 }
 
 bool mdk_uart_set_baud_rate(mdk_uart_port_t port, mdk_uart_baud_t baud_rate) {
-    if (port >= 3) {
+    if (port >= MDK_UART_PORT_COUNT) {
         return false;
     }
 
