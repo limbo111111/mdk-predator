@@ -124,12 +124,13 @@ bool crypto_entropy_analysis(uint8_t *data, uint32_t length,
         counts[data[i]]++;
     }
 
+    // Calculate Shannon entropy using change of base formula: log2(x) = log(x) / log(2)
     double entropy = 0.0;
-    const double log2_factor = log(2.0);  // Pre-calculate for performance
+    const double log2_inv = 1.0 / log(2.0);  // Pre-calculate inverse for performance
     for (int i = 0; i < 256; i++) {
         if (counts[i] > 0) {
             double p = (double)counts[i] / length;
-            entropy -= p * (log(p) / log2_factor);
+            entropy -= p * log(p) * log2_inv;  // Convert natural log to log2
         }
     }
 
