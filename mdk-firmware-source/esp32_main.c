@@ -138,67 +138,6 @@ static size_t i2c_slave_transmit_handler(uint8_t* buffer, size_t max_len) {
     return 1;
 }
 
-// I2C Slave Task (ESP-IDF v5.3 compatible)
-static void i2c_slave_task(void* arg) {
-    uint8_t rx_buffer[I2C_SLAVE_RX_BUF_LEN];
-    uint8_t tx_buffer[I2C_SLAVE_TX_BUF_LEN];
-    
-    ESP_LOGI(TAG, "I2C Slave task started");
-    
-    while (1) {
-        // Read from I2C (blocking)
-        int len = i2c_slave_read_buffer(I2C_SLAVE_NUM, rx_buffer, sizeof(rx_buffer), pdMS_TO_TICKS(100));
-        
-        if (len > 0) {
-            // Process received data
-            i2c_slave_receive_handler(rx_buffer, len);
-        }
-        
-        // Check if master requests data
-        size_t tx_len = i2c_slave_transmit_handler(tx_buffer, sizeof(tx_buffer));
-        if (tx_len > 0) {
-            i2c_slave_write_buffer(I2C_SLAVE_NUM, tx_buffer, tx_len, pdMS_TO_TICKS(100));
-        }
-        
-        vTaskDelay(pdMS_TO_TICKS(10));
-    }
-}
-
-// Initialize I2C Slave (ESP-IDF v5.3 compatible)
-static void init_i2c_slave(void) {
-    i2c_config_t conf_slave = {
-        .sda_io_num = I2C_SLAVE_SDA_IO,
-        .scl_io_num = I2C_SLAVE_SCL_IO,
-        .mode = I2C_MODE_SLAVE,
-        .sda_pullup_en = GPIO_PULLUP_ENABLE,
-        .scl_pullup_en = GPIO_PULLUP_ENABLE,
-        .slave = {
-            .addr_10bit_en = 0,
-            .slave_addr = I2C_SLAVE_ADDR,
-            .maximum_speed = I2C_SLAVE_FREQ_HZ,
-        },
-    };
-    
-    ESP_ERROR_CHECK(i2c_param_config(I2C_SLAVE_NUM, &conf_slave));
-    ESP_ERROR_CHECK(i2c_driver_install(I2C_SLAVE_NUM, conf_slave.mode, 
-                                       I2C_SLAVE_RX_BUF_LEN, I2C_SLAVE_TX_BUF_LEN, 0));
-    
-    ESP_LOGI(TAG, "I2C Slave initialized at address 0x%02X", I2C_SLAVE_ADDR);
-}
-
-// Initialize status LED
-static void init_status_led(void) {
-    gpio_config_t io_conf = {
-        .pin_bit_mask = (1ULL << STATUS_LED_GPIO),
-        .mode = GPIO_MODE_OUTPUT,
-        .pull_up_en = GPIO_PULLUP_DISABLE,
-        .pull_down_en = GPIO_PULLDOWN_DISABLE,
-        .intr_type = GPIO_INTR_DISABLE,
-    };
-    gpio_config(&io_conf);
-    gpio_set_level(STATUS_LED_GPIO, 0);
-}
-
 // ==================== COMMAND PROCESSOR TASK ====================
 
 static void command_processor_task(void* arg) {

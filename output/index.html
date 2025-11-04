@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MDK-Predator Download</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+        .download-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 18px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            margin: 10px 0;
+        }
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        .download-btn:active {
+            transform: translateY(0);
+        }
+        .info {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+            text-align: left;
+        }
+        .info h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        .info ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .info li {
+            color: #555;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 0.9em;
+        }
+        .info li:last-child {
+            border-bottom: none;
+        }
+        .info li strong {
+            color: #667eea;
+            display: inline-block;
+            width: 100px;
+        }
+        .icon {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+        .success {
+            color: #28a745;
+        }
+        .file-size {
+            color: #999;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">🎯</div>
+        <h1>MDK-Predator</h1>
+        <p class="subtitle">PortaPack External App</p>
+        
+        <a href="mdk_predator.ppma" download="mdk_predator.ppma" class="download-btn">
+            📥 Download .ppma
+        </a>
+        <div class="file-size">Dateigröße: 188 Bytes</div>
+        
+        <div class="info">
+            <h3>Installation:</h3>
+            <ul>
+                <li><strong>1.</strong> Datei herunterladen</li>
+                <li><strong>2.</strong> PortaPack SD-Karte anschließen</li>
+                <li><strong>3.</strong> In <code>/APPS/</code> Ordner kopieren</li>
+                <li><strong>4.</strong> PortaPack neu starten</li>
+                <li><strong>5.</strong> App im Apps-Menü finden</li>
+            </ul>
+        </div>
+        
+        <div class="info" style="margin-top: 20px;">
+            <h3>Build Info:</h3>
+            <ul>
+                <li><strong>Version:</strong> Latest</li>
+                <li><strong>Compiler:</strong> ARM GCC 9.2.1</li>
+                <li><strong>Firmware:</strong> Mayhem Compatible</li>
+                <li><strong>Datum:</strong> <span id="build-date"></span></li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('build-date').textContent = new Date().toLocaleDateString('de-DE');
+    </script>
+</body>
+</html>
