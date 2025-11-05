@@ -104,8 +104,8 @@ esptool.py --chip esp32s3 ^
 
 | ESP32-S3 Pin | PortaPack H4M Pin | Function |
 |--------------|-------------------|----------|
-| GPIO21       | SDA               | I2C Data |
-| GPIO22       | SCL               | I2C Clock |
+| GPIO8        | SDA               | I2C Data |
+| GPIO9        | SCL               | I2C Clock |
 | GND          | GND               | Ground |
 | 3.3V         | 3.3V              | Power |
 
@@ -120,8 +120,8 @@ esptool.py --chip esp32s3 ^
 PortaPack H4M          ESP32-S3
 ┌──────────┐          ┌──────────┐
 │          │          │          │
-│  SDA ────┼──────────┼── GPIO21 │
-│  SCL ────┼──────────┼── GPIO22 │
+│  SDA ────┼──────────┼── GPIO8  │
+│  SCL ────┼──────────┼── GPIO9  │
 │  GND ────┼──────────┼── GND    │
 │  3.3V ───┼──────────┼── 3.3V   │
 │          │          │          │

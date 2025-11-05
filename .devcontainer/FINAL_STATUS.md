@@ -176,8 +176,8 @@ esptool.py --chip esp32s3 --port /dev/ttyUSB0 --baud 921600 \
 
 ```
 ESP32-S3         PortaPack H4M
-GPIO21 (SDA) ←→  SDA
-GPIO22 (SCL) ←→  SCL
+GPIO8 (SDA)  ←→  SDA
+GPIO9 (SCL)  ←→  SCL
 GND          ←→  GND
 3.3V         ←→  3.3V
 ```
