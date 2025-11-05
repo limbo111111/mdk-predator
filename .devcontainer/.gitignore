@@ -1,0 +1,35 @@
+# ESP-IDF Build Artifacts
+build/
+sdkconfig
+sdkconfig.old
+dependencies.lock
+managed_components/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Logs
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak
+*.orig
+
+# Distribution packages (keep the final release packages)
+!mdk-predator-*.tar.gz

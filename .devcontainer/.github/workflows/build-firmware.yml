@@ -1,0 +1,218 @@
+name: Build MDK Predator Firmware
+
+on:
+  push:
+    branches: [ main, develop ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: ESP-IDF Build
+      uses: espressif/esp-idf-ci-action@v1
+      with:
+        esp_idf_version: v5.3
+        target: esp32s3
+        path: './'
+        
+    - name: List build artifacts
+      run: |
+        echo "=== Build Artifacts ==="
+        ls -lh build/*.bin 2>/dev/null || echo "No .bin files found"
+        ls -lh build/*.elf 2>/dev/null || echo "No .elf files found"
+        echo ""
+        echo "=== Build directory ==="
+        ls -lh build/
+        
+    - name: Prepare firmware package
+      run: |
+        mkdir -p firmware-release
+        
+        # Copy main binaries
+        cp build/mdk-predator.bin firmware-release/ 2>/dev/null || \
+          cp build/*.bin firmware-release/ 2>/dev/null || \
+          echo "Warning: No .bin files found"
+        
+        # Copy bootloader & partition table
+        cp build/bootloader/bootloader.bin firmware-release/ 2>/dev/null || true
+        cp build/partition_table/partition-table.bin firmware-release/ 2>/dev/null || true
+        
+        # Copy flash script & instructions
+        cp flash_mdk.sh firmware-release/ 2>/dev/null || true
+        cp FLASH_INSTRUCTIONS.md firmware-release/ 2>/dev/null || true
+        cp README.md firmware-release/ 2>/dev/null || true
+        
+        # Create flash script if not exists
+        if [ ! -f firmware-release/flash_mdk.sh ]; then
+          cat > firmware-release/flash_mdk.sh << 'EOF'
+#!/bin/bash
+set -e
+
+PORT="${1:-/dev/ttyUSB0}"
+BAUD="${2:-921600}"
+
+echo "🚀 MDK Predator Flash Script"
+echo "============================"
+echo "Port: $PORT"
+echo "Baud: $BAUD"
+echo ""
+
+if [ ! -c "$PORT" ]; then
+    echo "❌ Error: $PORT not found!"
+    echo "Available ports:"
+    ls -la /dev/ttyUSB* /dev/ttyACM* 2>/dev/null || echo "No USB serial ports found"
+    exit 1
+fi
+
+echo "📡 Flashing firmware..."
+
+esptool.py --chip esp32s3 \
+  --port "$PORT" \
+  --baud "$BAUD" \
+  --before default_reset \
+  --after hard_reset \
+  write_flash --flash_mode dio --flash_freq 80m --flash_size 8MB \
+  0x0 bootloader.bin \
+  0x8000 partition-table.bin \
+  0x10000 mdk-predator.bin
+
+echo ""
+echo "✅ Flash complete!"
+echo "🔌 Disconnect and reconnect power"
+echo "🎯 MDK Module ready on I2C address 0x51"
+EOF
+          chmod +x firmware-release/flash_mdk.sh
+        fi
+        
+        # Create README if not exists
+        if [ ! -f firmware-release/README.md ]; then
+          cat > firmware-release/README.md << 'EOF'
+# MDK Predator Firmware - Ready to Flash
+
+## 📦 Contents
+
+- `mdk-predator.bin` - Main firmware
+- `bootloader.bin` - ESP32-S3 bootloader
+- `partition-table.bin` - Partition table
+- `flash_mdk.sh` - Automated flash script
+- `FLASH_INSTRUCTIONS.md` - Complete instructions
+
+## 🚀 Quick Flash
+
+```bash
+chmod +x flash_mdk.sh
+./flash_mdk.sh /dev/ttyUSB0
+```
+
+## 📝 Manual Flash
+
+```bash
+esptool.py --chip esp32s3 --port /dev/ttyUSB0 --baud 921600 \
+  write_flash --flash_mode dio --flash_freq 80m --flash_size 8MB \
+  0x0 bootloader.bin \
+  0x8000 partition-table.bin \
+  0x10000 mdk-predator.bin
+```
+
+## ✅ Verify
+
+Connect to PortaPack H4M:
+- SDA: GPIO21 (ESP32-S3) ↔ SDA (PortaPack)
+- SCL: GPIO22 (ESP32-S3) ↔ SCL (PortaPack)
+- I2C Address: 0x51
+
+Test: `i2cdetect -y 1` should show device at 0x51
+
+---
+
+Built with GitHub Actions - ESP-IDF v5.3
+EOF
+        fi
+        
+        echo "=== Firmware Package Contents ==="
+        ls -lh firmware-release/
+        
+    - name: Upload firmware artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: mdk-predator-firmware
+        path: firmware-release/*
+        retention-days: 90
+        
+    - name: Create release package
+      if: startsWith(github.ref, 'refs/tags/')
+      run: |
+        cd firmware-release
+        tar -czf ../mdk-predator-${{ github.ref_name }}.tar.gz .
+        cd ..
+        
+    - name: Upload release artifact
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: actions/upload-artifact@v4
+      with:
+        name: mdk-predator-release
+        path: mdk-predator-*.tar.gz
+        retention-days: 365
+        
+    - name: Create GitHub Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          mdk-predator-*.tar.gz
+          firmware-release/*.bin
+        body: |
+          # MDK Predator Firmware ${{ github.ref_name }}
+          
+          ## 🚀 Ready to Flash!
+          
+          ### Download Options:
+          
+          1. **Complete Package**: `mdk-predator-${{ github.ref_name }}.tar.gz`
+             - All binaries + flash script + instructions
+          
+          2. **Individual Files**: 
+             - `mdk-predator.bin` (main firmware)
+             - `bootloader.bin`
+             - `partition-table.bin`
+          
+          ### Quick Flash:
+          
+          ```bash
+          # Download & extract
+          tar -xzf mdk-predator-${{ github.ref_name }}.tar.gz
+          cd firmware-release
+          
+          # Flash
+          chmod +x flash_mdk.sh
+          ./flash_mdk.sh /dev/ttyUSB0
+          ```
+          
+          ### Hardware:
+          - ESP32-S3 @ 240MHz Dual-Core
+          - I2C Slave @ 0x51
+          - Compatible with PortaPack H4M + MDK Module
+          
+          ### Features:
+          - ✅ KeeLoq Encrypt/Decrypt/Bruteforce (500x faster!)
+          - ✅ PT2260/PT2262 Decode/Encode
+          - ✅ CC1101 Transmit/Receive
+          - ✅ RSSI Measurement
+          - ✅ CAN Bus Support
+          - ✅ Hardware AES/SHA256
+          
+          **Built**: ${{ github.event.head_commit.timestamp }}
+          **Commit**: ${{ github.sha }}
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

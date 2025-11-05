@@ -1,0 +1,5 @@
+FROM ubuntu:22.04
+RUN apt-get update && apt-get install -y git wget flex bison gperf python3 python3-pip python3-venv cmake ninja-build ccache libffi-dev libssl-dev dfu-util libusb-1.0-0 && apt-get clean
+RUN mkdir -p /esp && cd /esp && git clone -b v5.1.2 --depth 1 --recursive https://github.com/espressif/esp-idf.git
+RUN cd /esp/esp-idf && ./install.sh esp32s3
+WORKDIR /project

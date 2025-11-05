@@ -103,6 +103,10 @@ cp -r "$SCRIPT_DIR/include" "$APP_DIR/"
 
 print_info "Files copied to $APP_DIR"
 
+# Apply GCC 15 compatibility patches to mayhem firmware
+print_info "Applying GCC compatibility patches..."
+"$SCRIPT_DIR/fix_mayhem_gcc15.sh" "$MAYHEM_DIR" || print_warning "Failed to apply patches"
+
 # Register app in external.cmake
 print_info "Registering app in external.cmake..."
 EXTERNAL_CMAKE="$MAYHEM_DIR/firmware/application/external/external.cmake"
@@ -148,6 +152,9 @@ print_info "Configuring build..."
 mkdir -p build
 cd build
 cmake ..
+
+print_info "Building baseband (required for external apps)..."
+make baseband -j$(nproc)
 
 print_info "Building application..."
 make application -j$(nproc)
