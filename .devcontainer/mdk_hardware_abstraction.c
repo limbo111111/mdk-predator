@@ -570,9 +570,13 @@ bool pt2260_encode(uint32_t code, uint8_t bits, uint16_t* pulses, size_t* count)
     if (!pulses || !count) return false;
     
     // Stub implementation - generate pulse pattern
-    *count = bits * 2;  // Each bit is 2 pulses
-    for (size_t i = 0; i < *count; i++) {
-        pulses[i] = (code & (1 << (i / 2))) ? 1200 : 400;  // Long or short pulse
+    // Each bit becomes 2 pulses (mark and space)
+    *count = bits * 2;
+    for (size_t i = 0; i < *count; i += 2) {
+        uint8_t bit_pos = i / 2;
+        bool bit_value = (code & (1 << (bits - 1 - bit_pos))) != 0;
+        pulses[i] = bit_value ? 1200 : 400;      // Mark: long for 1, short for 0
+        pulses[i + 1] = bit_value ? 400 : 1200;  // Space: short for 1, long for 0
     }
     ESP_LOGI(TAG, "PT2260 encoded: code=0x%X, bits=%d, pulses=%zu", code, bits, *count);
     return true;
