@@ -4,6 +4,7 @@
  */
 
 #include <stdint.h>
+#include <inttypes.h>
 #include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>
@@ -76,7 +77,7 @@ bool cc1101_set_frequency(uint32_t freq_hz) {
     // FREQ = (f * 2^16) / FXOSC
     uint32_t freq_reg = (freq_hz * 65536ULL) / 26000000;
     
-    ESP_LOGI(TAG, "CC1101 frequency set to %lu Hz", freq_hz);
+    ESP_LOGI(TAG, "CC1101 frequency set to %" PRIu32 " Hz", freq_hz);
     return true;
 }
 
@@ -84,7 +85,7 @@ bool cc1101_set_frequency(uint32_t freq_hz) {
 bool cc1101_transmit(const uint8_t* data, size_t len, uint32_t freq_hz) {
     if (!g_cc1101.spi) {
         ESP_LOGW(TAG, "CC1101 not initialized, simulating transmission");
-        ESP_LOGI(TAG, "TX: %d bytes @ %lu Hz", len, freq_hz);
+    ESP_LOGI(TAG, "TX: %zu bytes @ %" PRIu32 " Hz", len, freq_hz);
         return true;  // Simulate success
     }
     
@@ -203,7 +204,7 @@ bool transmit_code(uint64_t code, uint32_t frequency_hz) {
         packet[i] = (code >> (56 - i*8)) & 0xFF;
     }
     
-    ESP_LOGI(TAG, "Transmitting code: 0x%016llX @ %lu Hz", code, frequency_hz);
+    ESP_LOGI(TAG, "Transmitting code: 0x%016" PRIX64 " @ %" PRIu32 " Hz", code, frequency_hz);
     
     return cc1101_transmit(packet, 8, frequency_hz);
 }
@@ -266,7 +267,7 @@ bool can_init(uint32_t bitrate, bool silent_mode) {
     }
     
     g_can_initialized = true;
-    ESP_LOGI(TAG, "CAN initialized @ %lu bps, %s mode", 
+    ESP_LOGI(TAG, "CAN initialized @ %" PRIu32 " bps, %s mode", 
              bitrate, silent_mode ? "SILENT" : "NORMAL");
     return true;
 }
@@ -275,7 +276,7 @@ bool can_init(uint32_t bitrate, bool silent_mode) {
 bool can_send_frame(uint32_t can_id, const uint8_t* data, uint8_t dlc) {
     if (!g_can_initialized) {
         ESP_LOGW(TAG, "CAN not initialized, simulating frame send");
-        ESP_LOGI(TAG, "CAN TX: ID=0x%03lX, DLC=%d", can_id, dlc);
+    ESP_LOGI(TAG, "CAN TX: ID=0x%03" PRIX32 ", DLC=%u", can_id, (unsigned)dlc);
         return true;
     }
     
@@ -289,7 +290,7 @@ bool can_send_frame(uint32_t can_id, const uint8_t* data, uint8_t dlc) {
     
     esp_err_t ret = twai_transmit(&message, pdMS_TO_TICKS(1000));
     if (ret == ESP_OK) {
-        ESP_LOGI(TAG, "CAN frame sent: 0x%03lX", can_id);
+    ESP_LOGI(TAG, "CAN frame sent: 0x%03" PRIX32, can_id);
         return true;
     } else {
         ESP_LOGE(TAG, "CAN transmit failed: %s", esp_err_to_name(ret));
@@ -324,7 +325,7 @@ bool can_init(uint32_t bitrate, bool silent_mode) {
 }
 
 bool can_send_frame(uint32_t can_id, const uint8_t* data, uint8_t dlc) {
-    ESP_LOGD(TAG, "CAN TX (simulated): ID=0x%03lX, DLC=%d", can_id, dlc);
+    ESP_LOGD(TAG, "CAN TX (simulated): ID=0x%03" PRIX32 ", DLC=%u", can_id, (unsigned)dlc);
     return true;  // Simulate success for testing without hardware
 }
 

@@ -36,6 +36,7 @@ Build MDK-Predator using Docker (no local dependencies required!)
 OPTIONS:
     -c, --clean             Clean build (remove previous build artifacts)
     -u, --update-firmware   Update mayhem firmware from git (includes submodules)
+    --nightly              Use latest mayhem 'nightly' branch (sets --update-firmware)
     -n, --ninja             Use Ninja build system (faster than Make)
     -s, --shell             Open interactive shell in container for debugging
     -r, --rebuild           Rebuild Docker image (use after pulling updates)
@@ -100,6 +101,12 @@ while [[ $# -gt 0 ]]; do
             OPEN_SHELL=1
             shift
             ;;
+            --nightly)
+                # Update firmware and request nightly channel
+                UPDATE_FIRMWARE=1
+                export MAYHEM_CHANNEL=nightly
+                shift
+                ;;
         -r|--rebuild)
             REBUILD_IMAGE=1
             shift

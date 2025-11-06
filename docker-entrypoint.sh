@@ -36,6 +36,7 @@ clone_mayhem_firmware() {
     if [ ! -d "/workspace/mayhem-firmware/.git" ]; then
         print_step "Mayhem firmware not found, cloning from GitHub..."
         cd /workspace
+        # Clone shallow by default
         git clone --depth 1 https://github.com/portapack-mayhem/mayhem-firmware.git
         cd mayhem-firmware
         git submodule update --init --recursive
@@ -49,6 +50,33 @@ clone_mayhem_firmware() {
             git pull
             git submodule update --init --recursive
         fi
+    fi
+
+    # If a specific channel/branch is requested (e.g. nightly), try to switch to it
+    if [ -n "${MAYHEM_CHANNEL:-}" ]; then
+        print_step "Requested mayhem channel: $MAYHEM_CHANNEL"
+        # Check if remote has the branch
+        if git ls-remote --heads origin "$MAYHEM_CHANNEL" | grep -q refs/heads/; then
+            print_info "Remote branch '$MAYHEM_CHANNEL' found, checking out..."
+            # Fetch and check out the remote branch
+            git fetch origin "$MAYHEM_CHANNEL" --depth=1 || true
+            git checkout -B "$MAYHEM_CHANNEL" "origin/$MAYHEM_CHANNEL" || {
+                print_warning "Could not checkout origin/$MAYHEM_CHANNEL, falling back to current HEAD"
+            }
+            git submodule update --init --recursive || true
+        else
+            print_warning "Remote branch '$MAYHEM_CHANNEL' not found; using default branch instead"
+        fi
+    fi
+
+    # Print selected commit info
+    if git rev-parse --git-dir >/dev/null 2>&1; then
+        local mayhem_head
+        mayhem_head=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+        local mayhem_info
+        mayhem_info=$(git show -s --format='%ci %h %s' HEAD 2>/dev/null || echo "unknown")
+        print_info "Using mayhem-firmware commit: $mayhem_head"
+        print_info "Commit info: $mayhem_info"
     fi
 }
 
@@ -111,6 +139,20 @@ download_libopencm3() {
     rm -rf "$temp_dir"
 
     print_info "✓ libopencm3 downloaded successfully"
+
+    # Verify that libopencm3 contains expected Makefile; if not, fallback to official libopencm3 repo
+    if [ ! -f "$libopencm3_path/Makefile" ]; then
+        print_warning "libopencm3 Makefile not found after copy — attempting fallback clone from official libopencm3 repository"
+        rm -rf "$libopencm3_path"
+        mkdir -p "$(dirname \"$libopencm3_path\")"
+        if git clone --depth 1 https://github.com/libopencm3/libopencm3.git "$libopencm3_path"; then
+            print_info "Fallback clone of libopencm3 succeeded"
+        else
+            print_error "Fallback clone of libopencm3 failed — cannot continue"
+            rm -rf "$temp_dir"
+            exit 1
+        fi
+    fi
 }
 
 verify_submodules() {

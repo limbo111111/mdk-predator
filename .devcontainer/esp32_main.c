@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <inttypes.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
@@ -84,7 +85,7 @@ void bruteforce_progress_callback(uint32_t current, uint32_t total) {
     
     // Log every 1M iterations
     if (current % 1000000 == 0) {
-        ESP_LOGI(TAG, "Progress: %lu / %lu (%.1f%%)", 
+        ESP_LOGI(TAG, "Progress: %" PRIu32 " / %" PRIu32 " (%.1f%%)", 
                  current, total, (float)current * 100.0f / total);
     }
 }
@@ -96,7 +97,7 @@ static void i2c_slave_receive_handler(uint8_t* data, size_t len) {
     if (len < 1) return;
     
     uint8_t cmd = data[0];
-    ESP_LOGD(TAG, "I2C RX: cmd=0x%02X, len=%d", cmd, len);
+    ESP_LOGD(TAG, "I2C RX: cmd=0x%02X, len=%zu", (unsigned int)cmd, len);
     
     // Queue command for processing
     if (mdk_state.cmd_queue) {
@@ -242,13 +243,13 @@ static void command_processor_task(void* arg) {
                             key = (key << 8) | cmd.data[4 + i];
                         }
                         
-                        ESP_LOGI(TAG, "KEELOQ_DECRYPT: encrypted=0x%08lX, key=0x%016llX", encrypted, key);
+                        ESP_LOGI(TAG, "KEELOQ_DECRYPT: encrypted=0x%08" PRIX32 ", key=0x%016" PRIX64, encrypted, key);
                         
                         uint32_t decrypted = keeloq_decrypt(encrypted, key);
                         mdk_state.result_code = decrypted;
                         mdk_state.status = MDK_STATUS_READY;
                         
-                        ESP_LOGI(TAG, "Result: 0x%08lX", decrypted);
+                        ESP_LOGI(TAG, "Result: 0x%08" PRIX32, decrypted);
                     } else {
                         mdk_state.status = MDK_STATUS_ERROR;
                     }
@@ -265,13 +266,13 @@ static void command_processor_task(void* arg) {
                             key = (key << 8) | cmd.data[4 + i];
                         }
                         
-                        ESP_LOGI(TAG, "KEELOQ_ENCRYPT: plaintext=0x%08lX, key=0x%016llX", plaintext, key);
+                        ESP_LOGI(TAG, "KEELOQ_ENCRYPT: plaintext=0x%08" PRIX32 ", key=0x%016" PRIX64, plaintext, key);
                         
                         uint32_t encrypted = keeloq_encrypt(plaintext, key);
                         mdk_state.result_code = encrypted;
                         mdk_state.status = MDK_STATUS_READY;
                         
-                        ESP_LOGI(TAG, "Result: 0x%08lX", encrypted);
+                        ESP_LOGI(TAG, "Result: 0x%08" PRIX32, encrypted);
                     } else {
                         mdk_state.status = MDK_STATUS_ERROR;
                     }
@@ -292,7 +293,7 @@ static void command_processor_task(void* arg) {
                         uint32_t keyspace_size = (cmd.data[16] << 24) | (cmd.data[17] << 16) | 
                                                 (cmd.data[18] << 8) | cmd.data[19];
                         
-                        ESP_LOGI(TAG, "KEELOQ_BRUTEFORCE: encrypted=0x%08lX, serial=0x%08lX, seed=0x%016llX, keyspace=%lu",
+                        ESP_LOGI(TAG, "KEELOQ_BRUTEFORCE: encrypted=0x%08" PRIX32 ", serial=0x%08" PRIX32 ", seed=0x%016" PRIX64 ", keyspace=%" PRIu32,
                                  encrypted, serial, seed, keyspace_size);
                         
                         mdk_state.operation_active = true;
@@ -308,7 +309,7 @@ static void command_processor_task(void* arg) {
                         if (found) {
                             mdk_state.result_code = result_key;
                             mdk_state.status = MDK_STATUS_READY;
-                            ESP_LOGI(TAG, "Key found: 0x%016llX", result_key);
+                            ESP_LOGI(TAG, "Key found: 0x%016" PRIX64, result_key);
                         } else {
                             mdk_state.status = MDK_STATUS_ERROR;
                             ESP_LOGW(TAG, "Key not found");
@@ -335,7 +336,7 @@ static void command_processor_task(void* arg) {
                             if (pt2260_decode(pulses, pulse_count, &code, &bits)) {
                                 mdk_state.result_code = ((uint64_t)bits << 32) | code;
                                 mdk_state.status = MDK_STATUS_READY;
-                                ESP_LOGI(TAG, "PT2260 decoded: code=0x%08lX, bits=%d", code, bits);
+                                ESP_LOGI(TAG, "PT2260 decoded: code=0x%08" PRIX32 ", bits=%d", code, bits);
                             } else {
                                 mdk_state.status = MDK_STATUS_ERROR;
                             }
@@ -381,7 +382,7 @@ static void command_processor_task(void* arg) {
                         uint32_t frequency = (cmd.data[8] << 24) | (cmd.data[9] << 16) | 
                                            (cmd.data[10] << 8) | cmd.data[11];
                         
-                        ESP_LOGI(TAG, "TRANSMIT: code=0x%016llX @ %lu Hz", code, frequency);
+                        ESP_LOGI(TAG, "TRANSMIT: code=0x%016" PRIX64 " @ %" PRIu32 " Hz", code, frequency);
                         
                         if (transmit_code(code, frequency)) {
                             mdk_state.status = MDK_STATUS_READY;
@@ -397,7 +398,7 @@ static void command_processor_task(void* arg) {
                 // ===== GET RESULT =====
                 case MDK_CMD_GET_RESULT: {
                     // Result already in mdk_state.result_code
-                    ESP_LOGI(TAG, "GET_RESULT: 0x%016llX", mdk_state.result_code);
+                    ESP_LOGI(TAG, "GET_RESULT: 0x%016" PRIX64, mdk_state.result_code);
                     mdk_state.status = MDK_STATUS_READY;
                     break;
                 }
