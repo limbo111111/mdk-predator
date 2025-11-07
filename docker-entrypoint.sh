@@ -69,6 +69,27 @@ clone_mayhem_firmware() {
         fi
     fi
 
+    # If a specific version/tag/commit was requested, try to check it out
+    if [ -n "${MAYHEM_VERSION:-}" ]; then
+        print_step "Requested mayhem version: $MAYHEM_VERSION"
+        # Try to fetch tags and checkout the version
+        if git rev-parse --verify --quiet "$MAYHEM_VERSION" >/dev/null; then
+            print_info "Local ref '$MAYHEM_VERSION' found, checking out"
+            git checkout -B build_target "$MAYHEM_VERSION" || true
+        else
+            print_info "Fetching tags/refs and attempting to checkout '$MAYHEM_VERSION'"
+            git fetch --depth=1 origin "$MAYHEM_VERSION" || git fetch --tags || true
+            if git rev-parse --verify --quiet "origin/$MAYHEM_VERSION" >/dev/null; then
+                git checkout -B build_target "origin/$MAYHEM_VERSION" || true
+            elif git rev-parse --verify --quiet "$MAYHEM_VERSION" >/dev/null; then
+                git checkout -B build_target "$MAYHEM_VERSION" || true
+            else
+                print_warning "Requested mayhem version '$MAYHEM_VERSION' not found; using default branch"
+            fi
+        fi
+        git submodule update --init --recursive || true
+    fi
+
     # Print selected commit info
     if git rev-parse --git-dir >/dev/null 2>&1; then
         local mayhem_head

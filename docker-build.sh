@@ -83,43 +83,30 @@ OPEN_SHELL=0
 REBUILD_IMAGE=0
 
 # Parse arguments
-while [[ $# -gt 0 ]]; do
-    case $1 in
+while [ $# -gt 0 ]; do
+    case "$1" in
         -c|--clean)
-            CLEAN_BUILD=1
-            shift
-            ;;
+            CLEAN_BUILD=1; shift;;
         -u|--update-firmware)
-            UPDATE_FIRMWARE=1
-            shift
-            ;;
+            UPDATE_FIRMWARE=1; shift;;
+        --nightly)
+            UPDATE_FIRMWARE=1; export MAYHEM_CHANNEL=nightly; shift;;
+        --mayhem-version)
+            if [ -n "$2" ]; then
+                UPDATE_FIRMWARE=1; export MAYHEM_VERSION="$2"; shift 2
+            else
+                print_error "--mayhem-version requires an argument"; exit 1
+            fi;;
         -n|--ninja)
-            USE_NINJA=1
-            shift
-            ;;
+            USE_NINJA=1; shift;;
         -s|--shell)
-            OPEN_SHELL=1
-            shift
-            ;;
-            --nightly)
-                # Update firmware and request nightly channel
-                UPDATE_FIRMWARE=1
-                export MAYHEM_CHANNEL=nightly
-                shift
-                ;;
+            OPEN_SHELL=1; shift;;
         -r|--rebuild)
-            REBUILD_IMAGE=1
-            shift
-            ;;
+            REBUILD_IMAGE=1; shift;;
         -h|--help)
-            print_usage
-            exit 0
-            ;;
+            print_usage; exit 0;;
         *)
-            print_error "Unknown option: $1"
-            print_usage
-            exit 1
-            ;;
+            print_error "Unknown option: $1"; print_usage; exit 1;;
     esac
 done
 
