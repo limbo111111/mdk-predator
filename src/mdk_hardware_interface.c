@@ -6,6 +6,7 @@
  */
 
 #include "mdk_hardware_interface.h"
+#include "mdk_portapack_interface.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -190,8 +191,14 @@ bool mdk_i2c_write(const mdk_i2c_device_t *device, const uint8_t *data, size_t l
 
     mdk_i2c_bus_state_t *bus = &g_hw_state.i2c_buses[device->bus];
 
-    // In production: write data via I2C peripheral
-    // Simulate successful write
+    // Write data via PortaPack I2C driver (Mayhem firmware)
+    // Uses real I2C peripheral (or I2CDECMDL_PPMOD if available)
+    if (!mdk_portapack_i2c_write(device, data, length)) {
+        fprintf(stderr, "[ERROR] I2C write to device 0x%02X failed\n", device->device_addr);
+        return false;
+    }
+
+    fprintf(stdout, "[DEBUG] I2C wrote %zu bytes to 0x%02X successful\n", length, device->device_addr);
     (void)bus;  // Suppress unused warning
 
     return true;
@@ -210,10 +217,14 @@ bool mdk_i2c_read(const mdk_i2c_device_t *device, uint8_t *data, size_t length) 
         return false;
     }
 
-    // In production: read data via I2C peripheral
-    // Simulate successful read
-    memset(data, 0, length);
+    // Read data via PortaPack I2C driver (Mayhem firmware)
+    // Uses real I2C peripheral (or I2CDECMDL_PPMOD if available)
+    if (!mdk_portapack_i2c_read(device, data, length)) {
+        fprintf(stderr, "[ERROR] I2C read from device 0x%02X failed\n", device->device_addr);
+        return false;
+    }
 
+    fprintf(stdout, "[DEBUG] I2C read %zu bytes from 0x%02X successful\n", length, device->device_addr);
     return true;
 }
 
@@ -346,22 +357,26 @@ bool mdk_dma_transfer(mdk_dma_channel_t channel, const mdk_dma_transfer_t *trans
         return false;
     }
 
-    if (!transfer->src_addr || !transfer->dst_addr || transfer->length == 0) {
+        if (!transfer->src_addr || !transfer->dst_addr || transfer->length == 0) {
         return false;
     }
 
-    // Perform synchronous DMA transfer
+    // Perform synchronous DMA transfer via PortaPack (Mayhem LPC43xx GPDMA)
     chan->active = true;
     chan->current_transfer = *transfer;
 
-    // In production: configure and start DMA controller
-    // For now, use memcpy to simulate DMA transfer
-    memcpy(transfer->dst_addr, transfer->src_addr, transfer->length);
+    // Use real PortaPack DMA driver for hardware-accelerated transfer
+    if (!mdk_portapack_dma_transfer(channel, transfer)) {
+        fprintf(stderr, "[ERROR] DMA transfer on channel %d failed\n", channel);
+        chan->active = false;
+        return false;
+    }
 
     chan->current_transfer.completed = true;
     chan->current_transfer.error = false;
     chan->active = false;
 
+    fprintf(stdout, "[DEBUG] DMA transfer completed: %zu bytes\n", transfer->length);
     return true;
 }
 
@@ -392,7 +407,7 @@ bool mdk_dma_transfer_async(mdk_dma_channel_t channel, const mdk_dma_transfer_t 
 
     // In production: configure DMA controller and enable interrupts
     // Simulate immediate completion
-    memcpy(transfer->dst_addr, transfer->src_addr, transfer->length);
+        memcpy(transfer->dst_addr, transfer->src_addr, (size_t)transfer->length);
     chan->current_transfer.completed = true;
 
     if (chan->config.callback) {
@@ -534,8 +549,8 @@ bool mdk_stream_init(const mdk_stream_config_t *config) {
     // Initialize statistics
     memset(&stream->stats, 0, sizeof(stream->stats));
 
-    // If DMA is used, initialize DMA channel
-    if (config->dma_channel < 4) {
+        // If DMA is used, initialize DMA channel
+        if (config->dma_channel < MDK_DMA_CHANNEL_COUNT) {
         mdk_dma_config_t dma_config = {
             .channel = config->dma_channel,
             .direction = MDK_DMA_MEM_TO_MEM,
@@ -1155,7 +1170,7 @@ bool mdk_hw_get_status(mdk_hw_subsystem_t subsystem, uint8_t unit, mdk_hw_status
 
     switch (subsystem) {
         case MDK_HW_SUBSYS_I2C:
-            if (unit >= 2) return false;
+            if (unit >= MDK_I2C_BUS_COUNT) return false;
             status->initialized = g_hw_state.i2c_buses[unit].initialized;
             status->active = g_hw_state.i2c_buses[unit].initialized;
             status->error_count = g_hw_state.i2c_buses[unit].error_count;
@@ -1163,7 +1178,7 @@ bool mdk_hw_get_status(mdk_hw_subsystem_t subsystem, uint8_t unit, mdk_hw_status
             break;
 
         case MDK_HW_SUBSYS_DMA:
-            if (unit >= 4) return false;
+            if (unit >= MDK_DMA_CHANNEL_COUNT) return false;
             status->initialized = g_hw_state.dma_channels[unit].initialized;
             status->active = g_hw_state.dma_channels[unit].active;
             status->error_count = g_hw_state.dma_channels[unit].error_count;
@@ -1179,7 +1194,7 @@ bool mdk_hw_get_status(mdk_hw_subsystem_t subsystem, uint8_t unit, mdk_hw_status
             break;
 
         case MDK_HW_SUBSYS_GPIO:
-            if (unit >= 64) return false;
+            if (unit >= MDK_GPIO_PIN_COUNT) return false;
             status->initialized = g_hw_state.gpio_pins[unit].initialized;
             status->active = g_hw_state.gpio_pins[unit].initialized;
             status->error_count = 0;
@@ -1187,7 +1202,7 @@ bool mdk_hw_get_status(mdk_hw_subsystem_t subsystem, uint8_t unit, mdk_hw_status
             break;
 
         case MDK_HW_SUBSYS_UART:
-            if (unit >= 3) return false;
+            if (unit >= MDK_UART_PORT_COUNT) return false;
             status->initialized = g_hw_state.uart_ports[unit].initialized;
             status->active = g_hw_state.uart_ports[unit].initialized;
             status->error_count = g_hw_state.uart_ports[unit].error_count;
@@ -1209,12 +1224,12 @@ bool mdk_hw_get_system_status(mdk_hw_system_status_t *status) {
     memset(status, 0, sizeof(*status));
 
     // Gather status from all subsystems
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < MDK_I2C_BUS_COUNT; i++) {
         mdk_hw_get_status(MDK_HW_SUBSYS_I2C, i, &status->i2c_bus[i]);
         status->total_errors += status->i2c_bus[i].error_count;
     }
 
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < MDK_DMA_CHANNEL_COUNT; i++) {
         mdk_hw_get_status(MDK_HW_SUBSYS_DMA, i, &status->dma_channel[i]);
         status->total_errors += status->dma_channel[i].error_count;
     }
@@ -1224,7 +1239,7 @@ bool mdk_hw_get_system_status(mdk_hw_system_status_t *status) {
         status->total_errors += status->stream[i].error_count;
     }
 
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < MDK_UART_PORT_COUNT; i++) {
         mdk_hw_get_status(MDK_HW_SUBSYS_UART, i, &status->uart_port[i]);
         status->total_errors += status->uart_port[i].error_count;
     }
