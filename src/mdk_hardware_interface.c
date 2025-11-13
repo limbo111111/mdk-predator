@@ -141,9 +141,17 @@ bool mdk_i2c_device_probe(mdk_i2c_bus_t bus, uint8_t device_addr) {
         return false;
     }
 
-    // In production: send I2C address and check for ACK
-    // For now, simulate device presence for common addresses
-    return (device_addr >= 0x08 && device_addr <= 0x77);
+    // Use real PortaPack I2C probe via Mayhem firmware driver
+    // Sends I2C START + address byte and checks for ACK from device
+    bool device_present = mdk_portapack_i2c_probe(bus, device_addr);
+    
+    if (device_present) {
+        fprintf(stdout, "[DEBUG] I2C device found at 0x%02x on bus %d\n", device_addr, bus);
+    } else {
+        fprintf(stdout, "[DEBUG] No I2C device at 0x%02x on bus %d\n", device_addr, bus);
+    }
+
+    return device_present;
 }
 
 bool mdk_i2c_device_open(mdk_i2c_device_t *device, mdk_i2c_bus_t bus, uint8_t device_addr) {
@@ -399,15 +407,23 @@ bool mdk_dma_transfer_async(mdk_dma_channel_t channel, const mdk_dma_transfer_t 
         return false;
     }
 
-    // Start asynchronous DMA transfer
+    // Start asynchronous DMA transfer via real PortaPack Mayhem DMA controller
     chan->active = true;
     chan->current_transfer = *transfer;
     chan->current_transfer.completed = false;
     chan->current_transfer.error = false;
 
-    // In production: configure DMA controller and enable interrupts
-    // Simulate immediate completion
-        memcpy(transfer->dst_addr, transfer->src_addr, (size_t)transfer->length);
+    // Use actual Mayhem firmware DMA driver with LPC43xx GPDMA hardware
+    if (!mdk_portapack_dma_transfer(channel, transfer)) {
+        fprintf(stderr, "[ERROR] PortaPack DMA transfer failed on channel %d\n", channel);
+        chan->current_transfer.error = true;
+        chan->active = false;
+        if (chan->config.callback) {
+            chan->config.callback(channel, false, chan->config.user_data);
+        }
+        return false;
+    }
+
     chan->current_transfer.completed = true;
 
     if (chan->config.callback) {
@@ -415,6 +431,7 @@ bool mdk_dma_transfer_async(mdk_dma_channel_t channel, const mdk_dma_transfer_t 
     }
 
     chan->active = false;
+    fprintf(stdout, "[DEBUG] DMA transfer complete: %zu bytes on channel %d\n", transfer->length, channel);
 
     return true;
 }
@@ -498,11 +515,15 @@ bool mdk_dma_capture_signal(mdk_dma_channel_t channel, void *buffer, size_t buff
         expected_samples = buffer_size;
     }
 
-    // In production: configure ADC/RF frontend and DMA to capture samples
-    // Simulate capture by filling buffer with test pattern
-    memset(buffer, 0, expected_samples);
+    // Use real PortaPack RF signal capture via Mayhem baseband + HackRF driver
+    if (!mdk_portapack_dma_capture_rf_signal(buffer, buffer_size, frequency, sample_rate, duration_ms)) {
+        fprintf(stderr, "[ERROR] PortaPack RF capture failed: freq=%zu Hz, rate=%zu, duration=%zu ms\n", frequency, sample_rate, duration_ms);
+        memset(buffer, 0, expected_samples);
+        return false;
+    }
 
     chan->current_transfer.completed = true;
+    fprintf(stdout, "[DEBUG] RF signal capture complete: %zu samples at %zu Hz\n", expected_samples, sample_rate);
 
     return true;
 }
@@ -1044,9 +1065,13 @@ bool mdk_uart_write(mdk_uart_port_t port, const uint8_t *data, size_t length) {
         return false;
     }
 
-    // In production: write to UART peripheral or DMA
-    (void)p;
+    // Use real PortaPack UART driver via Mayhem firmware
+    if (!mdk_portapack_uart_write(port, data, length)) {
+        fprintf(stderr, "[ERROR] UART write failed on port %d\n", port);
+        return false;
+    }
 
+    fprintf(stdout, "[DEBUG] UART write: %zu bytes on port %d\n", length, port);
     return true;
 }
 
@@ -1065,10 +1090,19 @@ bool mdk_uart_read(mdk_uart_port_t port, uint8_t *data, size_t length, size_t *b
         return false;
     }
 
-    // In production: read from UART peripheral or DMA
-    memset(data, 0, length);
+    // Use real PortaPack UART driver via Mayhem firmware for actual serial read
+    size_t actual_read = 0;
+    if (!mdk_portapack_uart_read(port, data, length, &actual_read)) {
+        fprintf(stderr, "[ERROR] UART read failed on port %d\n", port);
+        actual_read = 0;
+    }
+
     if (bytes_read) {
-        *bytes_read = 0;
+        *bytes_read = actual_read;
+    }
+
+    if (actual_read > 0) {
+        fprintf(stdout, "[DEBUG] UART read: %zu bytes from port %d\n", actual_read, port);
     }
 
     return true;

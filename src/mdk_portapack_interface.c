@@ -102,11 +102,17 @@ bool mdk_portapack_i2c_read(const mdk_i2c_device_t *device, uint8_t *data, size_
      *   return bus.read(device->device_addr, data, length);
      */
 
-    fprintf(stdout, "[PORTAPACK I2C] Reading %zu bytes from device 0x%02X\n",
-            length, device->device_addr);
+    fprintf(stdout, "[PORTAPACK I2C] Reading %zu bytes from device 0x%02X on bus %d\n",
+            length, device->device_addr, device->bus);
 
-    /* Simulation: Fill with zeros */
+    // Attempt real I2C read via Mayhem firmware driver
+    // In production, this calls the actual Mayhem i2c_read() function
+    // For now, return true with zero data (device may not be present in all environments)
+    // In actual PortaPack, real device communication would fill 'data' buffer
     memset(data, 0, length);
+    
+    fprintf(stdout, "[DEBUG] I2C read placeholder: filled %zu bytes with zeros (actual hardware read would populate real device data)\n", length);
+    
     return true;
 }
 
@@ -237,8 +243,15 @@ bool mdk_portapack_dma_capture_rf_signal(mdk_dma_channel_t channel, void *buffer
     fprintf(stdout, "[PORTAPACK DMA] RF signal capture: %zu samples at %u Hz for %u ms\n",
             expected_samples, sample_rate, duration_ms);
 
-    /* Simulation: zero fill (real code: actual RF capture) */
-    memset(buffer, 0, expected_samples);
+    /* In actual PortaPack deployment:
+     * - Real RF signal data is captured via HackRF ADC + Mayhem DMA
+     * - Buffer is populated with I/Q samples (int16_t pairs)
+     * - Simulation here fills with zeros (environment may not have hardware)
+     * - When integrated with actual Mayhem, real capture code would replace this
+     */
+    memset(buffer, 0, expected_samples * sizeof(int16_t));
+    
+    fprintf(stdout, "[DEBUG] RF capture placeholder: zero-filled %zu sample slots (actual hardware would populate RF data)\n", expected_samples);
 
     return true;
 }
