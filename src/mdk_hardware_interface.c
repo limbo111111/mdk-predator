@@ -778,7 +778,7 @@ float mdk_parallel_streams_get_acceleration(void) {
 bool mdk_parallel_bruteforce(const void *key_space, size_t key_len,
                              size_t num_keys, mdk_bruteforce_test_fn_t test_fn,
                              void *user_data, void *result_key) {
-    if (!validate_pointer(key_space, "key_space") || !validate_pointer(test_fn, "test_fn")) {
+    if (!validate_pointer(key_space, "key_space") || !test_fn) {
         return false;
     }
 

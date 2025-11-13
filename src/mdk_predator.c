@@ -29,23 +29,29 @@ static uint32_t g_parallel_streams_count = 1;
  * Device model: I2CDECMDL_PPMOD
  */
 bool mdk_detect_i2c_module(void) {
-    // In production, this would use I2C communication to detect the MDK module
-    // Example pseudo-code:
-    // 1. Initialize I2C bus
-    // 2. Scan for I2C device at MDK module address
-    // 3. Read device identifier
-    // 4. Verify device model matches I2CDECMDL_PPMOD
-    //
-    // For now, we simulate detection based on system capabilities
-    // This would be replaced with actual I2C detection code in production
+    // Attempt to detect I2CDECMDL_PPMOD device on I2C bus
+    // Device is typically on I2C bus 0, address 0x50
+    mdk_i2c_config_t config = {
+        .bus = MDK_I2C_BUS_0,
+        .speed = MDK_I2C_SPEED_FAST,
+        .sda_pin = 21,
+        .scl_pin = 22,
+        .pullup_enable = true,
+        .timeout_ms = 100
+    };
 
-    // Simulated I2C detection logic
-    // In real hardware, would check:
-    // - I2C bus availability
-    // - Device presence at expected address
-    // - Device model string verification
+    if (!mdk_i2c_init(&config)) {
+        return false;  // I2C initialization failed
+    }
 
-    return false; // Default to not detected for software-only fallback
+    // Probe for device at expected address (0x50)
+    bool device_found = mdk_i2c_device_probe(MDK_I2C_BUS_0, 0x50);
+
+    if (device_found) {
+        fprintf(stdout, "[INFO] MDK module (I2CDECMDL_PPMOD) detected on I2C bus at address 0x50\n");
+    }
+
+    return device_found;
 }
 
 /**
@@ -58,6 +64,7 @@ bool mdk_predator_init(mdk_predator_config_t *config) {
 
     // Initialize MDK hardware interface
     if (!mdk_hardware_init()) {
+        fprintf(stderr, "[ERROR] Failed to initialize MDK hardware interface\n");
         return false;
     }
 
@@ -120,8 +127,10 @@ bool mdk_hardware_init(void) {
 
     // Initialize I2C for I2CDECMDL_PPMOD device model
     if (!mdk_i2c_init_i2cdecmdl()) {
-        // Non-fatal: I2C device may not be present
-        printf("[INFO] I2CDECMDL_PPMOD device not detected or failed to initialize. Continuing without I2C device as it is optional.\n");
+        // Non-fatal: I2C device may not be present on all hardware configurations
+        fprintf(stdout, "[WARN] I2CDECMDL_PPMOD device not detected or failed to initialize. Continuing in software-only mode.\n");
+    } else {
+        fprintf(stdout, "[INFO] I2CDECMDL_PPMOD device initialized successfully.\n");
     }
 
     // Configure DMA for signal capture
