@@ -88,8 +88,38 @@ MDKPredatorView::MDKPredatorView(NavigationView& nav)
     };
 }
 
+void CryptoView::draw(FantaManipulator* fb) {
+    fb->fill(BACKGROUND_COLOR);
+    View::draw(fb);
+}
+
+void SubGHzView::draw(FantaManipulator* fb) {
+    fb->fill(BACKGROUND_COLOR);
+    View::draw(fb);
+}
+
+void BluetoothView::draw(FantaManipulator* fb) {
+    fb->fill(BACKGROUND_COLOR);
+    View::draw(fb);
+}
+
+void WiFiView::draw(FantaManipulator* fb) {
+    fb->fill(BACKGROUND_COLOR);
+    View::draw(fb);
+}
+
+void AutomotiveView::draw(FantaManipulator* fb) {
+    fb->fill(BACKGROUND_COLOR);
+    View::draw(fb);
+}
+
 MDKPredatorView::~MDKPredatorView() {
     mdk_predator_cleanup();
+}
+
+void MDKPredatorView::draw(FantaManipulator* fb) {
+    fb->fill(BACKGROUND_COLOR);
+    View::draw(fb);
 }
 
 void MDKPredatorView::focus() {

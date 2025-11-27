@@ -34,7 +34,12 @@ static int tests_failed = 0;
  * Test: Initialize Bluetooth analyzer with valid config
  */
 void test_bluetooth_init_valid() {
-    bluetooth_config_t config;
+    bluetooth_config_t config = {
+        .mode = BT_MODE_SCAN,
+        .scan_duration = 10,
+        .scan_classic = true,
+        .scan_ble = true
+    };
     bool result = bluetooth_analyzer_init(&config);
 
     TEST_ASSERT(result == true, "Init should succeed with valid config");
@@ -62,10 +67,10 @@ void test_bluetooth_scan_devices_valid() {
     uint32_t count;
 
     bluetooth_analyzer_init(&config);
-    bool result = bluetooth_scan_devices(&config, devices, &count);
+    bool result = bluetooth_scan_devices(&config, devices, &count, MAX_BT_DEVICES);
 
     TEST_ASSERT(result == true, "Device scan should succeed with valid parameters");
-    TEST_ASSERT(count == 0, "Count should be initialized to 0");
+    TEST_ASSERT(count > 0, "Count should be greater than 0 after scan");
 }
 
 /**
@@ -74,7 +79,7 @@ void test_bluetooth_scan_devices_valid() {
 void test_bluetooth_scan_devices_null_config() {
     bt_device_t devices[MAX_BT_DEVICES];
     uint32_t count;
-    bool result = bluetooth_scan_devices(NULL, devices, &count);
+    bool result = bluetooth_scan_devices(NULL, devices, &count, MAX_BT_DEVICES);
 
     TEST_ASSERT(result == false, "Device scan should fail with NULL config");
 }
@@ -87,7 +92,7 @@ void test_bluetooth_scan_devices_null_buffer() {
     uint32_t count;
 
     bluetooth_analyzer_init(&config);
-    bool result = bluetooth_scan_devices(&config, NULL, &count);
+    bool result = bluetooth_scan_devices(&config, NULL, &count, MAX_BT_DEVICES);
 
     TEST_ASSERT(result == false, "Device scan should fail with NULL devices buffer");
 }
@@ -100,7 +105,7 @@ void test_bluetooth_scan_devices_null_count() {
     bt_device_t devices[MAX_BT_DEVICES];
 
     bluetooth_analyzer_init(&config);
-    bool result = bluetooth_scan_devices(&config, devices, NULL);
+    bool result = bluetooth_scan_devices(&config, devices, NULL, MAX_BT_DEVICES);
 
     TEST_ASSERT(result == false, "Device scan should fail with NULL count");
 }
@@ -152,10 +157,10 @@ void test_bluetooth_enumerate_services_valid() {
 
     memset(&device, 0, sizeof(device));
 
-    bool result = bluetooth_enumerate_services(&device, services, &count);
+    bool result = bluetooth_enumerate_services(&device, services, &count, MAX_BT_SERVICES);
 
     TEST_ASSERT(result == true, "Service enumeration should succeed with valid parameters");
-    TEST_ASSERT(count == 0, "Count should be initialized to 0");
+    TEST_ASSERT(count > 0, "Count should be greater than 0 after enumeration");
 }
 
 /**
@@ -165,7 +170,7 @@ void test_bluetooth_enumerate_services_null_device() {
     bt_service_t services[MAX_BT_SERVICES];
     uint32_t count;
 
-    bool result = bluetooth_enumerate_services(NULL, services, &count);
+    bool result = bluetooth_enumerate_services(NULL, services, &count, MAX_BT_SERVICES);
 
     TEST_ASSERT(result == false, "Service enumeration should fail with NULL device");
 }
@@ -178,7 +183,7 @@ void test_bluetooth_enumerate_services_null_buffer() {
     uint32_t count;
 
     memset(&device, 0, sizeof(device));
-    bool result = bluetooth_enumerate_services(&device, NULL, &count);
+    bool result = bluetooth_enumerate_services(&device, NULL, &count, MAX_BT_SERVICES);
 
     TEST_ASSERT(result == false, "Service enumeration should fail with NULL services buffer");
 }
@@ -191,7 +196,7 @@ void test_bluetooth_enumerate_services_null_count() {
     bt_service_t services[MAX_BT_SERVICES];
 
     memset(&device, 0, sizeof(device));
-    bool result = bluetooth_enumerate_services(&device, services, NULL);
+    bool result = bluetooth_enumerate_services(&device, services, NULL, MAX_BT_SERVICES);
 
     TEST_ASSERT(result == false, "Service enumeration should fail with NULL count");
 }

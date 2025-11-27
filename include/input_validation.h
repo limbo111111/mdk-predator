@@ -18,6 +18,8 @@
 #define MAX_SSID_LENGTH 32
 #define MAX_NAME_LENGTH 248
 
+#include "automotive/key_fob_analyzer.h"
+
 /* Frequency ranges (Hz) */
 #define MIN_FREQUENCY 1000000UL      // 1 MHz
 #define MAX_FREQUENCY 6000000000UL   // 6 GHz

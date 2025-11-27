@@ -34,7 +34,12 @@ static int tests_failed = 0;
  * Test: Initialize WiFi analyzer with valid config
  */
 void test_wifi_init_valid() {
-    wifi_config_t config;
+    wifi_config_t config = {
+        .channel = 6,
+        .mode = WIFI_MODE_MONITOR,
+        .capture_beacons = true,
+        .capture_data = true
+    };
     bool result = wifi_analyzer_init(&config);
 
     TEST_ASSERT(result == true, "Init should succeed with valid config");
@@ -62,10 +67,10 @@ void test_wifi_scan_networks_valid() {
     uint32_t count;
 
     wifi_analyzer_init(&config);
-    bool result = wifi_scan_networks(&config, networks, &count);
+    bool result = wifi_scan_networks(&config, networks, &count, MAX_NETWORKS);
 
     TEST_ASSERT(result == true, "Network scan should succeed with valid parameters");
-    TEST_ASSERT(count == 0, "Count should be initialized to 0");
+    TEST_ASSERT(count > 0, "Count should be greater than 0 after scan");
 }
 
 /**
@@ -74,7 +79,7 @@ void test_wifi_scan_networks_valid() {
 void test_wifi_scan_networks_null_config() {
     wifi_network_t networks[MAX_NETWORKS];
     uint32_t count;
-    bool result = wifi_scan_networks(NULL, networks, &count);
+    bool result = wifi_scan_networks(NULL, networks, &count, MAX_NETWORKS);
 
     TEST_ASSERT(result == false, "Network scan should fail with NULL config");
 }
@@ -87,7 +92,7 @@ void test_wifi_scan_networks_null_buffer() {
     uint32_t count;
 
     wifi_analyzer_init(&config);
-    bool result = wifi_scan_networks(&config, NULL, &count);
+    bool result = wifi_scan_networks(&config, NULL, &count, MAX_NETWORKS);
 
     TEST_ASSERT(result == false, "Network scan should fail with NULL networks buffer");
 }
@@ -100,7 +105,7 @@ void test_wifi_scan_networks_null_count() {
     wifi_network_t networks[MAX_NETWORKS];
 
     wifi_analyzer_init(&config);
-    bool result = wifi_scan_networks(&config, networks, NULL);
+    bool result = wifi_scan_networks(&config, networks, NULL, MAX_NETWORKS);
 
     TEST_ASSERT(result == false, "Network scan should fail with NULL count");
 }

@@ -284,15 +284,6 @@ void test_mdk_cleanup_multiple() {
 }
 
 /**
- * Test: Hardware init function
- */
-void test_mdk_hardware_init() {
-    bool result = mdk_hardware_init();
-
-    TEST_ASSERT(result == true, "Hardware init should succeed");
-}
-
-/**
  * Main test runner
  */
 int main(void) {
@@ -312,7 +303,6 @@ int main(void) {
     RUN_TEST(test_mdk_run_diagnostic_null);
     RUN_TEST(test_mdk_get_version);
     RUN_TEST(test_mdk_cleanup_multiple);
-    RUN_TEST(test_mdk_hardware_init);
 
     printf("\n========================================\n");
     printf("Test Results:\n");

@@ -16,7 +16,8 @@
 typedef enum {
     BT_MODE_SCAN,
     BT_MODE_MONITOR,
-    BT_MODE_CONNECT
+    BT_MODE_CONNECT,
+    BT_MODE_MITM
 } bt_mode_t;
 
 /* Bluetooth scan types */
@@ -63,7 +64,7 @@ typedef struct {
 /* Bluetooth service */
 typedef struct {
     uint16_t uuid;
-    char name[64];
+    char name[256];
     uint8_t channel;
 } bt_service_t;
 
@@ -83,9 +84,9 @@ typedef struct {
 
 /* Function prototypes */
 bool bluetooth_analyzer_init(bluetooth_config_t *config);
-bool bluetooth_scan_devices(bluetooth_config_t *config, bt_device_t *devices, uint32_t *count);
+bool bluetooth_scan_devices(bluetooth_config_t *config, bt_device_t *devices, uint32_t *count, uint32_t max_count);
 bool bluetooth_analyze_security(bt_device_t *device, bt_security_analysis_t *analysis);
-bool bluetooth_enumerate_services(bt_device_t *device, bt_service_t *services, uint32_t *count);
+bool bluetooth_enumerate_services(bt_device_t *device, bt_service_t *services, uint32_t *count, uint32_t max_count);
 bool bluetooth_capture_ble_adv(bluetooth_config_t *config, ble_adv_data_t *adv_data);
 bool bluetooth_test_mitm(bt_device_t *device, mitm_test_result_t *result);
 void bluetooth_analyzer_cleanup(bluetooth_config_t *config);

@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <stdbool.h>
 #include "automotive/key_fob_analyzer.h"
 
 /* Test counter */
@@ -35,7 +36,12 @@ static int tests_failed = 0;
  * Test: Initialize key fob analyzer with valid config
  */
 void test_keyfob_init_valid() {
-    keyfob_config_t config;
+    keyfob_config_t config = {
+        .frequency = 315000000,
+        .bandwidth = 200000,
+        .sample_rate = 2000000,
+        .mode = KEYFOB_MODE_RECEIVE
+    };
     bool result = keyfob_analyzer_init(&config);
 
     TEST_ASSERT(result == true, "Init should succeed with valid config");

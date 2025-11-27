@@ -10,6 +10,7 @@ LDFLAGS = -lm
 
 # Directories
 SRC_DIR = src
+HAL_DIR = hal
 BUILD_DIR = build
 OBJ_DIR = $(BUILD_DIR)/obj
 LIB_DIR = $(BUILD_DIR)/lib
@@ -18,17 +19,19 @@ LIB_DIR = $(BUILD_DIR)/lib
 AUTOMOTIVE_SRC = $(wildcard $(SRC_DIR)/automotive/*.c)
 WIRELESS_SRC = $(wildcard $(SRC_DIR)/wireless/*.c)
 CRYPTO_SRC = $(wildcard $(SRC_DIR)/crypto/*.c)
+HAL_SRC = $(wildcard $(HAL_DIR)/*.c)
 MAIN_SRC = $(SRC_DIR)/mdk_predator.c
 
-ALL_SRC = $(AUTOMOTIVE_SRC) $(WIRELESS_SRC) $(CRYPTO_SRC) $(MAIN_SRC)
+ALL_SRC = $(AUTOMOTIVE_SRC) $(WIRELESS_SRC) $(CRYPTO_SRC) $(HAL_SRC) $(MAIN_SRC)
 
 # Object files
 AUTOMOTIVE_OBJ = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(AUTOMOTIVE_SRC))
 WIRELESS_OBJ = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(WIRELESS_SRC))
 CRYPTO_OBJ = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(CRYPTO_SRC))
+HAL_OBJ = $(patsubst $(HAL_DIR)/%.c,$(OBJ_DIR)/%.o,$(HAL_SRC))
 MAIN_OBJ = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(MAIN_SRC))
 
-ALL_OBJ = $(AUTOMOTIVE_OBJ) $(WIRELESS_OBJ) $(CRYPTO_OBJ) $(MAIN_OBJ)
+ALL_OBJ = $(AUTOMOTIVE_OBJ) $(WIRELESS_OBJ) $(CRYPTO_OBJ) $(HAL_OBJ) $(MAIN_OBJ)
 
 # Output library
 LIB_NAME = libmdk_predator.a
@@ -43,6 +46,7 @@ directories:
 	@mkdir -p $(OBJ_DIR)/automotive
 	@mkdir -p $(OBJ_DIR)/wireless
 	@mkdir -p $(OBJ_DIR)/crypto
+	@mkdir -p $(OBJ_DIR)/hal
 	@mkdir -p $(LIB_DIR)
 
 $(LIB_PATH): $(ALL_OBJ)
@@ -50,6 +54,10 @@ $(LIB_PATH): $(ALL_OBJ)
 	$(AR) rcs $@ $^
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	@echo "Compiling: $<"
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+
+$(OBJ_DIR)/%.o: $(HAL_DIR)/%.c
 	@echo "Compiling: $<"
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
@@ -80,7 +88,7 @@ info:
 # Test configuration
 TEST_CC = gcc
 TEST_CFLAGS = -Wall -Wextra -O2 -std=c11
-TEST_INCLUDES = -Iinclude
+TEST_INCLUDES = -Iinclude -I.
 TEST_DIR = tests
 TEST_BUILD_DIR = $(BUILD_DIR)/tests
 TEST_BIN_DIR = $(TEST_BUILD_DIR)/bin

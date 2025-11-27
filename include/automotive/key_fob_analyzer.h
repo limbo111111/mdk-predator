@@ -24,7 +24,7 @@ typedef struct {
 } keyfob_config_t;
 
 /* Signal data structure */
-typedef struct {
+typedef struct signal_data_s {
     uint8_t *data;
     uint32_t length;
     uint32_t frequency;

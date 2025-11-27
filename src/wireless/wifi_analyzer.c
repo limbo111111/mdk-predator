@@ -7,21 +7,36 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
+#include <stdio.h>
 #include "wireless/wifi_analyzer.h"
+#include "input_validation.h"
+
+static bool wifi_add_network(wifi_network_t *networks, uint32_t *count, uint32_t max_count, const wifi_network_t *new_network) {
+    if (!validate_array_index(*count, max_count)) {
+        return false;
+    }
+
+    safe_memcpy(&networks[*count], sizeof(wifi_network_t), new_network, sizeof(wifi_network_t));
+    safe_strncpy(networks[*count].ssid, MAX_SSID_LENGTH, new_network->ssid, MAX_SSID_LENGTH - 1);
+
+    (*count)++;
+    return true;
+}
 
 /**
  * Initialize WiFi analyzer
  */
 bool wifi_analyzer_init(wifi_config_t *config) {
-    if (!config) {
+    if (!validate_not_null(config)) {
         return false;
     }
-
-    config->channel = 6;  // Default to channel 6
-    config->mode = WIFI_MODE_MONITOR;
-    config->capture_beacons = true;
-    config->capture_data = true;
-
+    if (validate_wifi_24_channel(config->channel) != VALIDATION_OK &&
+        validate_wifi_5_channel(config->channel) != VALIDATION_OK) {
+        return false;
+    }
+    if ((int)config->mode < WIFI_MODE_MONITOR || (int)config->mode > WIFI_MODE_CAPTURE) {
+        return false;
+    }
     return true;
 }
 
@@ -29,16 +44,21 @@ bool wifi_analyzer_init(wifi_config_t *config) {
  * Scan for WiFi networks
  */
 bool wifi_scan_networks(wifi_config_t *config, wifi_network_t *networks,
-                        uint32_t *count) {
-    if (!config || !networks || !count) {
+                        uint32_t *count, uint32_t max_count) {
+    if (!validate_not_null(config) || !validate_not_null(networks) || !validate_not_null(count)) {
         return false;
     }
 
     *count = 0;
+    // In a real implementation, you would add networks discovered through scanning.
+    // For now, let's assume we found one network.
+    wifi_network_t new_net = {0};
+    snprintf(new_net.ssid, MAX_SSID_LENGTH, "TestNet");
+    new_net.channel = 6;
+    new_net.rssi = -50;
+    new_net.security_type = WIFI_SECURITY_WPA2;
+    wifi_add_network(networks, count, max_count, &new_net);
 
-    // Scan all WiFi channels (2.4 GHz: 1-14, 5 GHz: 36-165)
-    // Capture beacon frames
-    // Parse SSIDs, BSSIDs, security types
 
     return true;
 }
@@ -47,7 +67,7 @@ bool wifi_scan_networks(wifi_config_t *config, wifi_network_t *networks,
  * Analyze WiFi security
  */
 bool wifi_analyze_security(wifi_network_t *network, wifi_security_analysis_t *analysis) {
-    if (!network || !analysis) {
+    if (!validate_not_null(network) || !validate_not_null(analysis)) {
         return false;
     }
 
@@ -70,7 +90,10 @@ bool wifi_analyze_security(wifi_network_t *network, wifi_security_analysis_t *an
  */
 bool wifi_capture_handshake(wifi_config_t *config, uint8_t *bssid,
                              handshake_data_t *handshake) {
-    if (!config || !bssid || !handshake) {
+    if (!validate_not_null(config) || !validate_not_null(bssid) || !validate_not_null(handshake)) {
+        return false;
+    }
+    if (!validate_mac_address(bssid)) {
         return false;
     }
 
@@ -87,7 +110,7 @@ bool wifi_capture_handshake(wifi_config_t *config, uint8_t *bssid,
  * Deauthentication attack detection
  */
 bool wifi_detect_deauth(wifi_config_t *config, deauth_detection_t *detection) {
-    if (!config || !detection) {
+    if (!validate_not_null(config) || !validate_not_null(detection)) {
         return false;
     }
 

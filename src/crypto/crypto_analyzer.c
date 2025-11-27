@@ -8,19 +8,25 @@
 #include <stdbool.h>
 #include <string.h>
 #include "crypto/crypto_analyzer.h"
+#include "input_validation.h"
+#include <math.h>
 
 /**
  * Initialize crypto analyzer
  */
 bool crypto_analyzer_init(crypto_config_t *config) {
-    if (!config) {
+    if (!validate_not_null(config)) {
         return false;
     }
-
-    config->algorithm = CRYPTO_ALG_AES;
-    config->key_length = 128;
-    config->mode = CRYPTO_MODE_ANALYZE;
-
+    if ((int)config->algorithm < CRYPTO_ALG_AES || (int)config->algorithm > CRYPTO_ALG_UNKNOWN) {
+        return false;
+    }
+    if (config->key_length != 128 && config->key_length != 192 && config->key_length != 256) {
+        return false;
+    }
+    if ((int)config->mode < CRYPTO_MODE_ANALYZE || (int)config->mode > CRYPTO_MODE_WEAK_KEYS) {
+        return false;
+    }
     return true;
 }
 
@@ -29,7 +35,10 @@ bool crypto_analyzer_init(crypto_config_t *config) {
  */
 bool crypto_identify_algorithm(uint8_t *ciphertext, uint32_t length,
                                 crypto_identification_t *result) {
-    if (!ciphertext || !result || length == 0) {
+    if (!validate_not_null(ciphertext) || !validate_not_null(result)) {
+        return false;
+    }
+    if (validate_buffer_length(length, MAX_DATA_BUFFER_SIZE) != VALIDATION_OK) {
         return false;
     }
 
@@ -50,7 +59,7 @@ bool crypto_identify_algorithm(uint8_t *ciphertext, uint32_t length,
  */
 bool crypto_analyze_key_exchange(key_exchange_data_t *data,
                                   key_exchange_analysis_t *analysis) {
-    if (!data || !analysis) {
+    if (!validate_not_null(data) || !validate_not_null(analysis)) {
         return false;
     }
 
@@ -66,11 +75,12 @@ bool crypto_analyze_key_exchange(key_exchange_data_t *data,
  */
 bool crypto_test_weak_keys(crypto_config_t *config, uint8_t *key,
                             uint32_t key_length, weak_key_result_t *result) {
-    if (!config || !key || !result) {
+    if (!validate_not_null(config) || !validate_not_null(key) || !validate_not_null(result)) {
         return false;
     }
-
-    (void)key_length;  // Reserved for future implementation
+    if (validate_buffer_length(key_length, 256) != VALIDATION_OK) { // Max key length 256 bytes
+        return false;
+    }
 
     result->is_weak = false;
     result->entropy = 0.0f;
@@ -89,11 +99,12 @@ bool crypto_test_weak_keys(crypto_config_t *config, uint8_t *key,
  */
 bool crypto_analyze_rolling_code(uint8_t *encrypted_data, uint32_t length,
                                   rolling_crypto_analysis_t *analysis) {
-    if (!encrypted_data || !analysis) {
+    if (!validate_not_null(encrypted_data) || !validate_not_null(analysis)) {
         return false;
     }
-
-    (void)length;  // Reserved for future implementation
+    if (validate_buffer_length(length, MAX_DATA_BUFFER_SIZE) != VALIDATION_OK) {
+        return false;
+    }
 
     // Analyze rolling code cryptography
     analysis->algorithm_detected = false;
@@ -112,7 +123,10 @@ bool crypto_analyze_rolling_code(uint8_t *encrypted_data, uint32_t length,
  */
 bool crypto_entropy_analysis(uint8_t *data, uint32_t length,
                               entropy_result_t *result) {
-    if (!data || !result || length == 0) {
+    if (!validate_not_null(data) || !validate_not_null(result)) {
+        return false;
+    }
+    if (validate_buffer_length(length, MAX_DATA_BUFFER_SIZE) != VALIDATION_OK) {
         return false;
     }
 
