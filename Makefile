@@ -2,9 +2,9 @@
 # Build system for Mayhem-MDK Predator Security Suite
 
 # Compiler and flags
-CC = arm-none-eabi-gcc
-AR = arm-none-eabi-ar
-CFLAGS = -Wall -Wextra -O2 -std=c11 -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16
+CC = gcc
+AR = ar
+CFLAGS = -Wall -Wextra -O2 -std=c11
 INCLUDES = -Iinclude
 LDFLAGS = -lm
 
@@ -15,20 +15,23 @@ OBJ_DIR = $(BUILD_DIR)/obj
 LIB_DIR = $(BUILD_DIR)/lib
 
 # Source files
-AUTOMOTIVE_SRC = $(wildcard $(SRC_DIR)/automotive/*.c)
-WIRELESS_SRC = $(wildcard $(SRC_DIR)/wireless/*.c)
-CRYPTO_SRC = $(wildcard $(SRC_DIR)/crypto/*.c)
-HARDWARE_SRC = $(SRC_DIR)/mdk_hardware_interface.c
-MAIN_SRC = $(SRC_DIR)/mdk_predator.c
+APPLICATION_SRC_DIR = $(SRC_DIR)/application
+HAL_SRC_DIR = $(SRC_DIR)/hal
+
+AUTOMOTIVE_SRC = $(wildcard $(APPLICATION_SRC_DIR)/automotive/*.c)
+WIRELESS_SRC = $(wildcard $(APPLICATION_SRC_DIR)/wireless/*.c)
+CRYPTO_SRC = $(wildcard $(APPLICATION_SRC_DIR)/crypto/*.c)
+HARDWARE_SRC = $(wildcard $(HAL_SRC_DIR)/*.c)
+MAIN_SRC = $(APPLICATION_SRC_DIR)/mdk_predator.c
 
 ALL_SRC = $(AUTOMOTIVE_SRC) $(WIRELESS_SRC) $(CRYPTO_SRC) $(HARDWARE_SRC) $(MAIN_SRC)
 
 # Object files
-AUTOMOTIVE_OBJ = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(AUTOMOTIVE_SRC))
-WIRELESS_OBJ = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(WIRELESS_SRC))
-CRYPTO_OBJ = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(CRYPTO_SRC))
-HARDWARE_OBJ = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(HARDWARE_SRC))
-MAIN_OBJ = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(MAIN_SRC))
+AUTOMOTIVE_OBJ = $(patsubst $(APPLICATION_SRC_DIR)/%.c,$(OBJ_DIR)/application/%.o,$(AUTOMOTIVE_SRC))
+WIRELESS_OBJ = $(patsubst $(APPLICATION_SRC_DIR)/%.c,$(OBJ_DIR)/application/%.o,$(WIRELESS_SRC))
+CRYPTO_OBJ = $(patsubst $(APPLICATION_SRC_DIR)/%.c,$(OBJ_DIR)/application/%.o,$(CRYPTO_SRC))
+HARDWARE_OBJ = $(patsubst $(HAL_SRC_DIR)/%.c,$(OBJ_DIR)/hal/%.o,$(HARDWARE_SRC))
+MAIN_OBJ = $(patsubst $(APPLICATION_SRC_DIR)/%.c,$(OBJ_DIR)/application/%.o,$(MAIN_SRC))
 
 ALL_OBJ = $(AUTOMOTIVE_OBJ) $(WIRELESS_OBJ) $(CRYPTO_OBJ) $(HARDWARE_OBJ) $(MAIN_OBJ)
 
@@ -42,16 +45,21 @@ LIB_PATH = $(LIB_DIR)/$(LIB_NAME)
 all: directories $(LIB_PATH)
 
 directories:
-	@mkdir -p $(OBJ_DIR)/automotive
-	@mkdir -p $(OBJ_DIR)/wireless
-	@mkdir -p $(OBJ_DIR)/crypto
+	@mkdir -p $(OBJ_DIR)/application/automotive
+	@mkdir -p $(OBJ_DIR)/application/wireless
+	@mkdir -p $(OBJ_DIR)/application/crypto
+	@mkdir -p $(OBJ_DIR)/hal
 	@mkdir -p $(LIB_DIR)
 
 $(LIB_PATH): $(ALL_OBJ)
 	@echo "Creating library: $@"
 	$(AR) rcs $@ $^
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+$(OBJ_DIR)/application/%.o: $(APPLICATION_SRC_DIR)/%.c
+	@echo "Compiling: $<"
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+
+$(OBJ_DIR)/hal/%.o: $(HAL_SRC_DIR)/%.c
 	@echo "Compiling: $<"
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
@@ -81,7 +89,7 @@ info:
 
 # Test configuration
 TEST_CC = gcc
-TEST_CFLAGS = -Wall -Wextra -O2 -std=c11
+TEST_CFLAGS = -Wall -Wextra -O2 -std=c11 --coverage
 TEST_INCLUDES = -Iinclude
 TEST_DIR = tests
 TEST_BUILD_DIR = $(BUILD_DIR)/tests
@@ -96,88 +104,57 @@ TEST_INTEGRATION_SRC = $(wildcard $(TEST_DIR)/integration/*.c)
 
 ALL_TEST_SRC = $(TEST_AUTOMOTIVE_SRC) $(TEST_WIRELESS_SRC) $(TEST_CRYPTO_SRC) $(TEST_HARDWARE_SRC) $(TEST_INTEGRATION_SRC)
 
-# Test binaries
-TEST_AUTOMOTIVE_BIN = $(patsubst $(TEST_DIR)/automotive/%.c,$(TEST_BIN_DIR)/automotive/%,$(TEST_AUTOMOTIVE_SRC))
-TEST_WIRELESS_BIN = $(patsubst $(TEST_DIR)/wireless/%.c,$(TEST_BIN_DIR)/wireless/%,$(TEST_WIRELESS_SRC))
-TEST_CRYPTO_BIN = $(patsubst $(TEST_DIR)/crypto/%.c,$(TEST_BIN_DIR)/crypto/%,$(TEST_CRYPTO_SRC))
-TEST_HARDWARE_BIN = $(patsubst $(TEST_DIR)/hardware/%.c,$(TEST_BIN_DIR)/hardware/%,$(TEST_HARDWARE_SRC))
-TEST_INTEGRATION_BIN = $(patsubst $(TEST_DIR)/integration/%.c,$(TEST_BIN_DIR)/integration/%,$(TEST_INTEGRATION_SRC))
+# Test objects
+TEST_OBJ_DIR = $(TEST_BUILD_DIR)/obj
+TEST_AUTOMOTIVE_OBJ = $(patsubst $(TEST_DIR)/%.c,$(TEST_OBJ_DIR)/%.o,$(TEST_AUTOMOTIVE_SRC))
+TEST_WIRELESS_OBJ = $(patsubst $(TEST_DIR)/%.c,$(TEST_OBJ_DIR)/%.o,$(TEST_WIRELESS_SRC))
+TEST_CRYPTO_OBJ = $(patsubst $(TEST_DIR)/%.c,$(TEST_OBJ_DIR)/%.o,$(TEST_CRYPTO_SRC))
+TEST_HARDWARE_OBJ = $(patsubst $(TEST_DIR)/%.c,$(TEST_OBJ_DIR)/%.o,$(TEST_HARDWARE_SRC))
+TEST_INTEGRATION_OBJ = $(patsubst $(TEST_DIR)/%.c,$(TEST_OBJ_DIR)/%.o,$(TEST_INTEGRATION_SRC))
 
-ALL_TEST_BIN = $(TEST_AUTOMOTIVE_BIN) $(TEST_WIRELESS_BIN) $(TEST_CRYPTO_BIN) $(TEST_HARDWARE_BIN) $(TEST_INTEGRATION_BIN)
+ALL_TEST_OBJ = $(TEST_AUTOMOTIVE_OBJ) $(TEST_WIRELESS_OBJ) $(TEST_CRYPTO_OBJ) $(TEST_HARDWARE_OBJ) $(TEST_INTEGRATION_OBJ)
+
+# Test executable
+TEST_EXEC = $(TEST_BIN_DIR)/mdk_predator_test
 
 # Test targets
-.PHONY: test test-build test-run test-automotive test-wireless test-crypto test-hardware test-integration test-clean
+.PHONY: test test-build test-run test-automotive test-wireless test-crypto test-hardware test-integration test-clean coverage
 
 test: test-build test-run
 
-test-build: $(ALL_TEST_BIN)
+test-build: directories test-directories $(TEST_EXEC)
 
 test-directories:
-	@mkdir -p $(TEST_BIN_DIR)/automotive
-	@mkdir -p $(TEST_BIN_DIR)/wireless
-	@mkdir -p $(TEST_BIN_DIR)/crypto
-	@mkdir -p $(TEST_BIN_DIR)/hardware
-	@mkdir -p $(TEST_BIN_DIR)/integration
+	@mkdir -p $(TEST_OBJ_DIR)/automotive
+	@mkdir -p $(TEST_OBJ_DIR)/wireless
+	@mkdir -p $(TEST_OBJ_DIR)/crypto
+	@mkdir -p $(TEST_OBJ_DIR)/hardware
+	@mkdir -p $(TEST_OBJ_DIR)/integration
+	@mkdir -p $(TEST_BIN_DIR)
 
+$(TEST_EXEC): $(ALL_TEST_OBJ) $(ALL_OBJ) $(TEST_DIR)/test-main.c
+	@echo "Building test executable: $@"
+	$(TEST_CC) $(TEST_CFLAGS) $(TEST_INCLUDES) $(ALL_TEST_OBJ) $(ALL_OBJ) $(TEST_DIR)/test-main.c -lm -o $@
 
-# Compile test binaries - automotive
-$(TEST_BIN_DIR)/automotive/%: $(TEST_DIR)/automotive/%.c $(AUTOMOTIVE_SRC) test-directories
-	@echo "Building test: $@"
-	$(TEST_CC) $(TEST_CFLAGS) $(TEST_INCLUDES) $< $(AUTOMOTIVE_SRC) -o $@
+$(TEST_OBJ_DIR)/%.o: $(TEST_DIR)/%.c
+	@echo "Compiling test: $<"
+	$(TEST_CC) $(TEST_CFLAGS) $(TEST_INCLUDES) -c $< -o $@
 
-# Compile test binaries - wireless
-$(TEST_BIN_DIR)/wireless/%: $(TEST_DIR)/wireless/%.c $(WIRELESS_SRC) test-directories
-	@echo "Building test: $@"
-	$(TEST_CC) $(TEST_CFLAGS) $(TEST_INCLUDES) $< $(WIRELESS_SRC) -o $@
-
-# Compile test binaries - crypto
-$(TEST_BIN_DIR)/crypto/%: $(TEST_DIR)/crypto/%.c $(CRYPTO_SRC) test-directories
-	@echo "Building test: $@"
-	$(TEST_CC) $(TEST_CFLAGS) $(TEST_INCLUDES) $< $(CRYPTO_SRC) -lm -o $@
-
-# Compile test binaries - hardware
-$(TEST_BIN_DIR)/hardware/%: $(TEST_DIR)/hardware/%.c $(HARDWARE_SRC) test-directories
-	@echo "Building test: $@"
-	$(TEST_CC) $(TEST_CFLAGS) $(TEST_INCLUDES) $< $(HARDWARE_SRC) -o $@
-
-# Compile test binaries - integration
-$(TEST_BIN_DIR)/integration/test_input_validation: $(TEST_DIR)/integration/test_input_validation.c test-directories
-	@echo "Building test: $@"
-	$(TEST_CC) $(TEST_CFLAGS) $(TEST_INCLUDES) $< -o $@
-
-$(TEST_BIN_DIR)/integration/%: $(TEST_DIR)/integration/%.c $(ALL_SRC) test-directories
-	@echo "Building test: $@"
-	$(TEST_CC) $(TEST_CFLAGS) $(TEST_INCLUDES) $< $(filter-out $(MAIN_SRC),$(ALL_SRC)) $(MAIN_SRC) -lm -o $@
-
-test-run:
+test-run: test-build
 	@echo ""
 	@echo "========================================="
 	@echo "Running MDK-Predator Test Suite"
 	@echo "========================================="
 	@echo ""
-	@test_count=0; \
-	pass_count=0; \
-	fail_count=0; \
-	for test in $(ALL_TEST_BIN); do \
-		if [ -f "$$test" ]; then \
-			test_count=$$((test_count + 1)); \
-			echo "Running: $$test"; \
-			if $$test; then \
-				pass_count=$$((pass_count + 1)); \
-			else \
-				fail_count=$$((fail_count + 1)); \
-			fi; \
-			echo ""; \
-		fi; \
-	done; \
-	echo "========================================"; \
-	echo "Overall Test Summary"; \
-	echo "========================================"; \
-	echo "Total test suites: $$test_count"; \
-	echo "Passed: $$pass_count"; \
-	echo "Failed: $$fail_count"; \
-	echo "========================================"; \
-	if [ $$fail_count -gt 0 ]; then exit 1; fi
+	@$(TEST_EXEC)
+
+coverage: test-run
+	@echo ""
+	@echo "========================================="
+	@echo "Generating Code Coverage Report"
+	@echo "========================================="
+	@echo ""
+	@gcov -b -c $(ALL_SRC) > coverage.txt
 
 test-automotive:
 	@echo "Building and running automotive tests..."

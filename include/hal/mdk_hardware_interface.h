@@ -133,7 +133,7 @@ bool mdk_dma_get_status(mdk_dma_channel_t channel, bool *active, size_t *bytes_t
 
 /* Signal Capture with DMA */
 bool mdk_dma_capture_signal(mdk_dma_channel_t channel, void *buffer, size_t buffer_size,
-                            uint32_t sample_rate, uint32_t duration_ms);
+                            uint32_t frequency, uint32_t sample_rate, uint32_t duration_ms);
 bool mdk_dma_get_capture_status(mdk_dma_channel_t channel, size_t *samples_captured);
 
 /* ========================================================================

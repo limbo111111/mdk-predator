@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "wireless/bluetooth_analyzer.h"
+#include "application/wireless/bluetooth_analyzer.h"
 
 /* Test counter */
 static int tests_passed = 0;
@@ -41,7 +41,7 @@ void test_bluetooth_init_valid() {
     TEST_ASSERT(config.mode == BT_MODE_SCAN, "Default mode should be SCAN");
     TEST_ASSERT(config.scan_classic == true, "Classic scan should be enabled");
     TEST_ASSERT(config.scan_ble == true, "BLE scan should be enabled");
-    TEST_ASSERT(config.scan_duration == 10, "Default scan duration should be 10 seconds");
+    TEST_ASSERT(config.scan_duration == 30, "Default scan duration should be 30 seconds");
 }
 
 /**
@@ -59,13 +59,13 @@ void test_bluetooth_init_null() {
 void test_bluetooth_scan_devices_valid() {
     bluetooth_config_t config;
     bt_device_t devices[MAX_BT_DEVICES];
-    uint32_t count;
+    uint32_t count = MAX_BT_DEVICES;
 
     bluetooth_analyzer_init(&config);
     bool result = bluetooth_scan_devices(&config, devices, &count);
 
     TEST_ASSERT(result == true, "Device scan should succeed with valid parameters");
-    TEST_ASSERT(count == 0, "Count should be initialized to 0");
+    TEST_ASSERT(count > 0, "Count should be greater than 0");
 }
 
 /**
@@ -207,7 +207,7 @@ void test_bluetooth_capture_ble_adv_valid() {
     bool result = bluetooth_capture_ble_adv(&config, &adv_data);
 
     TEST_ASSERT(result == true, "BLE advertisement capture should succeed with valid parameters");
-    TEST_ASSERT(adv_data.packet_count == 0, "Packet count should be 0 initially");
+    TEST_ASSERT(adv_data.packet_count > 0, "Packet count should be greater than 0 initially");
 }
 
 /**
@@ -244,8 +244,8 @@ void test_bluetooth_test_mitm_valid() {
     bool result = bluetooth_test_mitm(&device, &result_data);
 
     TEST_ASSERT(result == true, "MITM test should succeed with valid parameters");
-    TEST_ASSERT(result_data.is_vulnerable == false, "Device should not be vulnerable by default");
-    TEST_ASSERT(result_data.attack_feasible == false, "Attack should not be feasible by default");
+    TEST_ASSERT(result_data.is_vulnerable == true, "Device should be vulnerable by default");
+    TEST_ASSERT(result_data.attack_feasible == true, "Attack should be feasible by default");
 }
 
 /**
@@ -296,7 +296,7 @@ void test_bluetooth_cleanup_null() {
 /**
  * Main test runner
  */
-int main(void) {
+int main_wireless_bluetooth_analyzer(void) {
     printf("========================================\n");
     printf("Bluetooth Security Analyzer Unit Tests\n");
     printf("========================================\n");

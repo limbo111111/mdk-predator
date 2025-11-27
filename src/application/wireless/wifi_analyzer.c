@@ -14,7 +14,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <time.h>
-#include "wireless/wifi_analyzer.h"
+#include "application/wireless/wifi_analyzer.h"
 
 /* WiFi frame type constants (IEEE 802.11) */
 #define WIFI_FRAME_TYPE_BEACON 0x80
@@ -24,13 +24,6 @@
 #define WIFI_FRAME_TYPE_ASSOC_RESP 0x10
 #define WIFI_FRAME_TYPE_DEAUTH 0xC0
 #define WIFI_FRAME_TYPE_DISASSOC 0xA0
-
-/* WiFi channel frequency mapping for analysis */
-static const uint16_t wifi_channel_freq[] = {
-    2412, 2417, 2422, 2427, 2432, 2437, 2442, 2447, 2452, 2457, 2462, 2467, 2472,  /* 1-13 (2.4 GHz) */
-    2484,  /* 14 */
-    5180, 5200, 5220, 5240, 5260, 5280, 5300, 5320, 5500, 5520, 5540, 5560, 5580, 5600, 5620, 5640, 5660, 5680, 5700, 5720, 5745, 5765, 5785, 5805, 5825  /* 36-165 (5 GHz) */
-};
 
 /**
  * Initialize WiFi analyzer with PortaPack RF hardware

@@ -8,7 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "crypto/crypto_analyzer.h"
+#include "application/crypto/crypto_analyzer.h"
+#include "hal/mdk_hardware_interface.h"
 
 /* Test counter */
 static int tests_passed = 0;
@@ -243,7 +244,7 @@ void test_crypto_cleanup_null() {
 /**
  * Main test runner
  */
-int main(void) {
+int main_crypto_crypto_analyzer(void) {
     printf("========================================\n");
     printf("Crypto Analyzer Unit Tests\n");
     printf("========================================\n");

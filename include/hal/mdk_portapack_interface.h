@@ -83,7 +83,7 @@ bool mdk_portapack_dma_transfer(mdk_dma_channel_t channel, const mdk_dma_transfe
  * @return true if capture started/completed successfully
  */
 bool mdk_portapack_dma_capture_rf_signal(mdk_dma_channel_t channel, void *buffer, size_t buffer_size,
-                                         uint32_t sample_rate, uint32_t duration_ms);
+                                         uint32_t frequency, uint32_t sample_rate, uint32_t duration_ms);
 
 /* ========================================================================
  * GPIO Wrapper Functions
@@ -131,6 +131,16 @@ bool mdk_portapack_uart_init(const mdk_uart_config_t *config);
  * @return true if successful, false on error
  */
 bool mdk_portapack_uart_write(mdk_uart_port_t port, const uint8_t *data, size_t length);
+
+/**
+ * Read data from UART port.
+ * @param port UART port identifier
+ * @param data Buffer to receive data
+ * @param length Number of bytes to read
+ * @param bytes_read Pointer to store number of bytes actually read
+ * @return true if successful, false on error
+ */
+bool mdk_portapack_uart_read(mdk_uart_port_t port, uint8_t *data, size_t length, size_t *bytes_read);
 
 /* ========================================================================
  * System Integration Helpers

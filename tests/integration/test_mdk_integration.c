@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "mdk_predator.h"
+#include "application/mdk_predator.h"
 
 /* Test counter */
 static int tests_passed = 0;
@@ -49,9 +49,6 @@ void test_mdk_init_valid() {
     bool result = mdk_predator_init(&config);
 
     TEST_ASSERT(result == true, "Init should succeed with valid config");
-
-    // Cleanup after test
-    mdk_predator_cleanup();
 }
 
 /**
@@ -88,8 +85,6 @@ void test_mdk_get_status_after_init() {
     TEST_ASSERT(result == true, "Get status should succeed after init");
     TEST_ASSERT(status.is_initialized == true, "Status should show initialized");
     TEST_ASSERT(status.active_module == MODULE_SUBGHZ, "Active module should match config");
-
-    mdk_predator_cleanup();
 }
 
 /**
@@ -127,8 +122,6 @@ void test_mdk_get_status_null() {
     bool result = mdk_get_status(NULL);
 
     TEST_ASSERT(result == false, "Get status should fail with NULL buffer");
-
-    mdk_predator_cleanup();
 }
 
 /**
@@ -158,8 +151,6 @@ void test_mdk_set_active_module_valid() {
 
     result = mdk_set_active_module(MODULE_CRYPTO);
     TEST_ASSERT(result == true, "Should be able to switch to crypto module");
-
-    mdk_predator_cleanup();
 }
 
 /**
@@ -203,8 +194,6 @@ void test_mdk_run_diagnostic_valid() {
     TEST_ASSERT(result.bluetooth_ok == true, "Bluetooth module should be OK");
     TEST_ASSERT(result.subghz_ok == true, "SubGHz module should be OK");
     TEST_ASSERT(result.crypto_ok == true, "Crypto module should be OK");
-
-    mdk_predator_cleanup();
 }
 
 /**
@@ -242,8 +231,6 @@ void test_mdk_run_diagnostic_null() {
     bool result = mdk_run_diagnostic(NULL);
 
     TEST_ASSERT(result == false, "Diagnostic should fail with NULL result buffer");
-
-    mdk_predator_cleanup();
 }
 
 /**
@@ -295,7 +282,7 @@ void test_mdk_hardware_init() {
 /**
  * Main test runner
  */
-int main(void) {
+int main_integration_mdk_integration(void) {
     printf("========================================\n");
     printf("MDK-Predator Integration Tests\n");
     printf("========================================\n");

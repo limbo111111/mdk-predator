@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "automotive/rolling_code_tester.h"
+#include "application/automotive/rolling_code_tester.h"
 
 /* Test counter */
 static int tests_passed = 0;
@@ -232,7 +232,7 @@ void test_rolling_code_cleanup_null() {
 /**
  * Main test runner
  */
-int main(void) {
+int main_automotive_rolling_code_tester(void) {
     printf("========================================\n");
     printf("Rolling Code Tester Unit Tests\n");
     printf("========================================\n");

@@ -9,7 +9,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <assert.h>
-#include "../include/mdk_hardware_interface.h"
+#include "hal/mdk_hardware_interface.h"
 
 /* Test counters */
 static int tests_passed = 0;
@@ -52,8 +52,6 @@ TEST(test_hw_interface_init_valid) {
 
     bool result = mdk_hardware_interface_init(&config);
     ASSERT(result == true, "Init should succeed with valid config");
-
-    mdk_hardware_interface_cleanup();
 }
 
 TEST(test_hw_interface_init_null) {
@@ -81,8 +79,6 @@ TEST(test_hw_interface_self_test) {
     mdk_hardware_interface_init(&config);
     bool result = mdk_hardware_interface_self_test();
     ASSERT(result == true, "Self test should pass");
-
-    mdk_hardware_interface_cleanup();
 }
 
 /* ========================================================================
@@ -153,7 +149,7 @@ TEST(test_i2c_i2cdecmdl_integration) {
     result = mdk_i2c_i2cdecmdl_read_status(&status);
     ASSERT(result == true, "I2CDECMDL read status should succeed");
 
-    uint8_t config_data[] = {0x01, 0x02, 0x03, 0x04};
+    uint8_t config_data[32] = {0x01, 0x02, 0x03, 0x04};
     result = mdk_i2c_i2cdecmdl_configure(config_data, sizeof(config_data));
     ASSERT(result == true, "I2CDECMDL configure should succeed");
 
@@ -231,7 +227,7 @@ TEST(test_dma_signal_capture) {
 
     uint8_t buffer[1024];
     bool result = mdk_dma_capture_signal(MDK_DMA_CHANNEL_1, buffer,
-                                         sizeof(buffer), 2000000, 100);
+                                         sizeof(buffer), 433920000, 2000000, 100);
     ASSERT(result == true, "Signal capture should succeed");
 
     size_t samples;
@@ -466,15 +462,13 @@ TEST(test_hw_status) {
     mdk_hw_system_status_t status;
     bool result = mdk_hw_get_system_status(&status);
     ASSERT(result == true, "Get system status should succeed");
-
-    mdk_hardware_interface_cleanup();
 }
 
 /* ========================================================================
  * Main Test Runner
  * ======================================================================== */
 
-int main(void) {
+int main_hardware_mdk_hardware_interface(void) {
     printf("========================================\n");
     printf("MDK Hardware Interface Unit Tests\n");
     printf("========================================\n\n");

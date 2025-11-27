@@ -8,14 +8,14 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include "mdk_predator.h"
-#include "mdk_hardware_interface.h"
-#include "automotive/key_fob_analyzer.h"
-#include "automotive/rolling_code_tester.h"
-#include "wireless/wifi_analyzer.h"
-#include "wireless/bluetooth_analyzer.h"
-#include "wireless/subghz_analyzer.h"
-#include "crypto/crypto_analyzer.h"
+#include "application/mdk_predator.h"
+#include "hal/mdk_hardware_interface.h"
+#include "application/automotive/key_fob_analyzer.h"
+#include "application/automotive/rolling_code_tester.h"
+#include "application/wireless/wifi_analyzer.h"
+#include "application/wireless/bluetooth_analyzer.h"
+#include "application/wireless/subghz_analyzer.h"
+#include "application/crypto/crypto_analyzer.h"
 
 /* Global configuration */
 static mdk_predator_config_t g_config;

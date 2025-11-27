@@ -205,7 +205,7 @@ void test_get_validation_error_message() {
 /**
  * Main test runner
  */
-int main(void) {
+int main_integration_test_input_validation(void) {
     printf("========================================\n");
     printf("Input Validation Utilities Unit Tests\n");
     printf("========================================\n");

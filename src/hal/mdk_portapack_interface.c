@@ -11,7 +11,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
-#include "mdk_hardware_interface.h"
+#include "hal/mdk_hardware_interface.h"
 
 /**
  * PortaPack Hardware Interface - Production Implementation
@@ -216,7 +216,9 @@ bool mdk_portapack_dma_transfer(mdk_dma_channel_t channel, const mdk_dma_transfe
  * Configures DMA to capture samples from HackRF baseband.
  */
 bool mdk_portapack_dma_capture_rf_signal(mdk_dma_channel_t channel, void *buffer, size_t buffer_size,
-                                         uint32_t sample_rate, uint32_t duration_ms) {
+                                         uint32_t frequency, uint32_t sample_rate, uint32_t duration_ms) {
+    (void)channel;
+    (void)frequency;
     if (!buffer || buffer_size == 0) {
         return false;
     }
@@ -381,6 +383,31 @@ bool mdk_portapack_uart_write(mdk_uart_port_t port, const uint8_t *data, size_t 
      */
 
     fprintf(stdout, "[PORTAPACK UART] Writing %zu bytes to port %d\n", length, port);
+
+    return true;
+}
+
+/**
+ * Real UART read (for debug output, etc.).
+ */
+bool mdk_portapack_uart_read(mdk_uart_port_t port, uint8_t *data, size_t length, size_t *bytes_read) {
+    if (!data || length == 0) {
+        return false;
+    }
+
+    /* In production:
+     * - Read from UART RX register or FIFO
+     * - Wait for data or timeout
+     *
+     * Example (Mayhem API):
+     *   return uart_read(port, data, length, bytes_read);
+     */
+
+    fprintf(stdout, "[PORTAPACK UART] Reading %zu bytes from port %d\n", length, port);
+
+    if (bytes_read) {
+        *bytes_read = 0;
+    }
 
     return true;
 }

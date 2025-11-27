@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include "automotive/key_fob_analyzer.h"
+#include "application/automotive/key_fob_analyzer.h"
 
 /* Test counter */
 static int tests_passed = 0;
@@ -194,7 +194,7 @@ void test_keyfob_cleanup_null() {
 /**
  * Main test runner
  */
-int main(void) {
+int main_automotive_key_fob_analyzer(void) {
     printf("========================================\n");
     printf("Key Fob Analyzer Unit Tests\n");
     printf("========================================\n");

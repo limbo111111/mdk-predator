@@ -5,8 +5,8 @@
  * Provides I2C, DMA, parallel streams, GPIO, and UART functionality
  */
 
-#include "mdk_hardware_interface.h"
-#include "mdk_portapack_interface.h"
+#include "hal/mdk_hardware_interface.h"
+#include "hal/mdk_portapack_interface.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -294,13 +294,28 @@ bool mdk_i2c_i2cdecmdl_configure(const uint8_t *config_data, size_t length) {
         return false;
     }
 
+    mdk_i2c_config_t config = {
+        .bus = MDK_I2C_BUS_0,
+        .speed = MDK_I2C_SPEED_FAST,
+        .sda_pin = 21,
+        .scl_pin = 22,
+        .pullup_enable = true,
+        .timeout_ms = 100
+    };
+
+    if (!mdk_i2c_init(&config)) {
+        return false;
+    }
+
     mdk_i2c_device_t device;
     if (!mdk_i2c_device_open(&device, MDK_I2C_BUS_0, 0x50)) {
+        mdk_i2c_deinit(MDK_I2C_BUS_0);
         return false;
     }
 
     bool result = mdk_i2c_write(&device, config_data, length);
     mdk_i2c_device_close(&device);
+    mdk_i2c_deinit(MDK_I2C_BUS_0);
 
     return result;
 }
@@ -494,7 +509,7 @@ bool mdk_dma_get_status(mdk_dma_channel_t channel, bool *active, size_t *bytes_t
 }
 
 bool mdk_dma_capture_signal(mdk_dma_channel_t channel, void *buffer, size_t buffer_size,
-                            uint32_t sample_rate, uint32_t duration_ms) {
+                            uint32_t frequency, uint32_t sample_rate, uint32_t duration_ms) {
     if (!validate_pointer(buffer, "buffer")) {
         return false;
     }
@@ -516,14 +531,14 @@ bool mdk_dma_capture_signal(mdk_dma_channel_t channel, void *buffer, size_t buff
     }
 
     // Use real PortaPack RF signal capture via Mayhem baseband + HackRF driver
-    if (!mdk_portapack_dma_capture_rf_signal(buffer, buffer_size, frequency, sample_rate, duration_ms)) {
-        fprintf(stderr, "[ERROR] PortaPack RF capture failed: freq=%zu Hz, rate=%zu, duration=%zu ms\n", frequency, sample_rate, duration_ms);
+    if (!mdk_portapack_dma_capture_rf_signal(channel, buffer, buffer_size, frequency, sample_rate, duration_ms)) {
+        fprintf(stderr, "[ERROR] PortaPack RF capture failed: freq=%u Hz, rate=%u, duration=%u ms\n", frequency, sample_rate, duration_ms);
         memset(buffer, 0, expected_samples);
         return false;
     }
 
     chan->current_transfer.completed = true;
-    fprintf(stdout, "[DEBUG] RF signal capture complete: %zu samples at %zu Hz\n", expected_samples, sample_rate);
+    fprintf(stdout, "[DEBUG] RF signal capture complete: %zu samples at %u Hz\n", expected_samples, sample_rate);
 
     return true;
 }
