@@ -8,7 +8,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <math.h>
-#include "crypto/crypto_analyzer.h"
+#include "application/crypto/crypto_analyzer.h"
 
 /**
  * Initialize crypto analyzer

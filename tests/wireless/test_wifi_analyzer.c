@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "wireless/wifi_analyzer.h"
+#include "application/wireless/wifi_analyzer.h"
 
 /* Test counter */
 static int tests_passed = 0;

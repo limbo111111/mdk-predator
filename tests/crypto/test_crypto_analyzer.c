@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "crypto/crypto_analyzer.h"
+#include "application/crypto/crypto_analyzer.h"
 
 /* Test counter */
 static int tests_passed = 0;

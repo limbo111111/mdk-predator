@@ -15,20 +15,23 @@ OBJ_DIR = $(BUILD_DIR)/obj
 LIB_DIR = $(BUILD_DIR)/lib
 
 # Source files
-AUTOMOTIVE_SRC = $(wildcard $(SRC_DIR)/automotive/*.c)
-WIRELESS_SRC = $(wildcard $(SRC_DIR)/wireless/*.c)
-CRYPTO_SRC = $(wildcard $(SRC_DIR)/crypto/*.c)
-HARDWARE_SRC = $(SRC_DIR)/mdk_hardware_interface.c
-MAIN_SRC = $(SRC_DIR)/mdk_predator.c
+APPLICATION_SRC_DIR = $(SRC_DIR)/application
+HAL_SRC_DIR = $(SRC_DIR)/hal
+
+AUTOMOTIVE_SRC = $(wildcard $(APPLICATION_SRC_DIR)/automotive/*.c)
+WIRELESS_SRC = $(wildcard $(APPLICATION_SRC_DIR)/wireless/*.c)
+CRYPTO_SRC = $(wildcard $(APPLICATION_SRC_DIR)/crypto/*.c)
+HARDWARE_SRC = $(wildcard $(HAL_SRC_DIR)/*.c)
+MAIN_SRC = $(APPLICATION_SRC_DIR)/mdk_predator.c
 
 ALL_SRC = $(AUTOMOTIVE_SRC) $(WIRELESS_SRC) $(CRYPTO_SRC) $(HARDWARE_SRC) $(MAIN_SRC)
 
 # Object files
-AUTOMOTIVE_OBJ = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(AUTOMOTIVE_SRC))
-WIRELESS_OBJ = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(WIRELESS_SRC))
-CRYPTO_OBJ = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(CRYPTO_SRC))
-HARDWARE_OBJ = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(HARDWARE_SRC))
-MAIN_OBJ = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(MAIN_SRC))
+AUTOMOTIVE_OBJ = $(patsubst $(APPLICATION_SRC_DIR)/%.c,$(OBJ_DIR)/application/%.o,$(AUTOMOTIVE_SRC))
+WIRELESS_OBJ = $(patsubst $(APPLICATION_SRC_DIR)/%.c,$(OBJ_DIR)/application/%.o,$(WIRELESS_SRC))
+CRYPTO_OBJ = $(patsubst $(APPLICATION_SRC_DIR)/%.c,$(OBJ_DIR)/application/%.o,$(CRYPTO_SRC))
+HARDWARE_OBJ = $(patsubst $(HAL_SRC_DIR)/%.c,$(OBJ_DIR)/hal/%.o,$(HARDWARE_SRC))
+MAIN_OBJ = $(patsubst $(APPLICATION_SRC_DIR)/%.c,$(OBJ_DIR)/application/%.o,$(MAIN_SRC))
 
 ALL_OBJ = $(AUTOMOTIVE_OBJ) $(WIRELESS_OBJ) $(CRYPTO_OBJ) $(HARDWARE_OBJ) $(MAIN_OBJ)
 
@@ -42,16 +45,21 @@ LIB_PATH = $(LIB_DIR)/$(LIB_NAME)
 all: directories $(LIB_PATH)
 
 directories:
-	@mkdir -p $(OBJ_DIR)/automotive
-	@mkdir -p $(OBJ_DIR)/wireless
-	@mkdir -p $(OBJ_DIR)/crypto
+	@mkdir -p $(OBJ_DIR)/application/automotive
+	@mkdir -p $(OBJ_DIR)/application/wireless
+	@mkdir -p $(OBJ_DIR)/application/crypto
+	@mkdir -p $(OBJ_DIR)/hal
 	@mkdir -p $(LIB_DIR)
 
 $(LIB_PATH): $(ALL_OBJ)
 	@echo "Creating library: $@"
 	$(AR) rcs $@ $^
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+$(OBJ_DIR)/application/%.o: $(APPLICATION_SRC_DIR)/%.c
+	@echo "Compiling: $<"
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+
+$(OBJ_DIR)/hal/%.o: $(HAL_SRC_DIR)/%.c
 	@echo "Compiling: $<"
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
@@ -81,7 +89,7 @@ info:
 
 # Test configuration
 TEST_CC = gcc
-TEST_CFLAGS = -Wall -Wextra -O2 -std=c11
+TEST_CFLAGS = -Wall -Wextra -O2 -std=c11 --coverage
 TEST_INCLUDES = -Iinclude
 TEST_DIR = tests
 TEST_BUILD_DIR = $(BUILD_DIR)/tests

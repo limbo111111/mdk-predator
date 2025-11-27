@@ -15,7 +15,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <time.h>
-#include "wireless/bluetooth_analyzer.h"
+#include "application/wireless/bluetooth_analyzer.h"
 
 /* Bluetooth Device Class identifiers (COD - Class of Device) */
 #define BT_COD_MISC 0x000000

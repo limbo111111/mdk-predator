@@ -9,7 +9,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <assert.h>
-#include "../include/mdk_hardware_interface.h"
+#include "hal/mdk_hardware_interface.h"
 
 /* Test counters */
 static int tests_passed = 0;

@@ -11,7 +11,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
-#include "mdk_hardware_interface.h"
+#include "hal/mdk_hardware_interface.h"
 
 /**
  * PortaPack Hardware Interface - Production Implementation

@@ -14,7 +14,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <time.h>
-#include "wireless/wifi_analyzer.h"
+#include "application/wireless/wifi_analyzer.h"
 
 /* WiFi frame type constants (IEEE 802.11) */
 #define WIFI_FRAME_TYPE_BEACON 0x80

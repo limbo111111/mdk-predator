@@ -5,8 +5,8 @@
  * Provides I2C, DMA, parallel streams, GPIO, and UART functionality
  */
 
-#include "mdk_hardware_interface.h"
-#include "mdk_portapack_interface.h"
+#include "hal/mdk_hardware_interface.h"
+#include "hal/mdk_portapack_interface.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>

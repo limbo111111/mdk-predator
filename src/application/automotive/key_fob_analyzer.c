@@ -7,7 +7,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "automotive/key_fob_analyzer.h"
+#include "application/automotive/key_fob_analyzer.h"
 
 /* Supported key fob frequencies (MHz) */
 static const uint32_t KEYFOB_FREQUENCIES[] = {

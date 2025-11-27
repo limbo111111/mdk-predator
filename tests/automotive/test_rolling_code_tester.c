@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "automotive/rolling_code_tester.h"
+#include "application/automotive/rolling_code_tester.h"
 
 /* Test counter */
 static int tests_passed = 0;

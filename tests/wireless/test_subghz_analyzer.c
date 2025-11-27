@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "wireless/subghz_analyzer.h"
+#include "application/wireless/subghz_analyzer.h"
 
 /* Test counter */
 static int tests_passed = 0;

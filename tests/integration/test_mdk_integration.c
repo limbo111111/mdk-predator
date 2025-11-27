@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "mdk_predator.h"
+#include "application/mdk_predator.h"
 
 /* Test counter */
 static int tests_passed = 0;
