@@ -15,7 +15,8 @@
 typedef enum {
     WIFI_MODE_MONITOR,
     WIFI_MODE_MANAGED,
-    WIFI_MODE_SCAN
+    WIFI_MODE_ATTACK,
+    WIFI_MODE_CAPTURE
 } wifi_mode_t;
 
 /* Security types */
@@ -71,7 +72,7 @@ typedef struct {
 
 /* Function prototypes */
 bool wifi_analyzer_init(wifi_config_t *config);
-bool wifi_scan_networks(wifi_config_t *config, wifi_network_t *networks, uint32_t *count);
+bool wifi_scan_networks(wifi_config_t *config, wifi_network_t *networks, uint32_t *count, uint32_t max_count);
 bool wifi_analyze_security(wifi_network_t *network, wifi_security_analysis_t *analysis);
 bool wifi_capture_handshake(wifi_config_t *config, uint8_t *bssid, handshake_data_t *handshake);
 bool wifi_detect_deauth(wifi_config_t *config, deauth_detection_t *detection);

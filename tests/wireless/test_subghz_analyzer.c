@@ -34,7 +34,12 @@ static int tests_failed = 0;
  * Test: Initialize SubGHz analyzer with valid config
  */
 void test_subghz_init_valid() {
-    subghz_config_t config;
+    subghz_config_t config = {
+        .frequency = 433920000,
+        .bandwidth = 200000,
+        .sample_rate = 2000000,
+        .modulation = SUBGHZ_MOD_ASK_OOK
+    };
     bool result = subghz_analyzer_init(&config);
 
     TEST_ASSERT(result == true, "Init should succeed with valid config");
@@ -94,6 +99,12 @@ void test_subghz_scan_spectrum_null_buffer() {
 void test_subghz_capture_signal_valid() {
     subghz_config_t config;
     rf_signal_t signal;
+    int16_t i_samples[10] = {0};
+    int16_t q_samples[10] = {0};
+
+    signal.i_samples = i_samples;
+    signal.q_samples = q_samples;
+    signal.sample_count = 10;
 
     subghz_analyzer_init(&config);
     bool result = subghz_capture_signal(&config, &signal);
@@ -129,10 +140,12 @@ void test_subghz_capture_signal_null_buffer() {
 void test_subghz_analyze_signal_valid() {
     rf_signal_t signal;
     signal_analysis_t analysis;
+    int16_t i_samples[10] = {0};
+    int16_t q_samples[10] = {0};
 
-    signal.i_samples = NULL;
-    signal.q_samples = NULL;
-    signal.sample_count = 0;
+    signal.i_samples = i_samples;
+    signal.q_samples = q_samples;
+    signal.sample_count = 10;
 
     bool result = subghz_analyze_signal(&signal, &analysis);
 
@@ -168,10 +181,12 @@ void test_subghz_analyze_signal_null_buffer() {
 void test_subghz_decode_protocol_valid() {
     rf_signal_t signal;
     protocol_data_t protocol;
+    int16_t i_samples[10] = {0};
+    int16_t q_samples[10] = {0};
 
-    signal.i_samples = NULL;
-    signal.q_samples = NULL;
-    signal.sample_count = 0;
+    signal.i_samples = i_samples;
+    signal.q_samples = q_samples;
+    signal.sample_count = 10;
 
     bool result = subghz_decode_protocol(&signal, &protocol);
 

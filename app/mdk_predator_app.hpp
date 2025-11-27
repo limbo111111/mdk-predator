@@ -13,6 +13,7 @@
 #include "message.hpp"
 #include "mdk_hardware_interface.h"
 #include <string>
+#include "UI_THEME.hpp"
 
 namespace ui {
 
@@ -29,6 +30,7 @@ public:
     MDKPredatorView(NavigationView& nav);
     ~MDKPredatorView();
 
+    void draw(FantaManipulator* fb) override;
     void focus() override;
     std::string title() const override { return "MDK-Predator"; };
 
@@ -95,6 +97,7 @@ private:
 class AutomotiveView : public View {
 public:
     AutomotiveView(NavigationView& nav);
+    void draw(FantaManipulator* fb) override;
     void focus() override;
     std::string title() const override { return "Automotive"; };
 
@@ -150,6 +153,7 @@ private:
 class WiFiView : public View {
 public:
     WiFiView(NavigationView& nav);
+    void draw(FantaManipulator* fb) override;
     void focus() override;
     std::string title() const override { return "WiFi"; };
 
@@ -204,6 +208,7 @@ private:
 class BluetoothView : public View {
 public:
     BluetoothView(NavigationView& nav);
+    void draw(FantaManipulator* fb) override;
     void focus() override;
     std::string title() const override { return "Bluetooth"; };
 
@@ -258,6 +263,7 @@ private:
 class SubGHzView : public View {
 public:
     SubGHzView(NavigationView& nav);
+    void draw(FantaManipulator* fb) override;
     void focus() override;
     std::string title() const override { return "SubGHz RF"; };
 
@@ -319,6 +325,7 @@ private:
 class CryptoView : public View {
 public:
     CryptoView(NavigationView& nav);
+    void draw(FantaManipulator* fb) override;
     void focus() override;
     std::string title() const override { return "Crypto"; };
 

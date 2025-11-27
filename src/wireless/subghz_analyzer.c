@@ -8,29 +8,27 @@
 #include <stdbool.h>
 #include <string.h>
 #include "wireless/subghz_analyzer.h"
-
-/* Common SubGHz frequencies */
-static const uint32_t SUBGHZ_FREQUENCIES[] = {
-    300000000,  // 300 MHz
-    315000000,  // 315 MHz
-    433920000,  // 433.92 MHz
-    868000000,  // 868 MHz
-    915000000   // 915 MHz
-};
+#include "input_validation.h"
 
 /**
  * Initialize SubGHz analyzer
  */
 bool subghz_analyzer_init(subghz_config_t *config) {
-    if (!config) {
+    if (!validate_not_null(config)) {
         return false;
     }
-
-    config->frequency = SUBGHZ_FREQUENCIES[2];  // Default to 433.92 MHz
-    config->bandwidth = 200000;  // 200 kHz
-    config->sample_rate = 2000000;  // 2 MS/s
-    config->modulation = SUBGHZ_MOD_ASK_OOK;
-
+    if (validate_subghz_frequency(config->frequency) != VALIDATION_OK) {
+        return false;
+    }
+    if (config->bandwidth == 0 || config->bandwidth > 5000000) { // 5 MHz
+        return false;
+    }
+    if (config->sample_rate == 0 || config->sample_rate > 20000000) { // 20 MS/s
+        return false;
+    }
+    if ((int)config->modulation < SUBGHZ_MOD_ASK_OOK || (int)config->modulation > SUBGHZ_MOD_GFSK) {
+        return false;
+    }
     return true;
 }
 
@@ -38,7 +36,7 @@ bool subghz_analyzer_init(subghz_config_t *config) {
  * Scan SubGHz spectrum
  */
 bool subghz_scan_spectrum(subghz_config_t *config, spectrum_data_t *spectrum) {
-    if (!config || !spectrum) {
+    if (!validate_not_null(config) || !validate_not_null(spectrum)) {
         return false;
     }
 
@@ -54,7 +52,10 @@ bool subghz_scan_spectrum(subghz_config_t *config, spectrum_data_t *spectrum) {
  * Capture RF signal
  */
 bool subghz_capture_signal(subghz_config_t *config, rf_signal_t *signal) {
-    if (!config || !signal) {
+    if (!validate_not_null(config) || !validate_not_null(signal) || !validate_not_null(signal->i_samples) || !validate_not_null(signal->q_samples)) {
+        return false;
+    }
+    if (validate_buffer_length(signal->sample_count, MAX_SIGNAL_BUFFER_SIZE) != VALIDATION_OK) {
         return false;
     }
 
@@ -69,7 +70,10 @@ bool subghz_capture_signal(subghz_config_t *config, rf_signal_t *signal) {
  * Analyze RF signal
  */
 bool subghz_analyze_signal(rf_signal_t *signal, signal_analysis_t *analysis) {
-    if (!signal || !analysis) {
+    if (!validate_not_null(signal) || !validate_not_null(analysis) || !validate_not_null(signal->i_samples) || !validate_not_null(signal->q_samples)) {
+        return false;
+    }
+    if (validate_buffer_length(signal->sample_count, MAX_SIGNAL_BUFFER_SIZE) != VALIDATION_OK) {
         return false;
     }
 
@@ -85,7 +89,10 @@ bool subghz_analyze_signal(rf_signal_t *signal, signal_analysis_t *analysis) {
  * Decode common protocols
  */
 bool subghz_decode_protocol(rf_signal_t *signal, protocol_data_t *protocol) {
-    if (!signal || !protocol) {
+    if (!validate_not_null(signal) || !validate_not_null(protocol) || !validate_not_null(signal->i_samples) || !validate_not_null(signal->q_samples)) {
+        return false;
+    }
+    if (validate_buffer_length(signal->sample_count, MAX_SIGNAL_BUFFER_SIZE) != VALIDATION_OK) {
         return false;
     }
 
@@ -107,7 +114,10 @@ bool subghz_decode_protocol(rf_signal_t *signal, protocol_data_t *protocol) {
  */
 bool subghz_record_raw(subghz_config_t *config, uint32_t duration_ms,
                        raw_signal_t *raw_data) {
-    if (!config || !raw_data) {
+    if (!validate_not_null(config) || !validate_not_null(raw_data)) {
+        return false;
+    }
+    if (duration_ms == 0 || duration_ms > 60000) { // Max 60 seconds
         return false;
     }
 
@@ -122,7 +132,10 @@ bool subghz_record_raw(subghz_config_t *config, uint32_t duration_ms,
  * Replay signal (for testing only)
  */
 bool subghz_replay_signal(subghz_config_t *config, rf_signal_t *signal) {
-    if (!config || !signal) {
+    if (!validate_not_null(config) || !validate_not_null(signal) || !validate_not_null(signal->i_samples) || !validate_not_null(signal->q_samples)) {
+        return false;
+    }
+    if (validate_buffer_length(signal->sample_count, MAX_SIGNAL_BUFFER_SIZE) != VALIDATION_OK) {
         return false;
     }
 

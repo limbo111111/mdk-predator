@@ -8,26 +8,32 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "automotive/key_fob_analyzer.h"
-
-/* Supported key fob frequencies (MHz) */
-static const uint32_t KEYFOB_FREQUENCIES[] = {
-    315000000,  // 315 MHz (North America)
-    433920000,  // 433.92 MHz (Europe, Asia)
-    868000000   // 868 MHz (Europe)
-};
+#include "input_validation.h"
 
 /**
  * Initialize the key fob analyzer module
  */
 bool keyfob_analyzer_init(keyfob_config_t *config) {
-    if (!config) {
+    if (!validate_not_null(config)) {
         return false;
     }
 
-    config->frequency = KEYFOB_FREQUENCIES[0];
-    config->bandwidth = 200000;  // 200 kHz
-    config->sample_rate = 2000000;  // 2 MS/s
-    config->mode = KEYFOB_MODE_RECEIVE;
+    if (validate_subghz_frequency(config->frequency) != VALIDATION_OK) {
+        config->frequency = 315000000;
+    }
+
+    // Basic validation for bandwidth and sample rate.
+    if (config->bandwidth == 0 || config->bandwidth > 1000000) { // 1 MHz
+        config->bandwidth = 200000;
+    }
+
+    if (config->sample_rate == 0 || config->sample_rate > 20000000) { // 20 MS/s
+        config->sample_rate = 2000000;
+    }
+
+    if ((int)config->mode < KEYFOB_MODE_RECEIVE || (int)config->mode > KEYFOB_MODE_ANALYZE) {
+        config->mode = KEYFOB_MODE_RECEIVE;
+    }
 
     return true;
 }
@@ -36,7 +42,7 @@ bool keyfob_analyzer_init(keyfob_config_t *config) {
  * Capture key fob signal
  */
 bool keyfob_capture_signal(keyfob_config_t *config, signal_data_t *signal) {
-    if (!config || !signal) {
+    if (!validate_not_null(config) || !validate_not_null(signal)) {
         return false;
     }
 
@@ -50,7 +56,11 @@ bool keyfob_capture_signal(keyfob_config_t *config, signal_data_t *signal) {
  * Analyze captured key fob signal
  */
 bool keyfob_analyze_signal(signal_data_t *signal, keyfob_analysis_t *result) {
-    if (!signal || !result) {
+    if (!validate_not_null(signal) || !validate_not_null(result) || !validate_not_null(signal->data)) {
+        return false;
+    }
+
+    if (validate_buffer_length(signal->length, MAX_SIGNAL_BUFFER_SIZE) != VALIDATION_OK) {
         return false;
     }
 
@@ -66,7 +76,11 @@ bool keyfob_analyze_signal(signal_data_t *signal, keyfob_analysis_t *result) {
  * Detect rolling code pattern
  */
 bool keyfob_detect_rolling_code(signal_data_t *signal, rolling_code_info_t *info) {
-    if (!signal || !info) {
+    if (!validate_not_null(signal) || !validate_not_null(info) || !validate_not_null(signal->data)) {
+        return false;
+    }
+
+    if (validate_buffer_length(signal->length, MAX_SIGNAL_BUFFER_SIZE) != VALIDATION_OK) {
         return false;
     }
 

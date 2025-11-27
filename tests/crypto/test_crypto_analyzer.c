@@ -34,7 +34,11 @@ static int tests_failed = 0;
  * Test: Initialize crypto analyzer with valid config
  */
 void test_crypto_init_valid() {
-    crypto_config_t config;
+    crypto_config_t config = {
+        .algorithm = CRYPTO_ALG_AES,
+        .key_length = 128,
+        .mode = CRYPTO_MODE_ANALYZE
+    };
     bool result = crypto_analyzer_init(&config);
 
     TEST_ASSERT(result == true, "Init should succeed with valid config");

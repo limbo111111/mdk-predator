@@ -1,13 +1,10 @@
-// mdk_hardware_interface.h
-
-#ifndef MDK_HARDWARE_INTERFACE_H
-#define MDK_HARDWARE_INTERFACE_H
+#ifndef HAL_H
+#define HAL_H
 
 #include <stdint.h>
 #include <stdbool.h>
-#include <stdlib.h>
+#include "mdk_predator.h"
 
-// Constants
 #define MDK_MAX_PARALLEL_STREAMS 8
 
 // Device Information Structure
@@ -35,21 +32,15 @@ typedef struct {
     bool *found;
 } mdk_bruteforce_task_t;
 
-// I2C ESP32-S3 API Definitions
-#define I2C_MASTER_SDA_PIN 21
-#define I2C_MASTER_SCL_PIN 22
-#define I2C_MASTER_FREQUENCY 100000
+void hal_init(void);
+void hal_cleanup(void);
+void hal_set_frequency(uint32_t frequency);
+void hal_set_sample_rate(uint32_t sample_rate);
+void hal_set_bandwidth(uint32_t bandwidth);
+void hal_set_lna_gain(uint8_t gain);
+void hal_set_vga_gain(uint8_t gain);
+void hal_set_txvga_gain(uint8_t gain);
+int hal_rx_callback(void* data, uint32_t length);
+int hal_tx_callback(void* data, uint32_t length);
 
-void i2c_master_init();
-void i2c_master_write(uint8_t device_addr, uint8_t *data, size_t size);
-void i2c_master_read(uint8_t device_addr, uint8_t *data, size_t size);
-
-// MDK Hardware API Functions
-bool mdk_hardware_detect(mdk_device_info_t *info);
-bool mdk_accel_init(mdk_accel_config_t *config);
-bool mdk_accel_bruteforce(mdk_bruteforce_task_t *task);
-bool mdk_is_acceleration_enabled(void);
-uint32_t mdk_get_performance_multiplier(void);
-void mdk_accel_cleanup(void);
-
-#endif // MDK_HARDWARE_INTERFACE_H
+#endif // HAL_H

@@ -29,7 +29,8 @@ typedef enum {
 typedef enum {
     CRYPTO_MODE_ANALYZE,
     CRYPTO_MODE_TEST,
-    CRYPTO_MODE_RESEARCH
+    CRYPTO_MODE_DECRYPT,
+    CRYPTO_MODE_WEAK_KEYS
 } crypto_mode_t;
 
 /* Key exchange protocols */

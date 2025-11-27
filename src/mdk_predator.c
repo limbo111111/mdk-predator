@@ -9,12 +9,14 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include "mdk_predator.h"
+#include "input_validation.h"
 #include "automotive/key_fob_analyzer.h"
 #include "automotive/rolling_code_tester.h"
 #include "wireless/wifi_analyzer.h"
 #include "wireless/bluetooth_analyzer.h"
 #include "wireless/subghz_analyzer.h"
 #include "crypto/crypto_analyzer.h"
+#include "hal/hal.h"
 
 /* Global configuration */
 static mdk_predator_config_t g_config;
@@ -24,52 +26,35 @@ static bool g_initialized = false;
  * Initialize MDK-Predator suite
  */
 bool mdk_predator_init(mdk_predator_config_t *config) {
-    if (!config) {
+    if (!validate_not_null(config)) {
         return false;
     }
 
-    // Initialize HackRF/Mayhem-MDK hardware with config
-    if (!mdk_hardware_init()) {
+    if (validate_frequency(config->hardware.hackrf_sample_rate) != VALIDATION_OK ||
+        validate_frequency(config->hardware.hackrf_bandwidth) != VALIDATION_OK) {
         return false;
     }
 
-    // Copy configuration
-    g_config = *config;
+    hal_init();
+    hal_set_sample_rate(config->hardware.hackrf_sample_rate);
+    hal_set_bandwidth(config->hardware.hackrf_bandwidth);
+    hal_set_lna_gain(config->hardware.hackrf_lna_gain);
+    hal_set_vga_gain(config->hardware.hackrf_vga_gain);
+    hal_set_txvga_gain(config->hardware.hackrf_txvga_gain);
 
-    // Apply hardware configuration
-    // Note: In production, this would call HackRF API functions
-    // hackrf_set_sample_rate(g_config.hardware.hackrf_sample_rate);
-    // hackrf_set_baseband_filter_bandwidth(g_config.hardware.hackrf_bandwidth);
-    // hackrf_set_lna_gain(g_config.hardware.hackrf_lna_gain);
-    // hackrf_set_vga_gain(g_config.hardware.hackrf_vga_gain);
-    // hackrf_set_txvga_gain(g_config.hardware.hackrf_txvga_gain);
-
-    // Apply security configuration
-    if (!g_config.security.allow_transmit) {
-        // Disable transmit functions
-    }
+    safe_memcpy(&g_config, sizeof(g_config), config, sizeof(mdk_predator_config_t));
 
     g_initialized = true;
 
     return true;
 }
 
-/**
- * Initialize hardware interface
- */
-bool mdk_hardware_init(void) {
-    // Initialize HackRF One hardware
-    // Configure for Mayhem-MDK module
-    // Set up GPIO, SPI, I2C interfaces
-
-    return true;
-}
 
 /**
  * Get module status
  */
 bool mdk_get_status(mdk_status_t *status) {
-    if (!status || !g_initialized) {
+    if (!validate_not_null(status) || !g_initialized) {
         return false;
     }
 
@@ -85,6 +70,9 @@ bool mdk_get_status(mdk_status_t *status) {
  */
 bool mdk_set_active_module(security_module_t module) {
     if (!g_initialized) {
+        return false;
+    }
+    if (module < MODULE_AUTOMOTIVE || module > MODULE_CRYPTO) {
         return false;
     }
 
@@ -118,7 +106,7 @@ bool mdk_set_active_module(security_module_t module) {
  * Run diagnostic test
  */
 bool mdk_run_diagnostic(diagnostic_result_t *result) {
-    if (!result || !g_initialized) {
+    if (!validate_not_null(result) || !g_initialized) {
         return false;
     }
 
@@ -141,19 +129,9 @@ bool mdk_run_diagnostic(diagnostic_result_t *result) {
  */
 void mdk_predator_cleanup(void) {
     if (g_initialized) {
-        // Cleanup hardware
-        mdk_hardware_cleanup();
-
+        hal_cleanup();
         g_initialized = false;
     }
-}
-
-/**
- * Cleanup hardware interface
- */
-void mdk_hardware_cleanup(void) {
-    // Release HackRF hardware
-    // Reset GPIO, SPI, I2C
 }
 
 /**
