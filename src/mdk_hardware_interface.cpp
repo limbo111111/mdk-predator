@@ -1,6 +1,9 @@
 #include <Wire.h> // Include the I2C library
 #include <TaskScheduler.h> // Include a library for parallel processing
 
+// Create Scheduler instance for parallel processing
+Scheduler scheduler;
+
 class MDKHardwareInterface {
 public:
     MDKHardwareInterface() {
@@ -29,7 +32,7 @@ public:
     // Function to start parallel tasks
     void startParallelProcessing() {
         // Example of using the TaskScheduler for parallel tasks
-        Scheduler.start();
+        scheduler.start();
     }
 };
 
