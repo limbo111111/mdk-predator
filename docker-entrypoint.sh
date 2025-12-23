@@ -369,7 +369,7 @@ build_libopencm3() {
     print_info "Building libopencm3 for LPC43xx (this may take a few minutes)..."
 
     # Build libopencm3
-    if ! make TARGETS=lpc43xx 2>&1; then
+    if ! make TARGETS="lpc43xx/m4 lpc43xx/m0" 2>&1; then
         print_error "libopencm3 build failed"
         cd /workspace
         exit 1

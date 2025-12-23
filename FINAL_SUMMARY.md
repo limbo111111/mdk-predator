@@ -204,7 +204,7 @@ git clone --depth 1 https://github.com/portapack-mayhem/mayhem-firmware.git
 cd mayhem-firmware
 git submodule update --init --recursive hackrf
 cd hackrf/firmware/libopencm3
-make TARGETS=lpc43xx
+make TARGETS="lpc43xx/m4 lpc43xx/m0"
 cd ../../../
 mkdir build && cd build
 cmake ..

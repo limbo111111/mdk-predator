@@ -31,7 +31,7 @@
   - `scripts/build_portapack_app.ps1` (Windows PowerShell - Build-Libopencm3)
   - `scripts/build_portapack_app_wsl.sh` (WSL)
   - `docker-entrypoint.sh` (Docker builds)
-- Function explicitly builds libopencm3 with `make TARGETS=lpc43xx` before application build
+- Function explicitly builds libopencm3 with `make TARGETS="lpc43xx/m4 lpc43xx/m0"` before application build
 - Verifies that `nvic.h` is generated after build
 - Skips build if libopencm3 is already built (checks for lib file and nvic.h)
 - Called after `verify_submodules()` and before application build in all scripts
