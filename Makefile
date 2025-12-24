@@ -21,19 +21,21 @@ HAL_SRC_DIR = $(SRC_DIR)/hal
 AUTOMOTIVE_SRC = $(wildcard $(APPLICATION_SRC_DIR)/automotive/*.c)
 WIRELESS_SRC = $(wildcard $(APPLICATION_SRC_DIR)/wireless/*.c)
 CRYPTO_SRC = $(wildcard $(APPLICATION_SRC_DIR)/crypto/*.c)
+DATA_SRC = $(wildcard $(APPLICATION_SRC_DIR)/data/*.c)
 HARDWARE_SRC = $(wildcard $(HAL_SRC_DIR)/*.c)
 MAIN_SRC = $(APPLICATION_SRC_DIR)/mdk_predator.c
 
-ALL_SRC = $(AUTOMOTIVE_SRC) $(WIRELESS_SRC) $(CRYPTO_SRC) $(HARDWARE_SRC) $(MAIN_SRC)
+ALL_SRC = $(AUTOMOTIVE_SRC) $(WIRELESS_SRC) $(CRYPTO_SRC) $(DATA_SRC) $(HARDWARE_SRC) $(MAIN_SRC)
 
 # Object files
 AUTOMOTIVE_OBJ = $(patsubst $(APPLICATION_SRC_DIR)/%.c,$(OBJ_DIR)/application/%.o,$(AUTOMOTIVE_SRC))
 WIRELESS_OBJ = $(patsubst $(APPLICATION_SRC_DIR)/%.c,$(OBJ_DIR)/application/%.o,$(WIRELESS_SRC))
 CRYPTO_OBJ = $(patsubst $(APPLICATION_SRC_DIR)/%.c,$(OBJ_DIR)/application/%.o,$(CRYPTO_SRC))
+DATA_OBJ = $(patsubst $(APPLICATION_SRC_DIR)/%.c,$(OBJ_DIR)/application/%.o,$(DATA_SRC))
 HARDWARE_OBJ = $(patsubst $(HAL_SRC_DIR)/%.c,$(OBJ_DIR)/hal/%.o,$(HARDWARE_SRC))
 MAIN_OBJ = $(patsubst $(APPLICATION_SRC_DIR)/%.c,$(OBJ_DIR)/application/%.o,$(MAIN_SRC))
 
-ALL_OBJ = $(AUTOMOTIVE_OBJ) $(WIRELESS_OBJ) $(CRYPTO_OBJ) $(HARDWARE_OBJ) $(MAIN_OBJ)
+ALL_OBJ = $(AUTOMOTIVE_OBJ) $(WIRELESS_OBJ) $(CRYPTO_OBJ) $(DATA_OBJ) $(HARDWARE_OBJ) $(MAIN_OBJ)
 
 # Output library
 LIB_NAME = libmdk_predator.a
@@ -48,6 +50,7 @@ directories:
 	@mkdir -p $(OBJ_DIR)/application/automotive
 	@mkdir -p $(OBJ_DIR)/application/wireless
 	@mkdir -p $(OBJ_DIR)/application/crypto
+	@mkdir -p $(OBJ_DIR)/application/data
 	@mkdir -p $(OBJ_DIR)/hal
 	@mkdir -p $(LIB_DIR)
 
@@ -76,6 +79,9 @@ wireless: $(WIRELESS_OBJ)
 
 crypto: $(CRYPTO_OBJ)
 	@echo "Crypto module built"
+
+data: $(DATA_OBJ)
+	@echo "Data module built"
 
 # Print configuration
 info:
@@ -129,19 +135,19 @@ test-directories:
 
 
 # Compile test binaries - automotive
-$(TEST_BIN_DIR)/automotive/%: $(TEST_DIR)/automotive/%.c $(AUTOMOTIVE_SRC) test-directories
+$(TEST_BIN_DIR)/automotive/%: $(TEST_DIR)/automotive/%.c $(AUTOMOTIVE_SRC) $(DATA_SRC) test-directories
 	@echo "Building test: $@"
-	$(TEST_CC) $(TEST_CFLAGS) $(TEST_INCLUDES) $< $(AUTOMOTIVE_SRC) -o $@
+	$(TEST_CC) $(TEST_CFLAGS) $(TEST_INCLUDES) $< $(AUTOMOTIVE_SRC) $(DATA_SRC) -o $@
 
 # Compile test binaries - wireless
-$(TEST_BIN_DIR)/wireless/%: $(TEST_DIR)/wireless/%.c $(WIRELESS_SRC) test-directories
+$(TEST_BIN_DIR)/wireless/%: $(TEST_DIR)/wireless/%.c $(WIRELESS_SRC) $(DATA_SRC) test-directories
 	@echo "Building test: $@"
-	$(TEST_CC) $(TEST_CFLAGS) $(TEST_INCLUDES) $< $(WIRELESS_SRC) -o $@
+	$(TEST_CC) $(TEST_CFLAGS) $(TEST_INCLUDES) $< $(WIRELESS_SRC) $(DATA_SRC) -o $@
 
 # Compile test binaries - crypto
-$(TEST_BIN_DIR)/crypto/%: $(TEST_DIR)/crypto/%.c $(CRYPTO_SRC) test-directories
+$(TEST_BIN_DIR)/crypto/%: $(TEST_DIR)/crypto/%.c $(CRYPTO_SRC) $(DATA_SRC) test-directories
 	@echo "Building test: $@"
-	$(TEST_CC) $(TEST_CFLAGS) $(TEST_INCLUDES) $< $(CRYPTO_SRC) -lm -o $@
+	$(TEST_CC) $(TEST_CFLAGS) $(TEST_INCLUDES) $< $(CRYPTO_SRC) $(DATA_SRC) -lm -o $@
 
 # Compile test binaries - hardware
 $(TEST_BIN_DIR)/hardware/%: $(TEST_DIR)/hardware/%.c $(HARDWARE_SRC) test-directories

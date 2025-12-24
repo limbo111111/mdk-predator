@@ -9,6 +9,7 @@
 #include <string.h>
 #include <math.h>
 #include "application/crypto/crypto_analyzer.h"
+#include "application/data/known_keys.h"
 
 /**
  * Initialize crypto analyzer
@@ -71,16 +72,36 @@ bool crypto_test_weak_keys(crypto_config_t *config, uint8_t *key,
         return false;
     }
 
-    (void)key_length;  // Reserved for future implementation
-
     result->is_weak = false;
     result->entropy = 0.0f;
+
+    // Check for known weak keys
+    for (uint32_t i = 0; i < KNOWN_WEAK_KEYS_COUNT; i++) {
+        if (key_length == known_weak_keys[i].length) {
+            if (memcmp(key, known_weak_keys[i].key, key_length) == 0) {
+                result->is_weak = true;
+                return true;
+            }
+        }
+    }
 
     // Check for weak key patterns
     // - All zeros
     // - All ones
-    // - Low entropy
-    // - Known weak keys
+    bool all_zeros = true;
+    bool all_ones = true;
+
+    for (uint32_t i = 0; i < key_length; i++) {
+        if (key[i] != 0x00) all_zeros = false;
+        if (key[i] != 0xFF) all_ones = false;
+    }
+
+    if (all_zeros || all_ones) {
+        result->is_weak = true;
+        return true;
+    }
+
+    // Low entropy check could be added here
 
     return true;
 }
