@@ -207,6 +207,32 @@ void test_crypto_entropy_valid() {
 }
 
 /**
+ * Test: Known weak key detection
+ */
+void test_known_weak_key_detection() {
+    crypto_config_t config;
+    weak_key_result_t result;
+
+    // Known DES weak key (from known_keys.h: 0x01, 0x01, ...)
+    uint8_t weak_key[] = {0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01};
+
+    crypto_analyzer_init(&config);
+    // Test with a known weak key
+    bool test_result = crypto_test_weak_keys(&config, weak_key, 8, &result);
+
+    TEST_ASSERT(test_result == true, "Weak key test should succeed");
+    TEST_ASSERT(result.is_weak == true, "Should identify known weak key");
+
+    // Test with a safe key
+    uint8_t safe_key[] = {0x12, 0x34, 0x56, 0x78, 0x90, 0xAB, 0xCD, 0xEF};
+
+    test_result = crypto_test_weak_keys(&config, safe_key, 8, &result);
+
+    TEST_ASSERT(test_result == true, "Safe key test should succeed");
+    TEST_ASSERT(result.is_weak == false, "Should not identify safe key as weak");
+}
+
+/**
  * Test: Entropy analysis with null data
  */
 void test_crypto_entropy_null_data() {
@@ -265,6 +291,7 @@ int main(void) {
     RUN_TEST(test_crypto_entropy_null_data);
     RUN_TEST(test_crypto_cleanup_valid);
     RUN_TEST(test_crypto_cleanup_null);
+    RUN_TEST(test_known_weak_key_detection);
 
     printf("\n========================================\n");
     printf("Test Results:\n");

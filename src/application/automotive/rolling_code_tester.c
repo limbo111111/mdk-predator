@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include "application/automotive/rolling_code_tester.h"
+#include "application/data/known_keys.h"
 
 /* KeeLoq algorithm constants */
 #define KEELOQ_NLF 0x3A5C742E
@@ -24,7 +25,14 @@ bool rolling_code_tester_init(rolling_code_config_t *config) {
 
     config->algorithm = ROLLING_CODE_KEELOQ;
     config->mode = TEST_MODE_PASSIVE;
-    memset(config->manufacturer_key, 0, sizeof(config->manufacturer_key));
+
+    // Default to the first known key (Microchip Default) for testing if not specified
+    // In a real scenario, this would be user-selectable
+    if (KNOWN_MANUFACTURER_KEYS_COUNT > 0) {
+        memcpy(config->manufacturer_key, known_manufacturer_keys[0].key, sizeof(config->manufacturer_key));
+    } else {
+        memset(config->manufacturer_key, 0, sizeof(config->manufacturer_key));
+    }
 
     return true;
 }
