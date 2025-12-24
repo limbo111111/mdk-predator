@@ -29,7 +29,12 @@ bool rolling_code_tester_init(rolling_code_config_t *config) {
     // Default to the first known key (Microchip Default) for testing if not specified
     // In a real scenario, this would be user-selectable
     if (KNOWN_MANUFACTURER_KEYS_COUNT > 0) {
-        memcpy(config->manufacturer_key, known_manufacturer_keys[0].key, sizeof(config->manufacturer_key));
+        // Use the size of the known key to avoid overread, but ensure we don't overflow destination
+        size_t copy_size = sizeof(known_manufacturer_keys[0].key);
+        if (copy_size > sizeof(config->manufacturer_key)) {
+            copy_size = sizeof(config->manufacturer_key);
+        }
+        memcpy(config->manufacturer_key, known_manufacturer_keys[0].key, copy_size);
     } else {
         memset(config->manufacturer_key, 0, sizeof(config->manufacturer_key));
     }
