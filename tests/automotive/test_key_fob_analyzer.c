@@ -101,10 +101,11 @@ void test_keyfob_capture_null_signal() {
 void test_keyfob_analyze_valid() {
     signal_data_t signal;
     keyfob_analysis_t result_data;
+    uint8_t mock_data[64] = {0};
 
     // Setup mock signal data
-    signal.data = NULL;
-    signal.length = 0;
+    signal.data = mock_data;
+    signal.length = sizeof(mock_data);
     signal.frequency = 315000000;
     signal.timestamp = 0;
 
@@ -142,9 +143,10 @@ void test_keyfob_analyze_null_result() {
 void test_keyfob_rolling_code_valid() {
     signal_data_t signal;
     rolling_code_info_t info;
+    uint8_t mock_data[64] = {0};
 
-    signal.data = NULL;
-    signal.length = 0;
+    signal.data = mock_data;
+    signal.length = sizeof(mock_data);
 
     bool result = keyfob_detect_rolling_code(&signal, &info);
 

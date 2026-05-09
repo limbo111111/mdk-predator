@@ -5,7 +5,7 @@
 CC = arm-none-eabi-gcc
 AR = arm-none-eabi-ar
 CFLAGS = -Wall -Wextra -O2 -std=c11 -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16
-INCLUDES = -Iinclude
+INCLUDES = -Iinclude -I.
 LDFLAGS = -lm
 
 # Directories
