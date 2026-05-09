@@ -4,7 +4,7 @@
 # Compiler and flags
 CC = arm-none-eabi-gcc
 AR = arm-none-eabi-ar
-CFLAGS = -Wall -Wextra -O2 -std=c11 -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16
+CFLAGS = -Wall -Wextra -Wno-type-limits -O2 -std=c11 -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16
 INCLUDES = -Iinclude -I.
 LDFLAGS = -lm
 
@@ -87,7 +87,7 @@ info:
 
 # Test configuration
 TEST_CC = gcc
-TEST_CFLAGS = -Wall -Wextra -O2 -std=c11
+TEST_CFLAGS = -Wall -Wextra -Wno-type-limits -O2 -std=c11
 TEST_INCLUDES = -Iinclude -I.
 TEST_DIR = tests
 TEST_BUILD_DIR = $(BUILD_DIR)/tests
